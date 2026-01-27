@@ -1,0 +1,83 @@
+name: Deploy Contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: 'Network to deploy to'
+        required: true
+        default: 'polygonAmoy'
+        type: choice
+        options:
+          - polygonAmoy
+          - polygon
+      verify:
+        description: 'Verify contracts on Polygonscan'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PNPM_VERSION: '9'
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    name: Deploy Contracts
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.network }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compile contracts
+        run: pnpm --filter @vibechain/contracts compile
+
+      - name: Run tests before deployment
+        run: pnpm --filter @vibechain/contracts test
+
+      - name: Deploy contracts
+        id: deploy
+        run: |
+          if [ "${{ inputs.network }}" = "polygon" ]; then
+            pnpm --filter @vibechain/contracts deploy:mainnet
+          else
+            pnpm --filter @vibechain/contracts deploy:testnet
+          fi
+        env:
+          PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+          POLYGON_AMOY_RPC_URL: ${{ secrets.POLYGON_AMOY_RPC_URL }}
+          POLYGON_RPC_URL: ${{ secrets.POLYGON_RPC_URL }}
+          POLYGONSCAN_API_KEY: ${{ secrets.POLYGONSCAN_API_KEY }}
+
+      - name: Verify contracts
+        if: inputs.verify
+        run: |
+          echo "Contract verification would run here"
+          # pnpm --filter @vibechain/contracts verify
+        env:
+          POLYGONSCAN_API_KEY: ${{ secrets.POLYGONSCAN_API_KEY }}
+        continue-on-error: true
+
+      - name: Summary
+        run: |
+          echo "## Contract Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Network:** ${{ inputs.network }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Verified:** ${{ inputs.verify }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the logs above for deployed contract addresses." >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,25 @@
+{
+  "name": "vibechain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Social media platform with music video streaming, voting, and blockchain crowdfunding",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "pnpm --filter api run db:migrate",
+    "db:seed": "pnpm --filter api run db:seed",
+    "contracts:compile": "pnpm --filter contracts run compile",
+    "contracts:deploy": "pnpm --filter contracts run deploy"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
