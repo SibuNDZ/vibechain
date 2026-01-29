@@ -1,8 +1,9 @@
 [build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+builder = "nixpacks"
+buildCommand = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @vibechain/shared build && cd apps/web && pnpm build"
 
 [deploy]
+startCommand = "pnpm start"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
