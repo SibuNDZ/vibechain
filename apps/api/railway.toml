@@ -1,10 +1,7 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @vibechain/shared build && cd apps/api && pnpm db:generate && pnpm build"
 
 [deploy]
 startCommand = "node dist/main"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
