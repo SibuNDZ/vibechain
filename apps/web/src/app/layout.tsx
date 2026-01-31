@@ -12,6 +12,11 @@ const AIChatButton = dynamic(
   { ssr: false }
 );
 
+const Header = dynamic(
+  () => import("@/components/layout/Header").then((mod) => mod.Header),
+  { ssr: false }
+);
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -28,7 +33,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
+          <Header />
+          <main className="pt-16">{children}</main>
           <AIChatButton />
         </Providers>
       </body>

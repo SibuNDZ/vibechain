@@ -35,9 +35,9 @@ export class CommentsController {
   create(
     @Param("videoId") videoId: string,
     @Body() dto: CreateCommentDto,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.commentsService.create(req.user.sub, videoId, dto);
+    return this.commentsService.create(req.user.userId, videoId, dto);
   }
 
   @Get("videos/:videoId/comments")
@@ -84,9 +84,9 @@ export class CommentsController {
   update(
     @Param("commentId") commentId: string,
     @Body() dto: UpdateCommentDto,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.commentsService.update(commentId, req.user.sub, dto);
+    return this.commentsService.update(commentId, req.user.userId, dto);
   }
 
   @Delete("comments/:commentId")
@@ -98,8 +98,8 @@ export class CommentsController {
   @ApiResponse({ status: 404, description: "Comment not found" })
   delete(
     @Param("commentId") commentId: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.commentsService.delete(commentId, req.user.sub);
+    return this.commentsService.delete(commentId, req.user.userId);
   }
 }

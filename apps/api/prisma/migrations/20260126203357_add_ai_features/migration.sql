@@ -1,3 +1,6 @@
+-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- AlterTable
 ALTER TABLE "videos" ADD COLUMN     "embedding" vector(1536),
 ADD COLUMN     "embeddingUpdatedAt" TIMESTAMP(3);

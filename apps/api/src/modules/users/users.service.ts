@@ -69,4 +69,30 @@ export class UsersService {
       },
     });
   }
+
+  async searchByUsername(query: string, limit = 10) {
+    if (!query || query.length < 1) {
+      return { data: [] };
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        username: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarUrl: true,
+      },
+      take: Math.min(limit, 20),
+      orderBy: {
+        username: "asc",
+      },
+    });
+
+    return { data: users };
+  }
 }

@@ -33,9 +33,9 @@ export class FollowsController {
   @ApiResponse({ status: 409, description: "Already following" })
   follow(
     @Param("userId") userId: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.followsService.follow(req.user.sub, userId);
+    return this.followsService.follow(req.user.userId, userId);
   }
 
   @Delete("users/:userId/follow")
@@ -46,9 +46,9 @@ export class FollowsController {
   @ApiResponse({ status: 404, description: "Not following this user" })
   unfollow(
     @Param("userId") userId: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.followsService.unfollow(req.user.sub, userId);
+    return this.followsService.unfollow(req.user.userId, userId);
   }
 
   @Get("users/:userId/followers")
@@ -92,9 +92,9 @@ export class FollowsController {
   @ApiResponse({ status: 200, description: "Follow status retrieved" })
   checkFollowStatus(
     @Param("userId") userId: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.followsService.isFollowing(req.user.sub, userId);
+    return this.followsService.isFollowing(req.user.userId, userId);
   }
 
   @Get("users/:userId/follow-counts")

@@ -28,6 +28,11 @@ model User {
   followers     Follow[]  @relation("Following")
   following     Follow[]  @relation("Followers")
 
+  // Direct messaging
+  conversationsAsUser1  DirectConversation[] @relation("ConversationUser1")
+  conversationsAsUser2  DirectConversation[] @relation("ConversationUser2")
+  sentMessages          DirectMessage[]
+
   @@map("users")
 }
 
@@ -179,4 +184,39 @@ model ChatMessage {
 
   @@index([conversationId])
   @@map("chat_messages")
+}
+
+// Direct Messaging models
+model DirectConversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user1Id   String
+  user1     User     @relation("ConversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id   String
+  user2     User     @relation("ConversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  messages  DirectMessage[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("direct_conversations")
+}
+
+model DirectMessage {
+  id        String   @id @default(cuid())
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  senderId       String
+  sender         User               @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("direct_messages")
 }

@@ -60,10 +60,10 @@ export class AiController {
   @ApiResponse({ status: 200, description: "AI response returned" })
   async chat(
     @Body() dto: SendMessageDto,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
     const response = await this.chatService.sendMessage(
-      req.user.sub,
+      req.user.userId,
       dto.message,
       dto.conversationId
     );
@@ -77,7 +77,7 @@ export class AiController {
   @ApiResponse({ status: 200, description: "Streaming AI response" })
   async chatStream(
     @Body() dto: SendMessageDto,
-    @Request() req: { user: { sub: string } },
+    @Request() req: { user: { userId: string } },
     @Res() res: Response
   ) {
     res.setHeader("Content-Type", "text/event-stream");
@@ -86,7 +86,7 @@ export class AiController {
 
     try {
       for await (const chunk of this.chatService.streamMessage(
-        req.user.sub,
+        req.user.userId,
         dto.message,
         dto.conversationId
       )) {
@@ -104,8 +104,8 @@ export class AiController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get user's chat conversations" })
   @ApiResponse({ status: 200, description: "Conversations list returned" })
-  async getConversations(@Request() req: { user: { sub: string } }) {
-    const conversations = await this.chatService.getConversations(req.user.sub);
+  async getConversations(@Request() req: { user: { userId: string } }) {
+    const conversations = await this.chatService.getConversations(req.user.userId);
     return { data: conversations };
   }
 
@@ -117,9 +117,9 @@ export class AiController {
   @ApiResponse({ status: 404, description: "Conversation not found" })
   async getConversation(
     @Param("id") id: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    return this.chatService.getConversation(id, req.user.sub);
+    return this.chatService.getConversation(id, req.user.userId);
   }
 
   @Delete("conversations/:id")
@@ -130,9 +130,9 @@ export class AiController {
   @ApiResponse({ status: 404, description: "Conversation not found" })
   async deleteConversation(
     @Param("id") id: string,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
-    await this.chatService.deleteConversation(id, req.user.sub);
+    await this.chatService.deleteConversation(id, req.user.userId);
     return { message: "Conversation deleted" };
   }
 
@@ -145,10 +145,10 @@ export class AiController {
   @ApiResponse({ status: 200, description: "Recommendations returned" })
   async getRecommendations(
     @Query() dto: RecommendationQueryDto,
-    @Request() req: { user: { sub: string } }
+    @Request() req: { user: { userId: string } }
   ) {
     const recommendations = await this.recommendationService.getRecommendations(
-      req.user.sub,
+      req.user.userId,
       dto.limit
     );
     return { data: recommendations };

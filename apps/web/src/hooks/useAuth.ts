@@ -21,6 +21,7 @@ interface AuthState {
 }
 
 const TOKEN_KEY = "vibechain_token";
+const USER_KEY = "vibechain_user";
 
 export function useAuth() {
   const router = useRouter();
@@ -47,21 +48,27 @@ export function useAuth() {
       const user = await api.get<User>("/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Store user in localStorage for Header component
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
       setState({
         user,
         token,
         isLoading: false,
         isAuthenticated: true,
       });
+      // Dispatch event for Header to update
+      window.dispatchEvent(new Event("auth-change"));
     } catch {
       // Token is invalid, clear it
       localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
       setState({
         user: null,
         token: null,
         isLoading: false,
         isAuthenticated: false,
       });
+      window.dispatchEvent(new Event("auth-change"));
     }
   };
 
@@ -123,12 +130,14 @@ export function useAuth() {
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setState({
       user: null,
       token: null,
       isLoading: false,
       isAuthenticated: false,
     });
+    window.dispatchEvent(new Event("auth-change"));
     router.push("/");
   }, [router]);
 

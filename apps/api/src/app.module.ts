@@ -10,6 +10,7 @@ import { CrowdfundingModule } from "./modules/crowdfunding/crowdfunding.module";
 import { CommentsModule } from "./modules/comments/comments.module";
 import { FollowsModule } from "./modules/follows/follows.module";
 import { AiModule } from "./modules/ai/ai.module";
+import { MessagesModule } from "./modules/messages/messages.module";
 import { DatabaseModule } from "./database/database.module";
 import { HealthModule } from "./health/health.module";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
@@ -36,6 +37,7 @@ import { LoggingMiddleware } from "./common/middleware/logging.middleware";
     CommentsModule,
     FollowsModule,
     AiModule,
+    MessagesModule,
   ],
   providers: [
     {
