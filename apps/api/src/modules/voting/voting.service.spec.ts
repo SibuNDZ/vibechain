@@ -21,6 +21,7 @@ describe('VotingService', () => {
     updatedAt: new Date(),
     duration: 120,
     embeddingUpdatedAt: null,
+    cloudinaryPublicId: null,
   };
 
   const mockVote = {

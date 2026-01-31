@@ -37,15 +37,16 @@ model User {
 }
 
 model Video {
-  id           String   @id @default(cuid())
-  title        String
-  description  String?
-  videoUrl     String
-  thumbnailUrl String?
-  duration     Int      // in seconds
-  status       VideoStatus @default(PENDING)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  title               String
+  description         String?
+  videoUrl            String
+  thumbnailUrl        String?
+  duration            Int      // in seconds
+  status              VideoStatus @default(PENDING)
+  cloudinaryPublicId  String?  // Cloudinary public_id for video management
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // AI embedding for semantic search (pgvector)
   embedding           Unsupported("vector(1536)")?

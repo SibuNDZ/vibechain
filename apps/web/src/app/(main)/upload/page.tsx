@@ -3,13 +3,28 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, Video, Clock, FileText, Image, Loader2, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Upload,
+  Video,
+  Clock,
+  FileText,
+  Image,
+  Loader2,
+  AlertCircle,
+  Link as LinkIcon,
+  CloudUpload,
+} from "lucide-react";
 import { api } from "@/lib/api";
+import { VideoUploader } from "@/components/upload/VideoUploader";
+import toast from "react-hot-toast";
 
 interface CreateVideoResponse {
   id: string;
   title: string;
 }
+
+type UploadMode = "file" | "url";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -17,6 +32,8 @@ export default function UploadPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadMode, setUploadMode] = useState<UploadMode>("file");
+  const [isUploading, setIsUploading] = useState(false);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -24,6 +41,7 @@ export default function UploadPage() {
   const [videoUrl, setVideoUrl] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [duration, setDuration] = useState("");
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("vibechain_token");
@@ -35,13 +53,32 @@ export default function UploadPage() {
     setIsLoading(false);
   }, [router]);
 
+  const handleUploadComplete = (data: {
+    videoUrl: string;
+    thumbnailUrl: string;
+    duration: number;
+    cloudinaryPublicId: string;
+  }) => {
+    setVideoUrl(data.videoUrl);
+    setThumbnailUrl(data.thumbnailUrl);
+    setDuration(data.duration.toString());
+    setCloudinaryPublicId(data.cloudinaryPublicId);
+    setIsUploading(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!videoUrl) {
+      setError("Please upload a video or provide a video URL");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Parse duration (supports formats: "180", "3:00", "03:00")
+      // Parse duration for URL mode
       let durationSeconds = parseInt(duration, 10);
       if (duration.includes(":")) {
         const parts = duration.split(":");
@@ -65,13 +102,15 @@ export default function UploadPage() {
         videoUrl,
         thumbnailUrl: thumbnailUrl || undefined,
         duration: durationSeconds,
+        cloudinaryPublicId: cloudinaryPublicId || undefined,
       });
 
-      // Redirect to the new video
+      toast.success("Video uploaded successfully!");
       router.push(`/videos/${response.id}`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to upload video";
       setError(errorMessage);
+      toast.error(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -79,7 +118,7 @@ export default function UploadPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
+        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
       </div>
     );
   }
@@ -114,8 +153,123 @@ export default function UploadPage() {
           </div>
         )}
 
+        {/* Upload Mode Toggle */}
+        <div className="flex gap-2 mb-6">
+          <button
+            type="button"
+            onClick={() => setUploadMode("file")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
+              uploadMode === "file"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            <CloudUpload className="w-5 h-5" />
+            Upload File
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadMode("url")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
+              uploadMode === "url"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            <LinkIcon className="w-5 h-5" />
+            Paste URL
+          </button>
+        </div>
+
         {/* Upload Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Video Upload/URL Section */}
+          {uploadMode === "file" ? (
+            <div className="bg-gray-800 rounded-xl p-6">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-4">
+                <Video className="w-4 h-4 text-purple-400" />
+                Video File *
+              </label>
+              <VideoUploader
+                onUploadComplete={handleUploadComplete}
+                onUploadStart={() => setIsUploading(true)}
+                maxSizeMB={500}
+              />
+              {videoUrl && uploadMode === "file" && (
+                <p className="mt-3 text-sm text-green-400 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-400 rounded-full" />
+                  Video ready
+                </p>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Video URL */}
+              <div className="bg-gray-800 rounded-xl p-6">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+                  <Video className="w-4 h-4 text-purple-400" />
+                  Video URL *
+                </label>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://example.com/video.mp4"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  Supports: MP4, HLS (.m3u8), YouTube, Vimeo URLs
+                </p>
+              </div>
+
+              {/* Thumbnail URL (only for URL mode) */}
+              <div className="bg-gray-800 rounded-xl p-6">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+                  <Image className="w-4 h-4 text-purple-400" />
+                  Thumbnail URL
+                </label>
+                <input
+                  type="url"
+                  value={thumbnailUrl}
+                  onChange={(e) => setThumbnailUrl(e.target.value)}
+                  placeholder="https://example.com/thumbnail.jpg"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                />
+                {thumbnailUrl && (
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Preview:</p>
+                    <img
+                      src={thumbnailUrl}
+                      alt="Thumbnail preview"
+                      className="w-full max-w-xs h-auto rounded-lg object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Duration (only for URL mode) */}
+              <div className="bg-gray-800 rounded-xl p-6">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+                  <Clock className="w-4 h-4 text-purple-400" />
+                  Duration *
+                </label>
+                <input
+                  type="text"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  placeholder="e.g., 180 (seconds) or 3:00 (mm:ss)"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  Enter duration in seconds or mm:ss format
+                </p>
+              </div>
+            </>
+          )}
+
           {/* Title */}
           <div className="bg-gray-800 rounded-xl p-6">
             <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
@@ -151,87 +305,41 @@ export default function UploadPage() {
             <p className="mt-2 text-xs text-gray-500">{description.length}/2000 characters</p>
           </div>
 
-          {/* Video URL */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-              <Video className="w-4 h-4 text-purple-400" />
-              Video URL *
-            </label>
-            <input
-              type="url"
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              required
-              placeholder="https://example.com/video.mp4 or Cloudflare Stream URL"
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            />
-            <p className="mt-2 text-xs text-gray-500">
-              Supports: MP4, HLS (.m3u8), YouTube, Vimeo, or Cloudflare Stream URLs
-            </p>
-          </div>
-
-          {/* Thumbnail URL */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-              <Image className="w-4 h-4 text-purple-400" />
-              Thumbnail URL
-            </label>
-            <input
-              type="url"
-              value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-              placeholder="https://example.com/thumbnail.jpg"
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            />
-            {thumbnailUrl && (
-              <div className="mt-3">
-                <p className="text-xs text-gray-500 mb-2">Preview:</p>
-                <img
-                  src={thumbnailUrl}
-                  alt="Thumbnail preview"
-                  className="w-full max-w-xs h-auto rounded-lg object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Duration */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-              <Clock className="w-4 h-4 text-purple-400" />
-              Duration *
-            </label>
-            <input
-              type="text"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              required
-              placeholder="e.g., 180 (seconds) or 3:00 (mm:ss)"
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            />
-            <p className="mt-2 text-xs text-gray-500">
-              Enter duration in seconds (e.g., 180) or mm:ss format (e.g., 3:00)
-            </p>
-          </div>
+          {/* Thumbnail Preview for File Upload */}
+          {uploadMode === "file" && thumbnailUrl && (
+            <div className="bg-gray-800 rounded-xl p-6">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
+                <Image className="w-4 h-4 text-purple-400" />
+                Generated Thumbnail
+              </label>
+              <img
+                src={thumbnailUrl}
+                alt="Video thumbnail"
+                className="w-full max-w-md h-auto rounded-lg object-cover"
+              />
+            </div>
+          )}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploading || !videoUrl}
             className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Uploading...
+                Publishing...
+              </>
+            ) : isUploading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Uploading video...
               </>
             ) : (
               <>
                 <Upload className="w-5 h-5" />
-                Upload Video
+                Publish Video
               </>
             )}
           </button>
@@ -251,7 +359,11 @@ export default function UploadPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-purple-400">•</span>
-              No explicit content without proper labeling
+              Maximum file size: 500MB
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400">•</span>
+              Supported formats: MP4, WebM, MOV, AVI, MKV
             </li>
             <li className="flex items-start gap-2">
               <span className="text-purple-400">•</span>
