@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Users, X } from "lucide-react";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 interface UserProfile {
   id: string;
@@ -65,7 +66,7 @@ export function FollowersList({
       setHasMore(response.meta.page < response.meta.totalPages);
       setPage(pageNum);
     } catch (error) {
-      console.error(`Failed to fetch ${type}:`, error);
+      toast.error(`Failed to load ${type}`);
     } finally {
       setIsLoading(false);
     }

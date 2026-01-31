@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MessageCircle, ArrowLeft, Search, Plus } from "lucide-react";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 interface OtherUser {
   id: string;
@@ -71,7 +72,7 @@ export default function MessagesPage() {
       );
       setConversations(response.data);
     } catch (err) {
-      console.error("Failed to fetch conversations:", err);
+      toast.error("Failed to load conversations");
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +85,7 @@ export default function MessagesPage() {
       );
       router.replace(`/messages/${response.id}`);
     } catch (err) {
-      console.error("Failed to start conversation:", err);
+      toast.error("Failed to start conversation");
     }
   };
 

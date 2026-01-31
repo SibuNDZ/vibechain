@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { CampaignCard } from "@/components/crowdfunding/CampaignCard";
+import { CampaignCardSkeleton } from "@/components/ui/Skeleton";
 import { api, Campaign, PaginatedResponse } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function CrowdfundingPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -27,7 +29,9 @@ export default function CrowdfundingPage() {
       setCampaigns(response.data);
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setError(error.message || "Failed to load campaigns");
+      const errorMessage = error.message || "Failed to load campaigns";
+      setError(errorMessage);
+      toast.error(errorMessage);
       setCampaigns([]);
     } finally {
       setIsLoading(false);
@@ -62,19 +66,8 @@ export default function CrowdfundingPage() {
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-800 rounded-xl overflow-hidden animate-pulse"
-              >
-                <div className="aspect-video bg-gray-700" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-700 rounded w-3/4" />
-                  <div className="h-3 bg-gray-700 rounded w-1/2" />
-                  <div className="h-2 bg-gray-700 rounded w-full" />
-                  <div className="h-3 bg-gray-700 rounded w-2/3" />
-                </div>
-              </div>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <CampaignCardSkeleton key={i} />
             ))}
           </div>
         ) : campaigns.length === 0 ? (

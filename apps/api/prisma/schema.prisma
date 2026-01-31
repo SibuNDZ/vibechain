@@ -57,6 +57,9 @@ model Video {
   campaign     Campaign?
   comments     Comment[]
 
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
   @@map("videos")
 }
 
@@ -73,29 +76,32 @@ model Vote {
   createdAt DateTime @default(now())
 
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   videoId   String
-  video     Video    @relation(fields: [videoId], references: [id])
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   @@unique([userId, videoId])
+  @@index([videoId])
   @@map("votes")
 }
 
 model Campaign {
-  id              String   @id @default(cuid())
-  goalAmount      Decimal  @db.Decimal(18, 8)
-  raisedAmount    Decimal  @default(0) @db.Decimal(18, 8)
-  contractAddress String?
-  startDate       DateTime @default(now())
-  endDate         DateTime
-  status          CampaignStatus @default(ACTIVE)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  goalAmount          Decimal  @db.Decimal(18, 8)
+  raisedAmount        Decimal  @default(0) @db.Decimal(18, 8)
+  contractAddress     String?
+  contractCampaignId  Int?     // The campaign ID on the smart contract
+  startDate           DateTime @default(now())
+  endDate             DateTime
+  status              CampaignStatus @default(ACTIVE)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   videoId       String   @unique
   video         Video    @relation(fields: [videoId], references: [id])
   contributions Contribution[]
 
+  @@index([status])
   @@map("campaigns")
 }
 
@@ -113,10 +119,12 @@ model Contribution {
   createdAt     DateTime @default(now())
 
   userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   campaignId    String
-  campaign      Campaign @relation(fields: [campaignId], references: [id])
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([campaignId])
   @@map("contributions")
 }
 

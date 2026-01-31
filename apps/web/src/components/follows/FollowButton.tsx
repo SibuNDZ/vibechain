@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { UserPlus, UserMinus, Loader2 } from "lucide-react";
 import { api, FollowStatus } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface FollowButtonProps {
   userId: string;
@@ -42,7 +43,7 @@ export function FollowButton({
       const status = await api.get<FollowStatus>(`/users/${userId}/follow-status`);
       setIsFollowing(status.isFollowing);
     } catch (error) {
-      console.error("Failed to check follow status:", error);
+      // Silent fail for status check - not critical to user experience
     } finally {
       setIsCheckingStatus(false);
     }
@@ -51,19 +52,25 @@ export function FollowButton({
   const handleFollow = async () => {
     if (!isAuthenticated || isLoading) return;
 
+    const wasFollowing = isFollowing;
     setIsLoading(true);
+
+    // Optimistic update
+    setIsFollowing(!wasFollowing);
+
     try {
-      if (isFollowing) {
+      if (wasFollowing) {
         await api.delete(`/users/${userId}/follow`);
-        setIsFollowing(false);
         onFollowChange?.(false);
       } else {
         await api.post(`/users/${userId}/follow`);
-        setIsFollowing(true);
         onFollowChange?.(true);
       }
-    } catch (error) {
-      console.error("Follow action failed:", error);
+    } catch (error: unknown) {
+      // Revert optimistic update on error
+      setIsFollowing(wasFollowing);
+      const message = error instanceof Error ? error.message : "Failed to update follow status";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

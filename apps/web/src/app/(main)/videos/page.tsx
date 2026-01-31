@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { VideoCard } from "@/components/video/VideoCard";
 import { SemanticSearch } from "@/components/ai/SemanticSearch";
 import { RecommendationSection } from "@/components/ai/RecommendationSection";
+import { VideoCardSkeleton } from "@/components/ui/Skeleton";
 import { api, Video, PaginatedResponse } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -33,8 +35,9 @@ export default function VideosPage() {
       setVideos(response.data);
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setError(error.message || "Failed to load videos");
-      // Show empty state with placeholder if no videos
+      const errorMessage = error.message || "Failed to load videos";
+      setError(errorMessage);
+      toast.error(errorMessage);
       setVideos([]);
     } finally {
       setIsLoading(false);
@@ -75,17 +78,8 @@ export default function VideosPage() {
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gray-800 rounded-xl overflow-hidden animate-pulse"
-              >
-                <div className="aspect-video bg-gray-700" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-700 rounded w-3/4" />
-                  <div className="h-3 bg-gray-700 rounded w-1/2" />
-                </div>
-              </div>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <VideoCardSkeleton key={i} />
             ))}
           </div>
         ) : videos.length === 0 ? (

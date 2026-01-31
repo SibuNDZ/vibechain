@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, FormEvent } from "react";
 import { X, Send, Loader2, Sparkles, MessageCircle } from "lucide-react";
 import { api, AIChatMessage, SearchResult, StreamChunk } from "@/lib/api";
 import { ChatMessage } from "./ChatMessage";
+import toast from "react-hot-toast";
 
 interface AIChatModalProps {
   isOpen: boolean;
@@ -96,7 +97,6 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
         }
       }
     } catch (error) {
-      console.error("Chat failed:", error);
       // Fallback to non-streaming
       try {
         const response = await api.post<AIChatMessage>("/ai/chat", {
@@ -105,7 +105,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
         });
         setMessages((prev) => [...prev, response]);
       } catch (fallbackError) {
-        console.error("Fallback chat also failed:", fallbackError);
+        toast.error("Failed to get AI response. Please try again.");
         const errorMessage: AIChatMessage = {
           id: `error-${Date.now()}`,
           role: "assistant",

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heart } from "lucide-react";
 import { useAccount } from "wagmi";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface VoteButtonProps {
   videoId: string;
@@ -24,15 +25,27 @@ export function VoteButton({
   const { isConnected } = useAccount();
 
   const handleVote = async () => {
-    if (!isConnected || voted || isLoading) return;
+    if (!isConnected) {
+      toast.error("Please connect your wallet to vote");
+      return;
+    }
 
+    if (voted || isLoading) return;
+
+    // Optimistic update
+    setVotes((v) => v + 1);
+    setVoted(true);
     setIsLoading(true);
+
     try {
       await onVote?.(videoId);
-      setVotes((v) => v + 1);
-      setVoted(true);
-    } catch (error) {
-      console.error("Vote failed:", error);
+      toast.success("Vote recorded!");
+    } catch (error: unknown) {
+      // Revert optimistic update on error
+      setVotes((v) => v - 1);
+      setVoted(false);
+      const message = error instanceof Error ? error.message : "Failed to record vote";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

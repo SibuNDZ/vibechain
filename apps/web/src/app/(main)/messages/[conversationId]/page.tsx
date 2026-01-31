@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 interface User {
   id: string;
@@ -87,7 +88,7 @@ export default function ConversationPage() {
       );
       setConversation(data);
     } catch (err) {
-      console.error("Failed to fetch conversation:", err);
+      toast.error("Failed to load conversation");
       router.replace("/messages");
     } finally {
       setIsLoading(false);
@@ -98,22 +99,50 @@ export default function ConversationPage() {
     e.preventDefault();
     if (!newMessage.trim() || isSending) return;
 
+    const messageContent = newMessage.trim();
     setIsSending(true);
+
+    // Optimistic update
+    const tempMessage: Message = {
+      id: `temp-${Date.now()}`,
+      content: messageContent,
+      createdAt: new Date().toISOString(),
+      sender: { id: "", username: "", avatarUrl: null },
+      isOwn: true,
+    };
+
+    setConversation((prev) =>
+      prev ? { ...prev, messages: [...prev.messages, tempMessage] } : null
+    );
+    setNewMessage("");
+
     try {
       const message = await api.post<Message>(
         `/messages/conversations/${conversationId}`,
-        { content: newMessage.trim() }
+        { content: messageContent }
       );
 
+      // Replace temp message with real one
       setConversation((prev) =>
         prev
-          ? { ...prev, messages: [...prev.messages, message] }
+          ? {
+              ...prev,
+              messages: prev.messages.map((m) =>
+                m.id === tempMessage.id ? message : m
+              ),
+            }
           : null
       );
-      setNewMessage("");
       inputRef.current?.focus();
     } catch (err) {
-      console.error("Failed to send message:", err);
+      // Revert optimistic update
+      setConversation((prev) =>
+        prev
+          ? { ...prev, messages: prev.messages.filter((m) => m.id !== tempMessage.id) }
+          : null
+      );
+      setNewMessage(messageContent);
+      toast.error("Failed to send message");
     } finally {
       setIsSending(false);
     }

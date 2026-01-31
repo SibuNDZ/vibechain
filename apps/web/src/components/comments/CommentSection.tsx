@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { MessageCircle, Send, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { api, Comment, PaginatedResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface CommentSectionProps {
   videoId: string;
@@ -36,7 +37,7 @@ export function CommentSection({
       );
       setComments(response.data);
     } catch (error) {
-      console.error("Failed to fetch comments:", error);
+      toast.error("Failed to load comments");
     } finally {
       setIsLoading(false);
     }
@@ -53,8 +54,10 @@ export function CommentSection({
       });
       setComments([comment, ...comments]);
       setNewComment("");
-    } catch (error) {
-      console.error("Failed to post comment:", error);
+      toast.success("Comment posted!");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to post comment";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -87,8 +90,10 @@ export function CommentSection({
 
       setReplyContent("");
       setReplyingTo(null);
-    } catch (error) {
-      console.error("Failed to post reply:", error);
+      toast.success("Reply posted!");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to post reply";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -122,8 +127,10 @@ export function CommentSection({
       } else {
         setComments(comments.filter(c => c.id !== commentId));
       }
-    } catch (error) {
-      console.error("Failed to delete comment:", error);
+      toast.success("Comment deleted");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to delete comment";
+      toast.error(message);
     }
   };
 
@@ -138,7 +145,7 @@ export function CommentSection({
       }));
       setExpandedReplies(prev => new Set([...prev, commentId]));
     } catch (error) {
-      console.error("Failed to load replies:", error);
+      toast.error("Failed to load replies");
     }
   };
 

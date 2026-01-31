@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
+import { Toaster } from "react-hot-toast";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import "./globals.css";
 
 const Providers = dynamic(() => import("@/providers").then((mod) => mod.Providers), {
@@ -33,8 +35,33 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#1f2937',
+                color: '#f3f4f6',
+                border: '1px solid #374151',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#f3f4f6',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#f3f4f6',
+                },
+              },
+            }}
+          />
           <Header />
-          <main className="pt-16">{children}</main>
+          <ErrorBoundary>
+            <main className="pt-16">{children}</main>
+          </ErrorBoundary>
           <AIChatButton />
         </Providers>
       </body>
