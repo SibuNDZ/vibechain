@@ -2,24 +2,36 @@
 
 import { useState, useEffect } from "react";
 import { Users, X } from "lucide-react";
-import { api, UserProfile, PaginatedResponse } from "@/lib/api";
+import { api } from "@/lib/api";
+
+interface UserProfile {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+  _count: { followers: number };
+}
+
+interface PaginatedResponse<T> {
+  data: T[];
+  meta: { page: number; totalPages: number };
+}
 import { FollowButton } from "./FollowButton";
 
 interface FollowersListProps {
   userId: string;
   type: "followers" | "following";
-  isOpen: boolean;
   onClose: () => void;
-  isAuthenticated: boolean;
+  isOpen?: boolean;
+  isAuthenticated?: boolean;
   currentUserId?: string;
 }
 
 export function FollowersList({
   userId,
   type,
-  isOpen,
   onClose,
-  isAuthenticated,
+  isOpen = true,
+  isAuthenticated = false,
   currentUserId,
 }: FollowersListProps) {
   const [users, setUsers] = useState<UserProfile[]>([]);

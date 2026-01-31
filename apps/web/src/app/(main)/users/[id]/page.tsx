@@ -286,6 +286,8 @@ export default function UserProfilePage() {
             userId={userId}
             type="followers"
             onClose={() => setShowFollowers(false)}
+            isAuthenticated={!!currentUser}
+            currentUserId={currentUser?.id}
           />
         )}
 
@@ -295,6 +297,8 @@ export default function UserProfilePage() {
             userId={userId}
             type="following"
             onClose={() => setShowFollowing(false)}
+            isAuthenticated={!!currentUser}
+            currentUserId={currentUser?.id}
           />
         )}
       </div>
