@@ -1,5 +1,16 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
+import { DirectConversation, DirectMessage, User } from '@prisma/client';
+
+type ConversationWithRelations = DirectConversation & {
+  user1: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  user2: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  messages: DirectMessage[];
+};
+
+type MessageWithSender = DirectMessage & {
+  sender: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+};
 
 @Injectable()
 export class MessagesService {
@@ -23,14 +34,14 @@ export class MessagesService {
         },
       },
       orderBy: { updatedAt: 'desc' },
-    });
+    }) as ConversationWithRelations[];
 
     // Transform to show the "other" user
-    return conversations.map((conv) => {
+    return conversations.map((conv: ConversationWithRelations) => {
       const otherUser = conv.user1Id === userId ? conv.user2 : conv.user1;
       const lastMessage = conv.messages[0] || null;
       const unreadCount = conv.messages.filter(
-        (m) => !m.read && m.senderId !== userId,
+        (m: DirectMessage) => !m.read && m.senderId !== userId,
       ).length;
 
       return {
@@ -93,7 +104,7 @@ export class MessagesService {
     return {
       id: conversation.id,
       otherUser,
-      messages: conversation.messages.map((m) => ({
+      messages: conversation.messages.map((m: MessageWithSender) => ({
         id: m.id,
         content: m.content,
         createdAt: m.createdAt,
