@@ -3,12 +3,21 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Video, Users, MessageCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Video,
+  Heart,
+  Settings,
+  MessageCircle,
+  Wallet,
+  Calendar,
+  ExternalLink,
+} from "lucide-react";
 import { api } from "@/lib/api";
 import { FollowButton } from "@/components/follows/FollowButton";
 import { FollowersList } from "@/components/follows/FollowersList";
 import { VideoCard } from "@/components/video/VideoCard";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, formatAddress, formatRelativeTime } from "@/lib/utils";
 
 interface User {
   id: string;
@@ -20,7 +29,7 @@ interface User {
   createdAt: string;
 }
 
-interface Video {
+interface VideoData {
   id: string;
   title: string;
   thumbnailUrl: string | null;
@@ -35,15 +44,22 @@ interface FollowCounts {
   following: number;
 }
 
+type TabType = "videos" | "liked" | "activity";
+
 export default function UserProfilePage() {
   const params = useParams();
   const userId = params?.id as string;
 
   const [user, setUser] = useState<User | null>(null);
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [followCounts, setFollowCounts] = useState<FollowCounts>({ followers: 0, following: 0 });
+  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [likedVideos, setLikedVideos] = useState<VideoData[]>([]);
+  const [followCounts, setFollowCounts] = useState<FollowCounts>({
+    followers: 0,
+    following: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("videos");
 
   // Current user state
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
@@ -80,11 +96,15 @@ export default function UserProfilePage() {
         setUser(userData);
 
         // Fetch follow counts
-        const counts = await api.get<FollowCounts>(`/users/${userId}/follow-counts`);
+        const counts = await api.get<FollowCounts>(
+          `/users/${userId}/follow-counts`
+        );
         setFollowCounts(counts);
 
         // Fetch user's videos
-        const videosResponse = await api.get<{ data: Video[] }>(`/videos?userId=${userId}`);
+        const videosResponse = await api.get<{ data: VideoData[] }>(
+          `/videos?userId=${userId}`
+        );
         setVideos(videosResponse.data || []);
 
         // Check follow status if logged in
@@ -109,6 +129,22 @@ export default function UserProfilePage() {
 
     fetchData();
   }, [userId, currentUser]);
+
+  // Fetch liked videos when tab changes
+  useEffect(() => {
+    if (activeTab === "liked" && isOwnProfile && likedVideos.length === 0) {
+      fetchLikedVideos();
+    }
+  }, [activeTab, isOwnProfile]);
+
+  const fetchLikedVideos = async () => {
+    try {
+      const response = await api.get<{ data: VideoData[] }>("/votes/my-votes");
+      setLikedVideos(response.data || []);
+    } catch (err) {
+      console.error("Failed to fetch liked videos:", err);
+    }
+  };
 
   const handleFollowChange = (following: boolean) => {
     setIsFollowing(following);
@@ -137,24 +173,31 @@ export default function UserProfilePage() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error || "User not found"}</p>
-          <Link href="/videos" className="text-purple-400 hover:text-purple-300">
-            Back to Videos
+          <Link href="/" className="text-purple-400 hover:text-purple-300">
+            Back to Home
           </Link>
         </div>
       </div>
     );
   }
 
+  const tabs = [
+    { id: "videos" as TabType, label: "Videos", icon: Video, count: videos.length },
+    ...(isOwnProfile
+      ? [{ id: "liked" as TabType, label: "Liked", icon: Heart, count: likedVideos.length }]
+      : []),
+  ];
+
   return (
     <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Back Button */}
         <Link
-          href="/videos"
+          href="/"
           className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Videos
+          Back to Home
         </Link>
 
         {/* Profile Header */}
@@ -177,8 +220,36 @@ export default function UserProfilePage() {
 
             {/* Info */}
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-white mb-2">{user.username}</h1>
-              {user.bio && <p className="text-gray-300 mb-4 max-w-xl">{user.bio}</p>}
+              <h1 className="text-3xl font-bold text-white mb-2">
+                {user.username}
+              </h1>
+              {user.bio && (
+                <p className="text-gray-300 mb-4 max-w-xl">{user.bio}</p>
+              )}
+
+              {/* Meta info */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4 text-sm text-gray-400">
+                {user.walletAddress && (
+                  <div className="flex items-center gap-1.5">
+                    <Wallet className="w-4 h-4" />
+                    <span className="font-mono">
+                      {formatAddress(user.walletAddress)}
+                    </span>
+                    <a
+                      href={`https://amoy.polygonscan.com/address/${user.walletAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-purple-400"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4" />
+                  <span>Joined {formatRelativeTime(user.createdAt)}</span>
+                </div>
+              </div>
 
               {/* Stats */}
               <div className="flex items-center justify-center md:justify-start gap-6 mb-4">
@@ -201,7 +272,9 @@ export default function UserProfilePage() {
                   <span className="text-gray-400 text-sm">Following</span>
                 </button>
                 <div className="text-center px-3 py-2">
-                  <span className="text-2xl font-bold text-white block">{videos.length}</span>
+                  <span className="text-2xl font-bold text-white block">
+                    {videos.length}
+                  </span>
                   <span className="text-gray-400 text-sm">Videos</span>
                 </div>
               </div>
@@ -228,57 +301,126 @@ export default function UserProfilePage() {
               )}
 
               {isOwnProfile && (
-                <Link
-                  href="/settings"
-                  className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Edit Profile
-                </Link>
+                <div className="flex items-center justify-center md:justify-start gap-3">
+                  <Link
+                    href="/settings"
+                    className="flex items-center gap-2 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Edit Profile
+                  </Link>
+                  <Link
+                    href="/upload"
+                    className="flex items-center gap-2 px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    <Video className="w-4 h-4" />
+                    Upload Video
+                  </Link>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Videos Section */}
-        <div>
-          <div className="flex items-center gap-2 mb-6">
-            <Video className="w-5 h-5 text-purple-400" />
-            <h2 className="text-xl font-semibold text-white">
-              {isOwnProfile ? "My Videos" : `${user.username}'s Videos`}
-            </h2>
+        {/* Tabs */}
+        <div className="border-b border-gray-800 mb-6">
+          <div className="flex gap-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 -mb-px ${
+                  activeTab === tab.id
+                    ? "text-purple-400 border-purple-400"
+                    : "text-gray-400 border-transparent hover:text-white"
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {videos.length === 0 ? (
-            <div className="bg-gray-800 rounded-xl p-12 text-center">
-              <Video className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">
-                {isOwnProfile ? "You haven't uploaded any videos yet" : "No videos yet"}
-              </p>
-              {isOwnProfile && (
+        {/* Tab Content */}
+        {activeTab === "videos" && (
+          <div>
+            {videos.length === 0 ? (
+              <div className="bg-gray-800 rounded-xl p-12 text-center">
+                <Video className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400">
+                  {isOwnProfile
+                    ? "You haven't uploaded any videos yet"
+                    : "No videos yet"}
+                </p>
+                {isOwnProfile && (
+                  <Link
+                    href="/upload"
+                    className="inline-block mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Upload Your First Video
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {videos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    artist={video.user.username}
+                    thumbnailUrl={
+                      video.thumbnailUrl || "/placeholder-thumbnail.jpg"
+                    }
+                    voteCount={video._count?.votes || 0}
+                    duration={formatDuration(video.duration)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "liked" && isOwnProfile && (
+          <div>
+            {likedVideos.length === 0 ? (
+              <div className="bg-gray-800 rounded-xl p-12 text-center">
+                <Heart className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400">
+                  You haven't liked any videos yet
+                </p>
                 <Link
-                  href="/upload"
+                  href="/videos"
                   className="inline-block mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  Upload Your First Video
+                  Explore Videos
                 </Link>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {videos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  id={video.id}
-                  title={video.title}
-                  artist={video.user.username}
-                  thumbnailUrl={video.thumbnailUrl || "/placeholder-thumbnail.jpg"}
-                  voteCount={video._count?.votes || 0}
-                  duration={formatDuration(video.duration)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {likedVideos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    artist={video.user.username}
+                    thumbnailUrl={
+                      video.thumbnailUrl || "/placeholder-thumbnail.jpg"
+                    }
+                    voteCount={video._count?.votes || 0}
+                    duration={formatDuration(video.duration)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Followers Modal */}
         {showFollowers && (

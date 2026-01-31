@@ -15,10 +15,7 @@ interface User {
 
 const TOKEN_KEY = "vibechain_token";
 
-const navLinks = [
-  { href: "/videos", label: "Videos" },
-  { href: "/crowdfunding", label: "Crowdfunding" },
-];
+// Navigation links removed - using landing page CTAs instead
 
 export function Header() {
   const pathname = usePathname();
@@ -97,23 +94,8 @@ export function Header() {
             <span className="text-2xl font-bold text-white">VibeChain</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                  pathname === link.href
-                    ? "text-white bg-gray-800"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800/50"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Spacer for centered layout */}
+          <div className="hidden md:block" />
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
@@ -176,30 +158,64 @@ export function Header() {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-800">
             <nav className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                    pathname === link.href
-                      ? "text-white bg-gray-800"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              {user && (
-                <Link
-                  href="/upload"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium mt-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload Video
-                </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/upload"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload Video
+                  </Link>
+                  <Link
+                    href="/messages"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                  >
+                    Messages
+                  </Link>
+                  <Link
+                    href={`/users/${user.id}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800/50 transition-colors text-left"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-center"
+                  >
+                    Sign Up
+                  </Link>
+                </>
               )}
             </nav>
           </div>
