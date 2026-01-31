@@ -7,9 +7,31 @@ import { GlobalExceptionFilter } from "./common/filters/http-exception.filter";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Configure CORS with multiple allowed origins
+  const allowedOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(",").map((url) => url.trim())
+    : ["http://localhost:3000"];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowed list or is a Railway subdomain
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".railway.app") ||
+        origin.includes("localhost");
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   });
 
   app.useGlobalPipes(
