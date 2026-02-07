@@ -137,13 +137,18 @@ describe('UsersService', () => {
 
   describe('findByWallet', () => {
     it('should return user by wallet address', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(mockUser);
 
       const result = await service.findByWallet('0x1234567890abcdef');
 
       expect(result).toEqual(mockUser);
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { walletAddress: '0x1234567890abcdef' },
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: {
+          walletAddress: {
+            equals: '0x1234567890abcdef',
+            mode: 'insensitive',
+          },
+        },
       });
     });
   });

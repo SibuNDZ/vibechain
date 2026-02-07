@@ -5,14 +5,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAuth } from "@/hooks/useAuth";
+import { useAccount, useSignMessage } from "wagmi";
+import { api } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login, walletLogin, isAuthenticated } = useAuth();
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isWalletLoading, setIsWalletLoading] = useState(false);
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -32,6 +37,31 @@ export default function LoginPage() {
       setError(error.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleWalletLogin = async () => {
+    if (!address) {
+      setError("Please connect your wallet first.");
+      return;
+    }
+
+    setError("");
+    setIsWalletLoading(true);
+
+    try {
+      const nonceResponse = await api.get<{ nonce: string }>(
+        "/auth/wallet/nonce",
+        { params: { walletAddress: address } }
+      );
+      const message = `Sign this message to authenticate with VibeChain: ${nonceResponse.nonce}`;
+      const signature = await signMessageAsync({ message });
+      await walletLogin(address, signature, nonceResponse.nonce);
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || "Wallet login failed. Please try again.");
+    } finally {
+      setIsWalletLoading(false);
     }
   };
 
@@ -100,6 +130,17 @@ export default function LoginPage() {
           <div className="flex justify-center">
             <ConnectButton />
           </div>
+
+          {isConnected && (
+            <button
+              type="button"
+              onClick={handleWalletLogin}
+              disabled={isWalletLoading}
+              className="mt-4 w-full py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isWalletLoading ? "Signing in with wallet..." : "Sign in with wallet"}
+            </button>
+          )}
 
           <p className="text-center text-gray-400 text-sm mt-6">
             Don&apos;t have an account?{" "}

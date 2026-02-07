@@ -4,11 +4,57 @@ import { useState, useEffect } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 import toast from "react-hot-toast";
+import { BaseError, UserRejectedRequestError } from "viem";
 
 interface FundButtonProps {
   campaignId: string;
   contractAddress: `0x${string}`;
   minContribution?: number;
+}
+
+/**
+ * Parse blockchain errors and return user-friendly messages
+ */
+function getErrorMessage(error: Error): string {
+  // Check for user rejection (works with different wallet providers)
+  if (error instanceof UserRejectedRequestError) {
+    return "Transaction was rejected";
+  }
+
+  // Check for viem BaseError which has structured error info
+  if (error instanceof BaseError) {
+    const message = error.shortMessage || error.message;
+
+    // Common error patterns
+    if (message.toLowerCase().includes("user rejected") ||
+        message.toLowerCase().includes("user denied")) {
+      return "Transaction was rejected";
+    }
+    if (message.toLowerCase().includes("insufficient funds") ||
+        message.toLowerCase().includes("insufficient balance")) {
+      return "Insufficient funds in your wallet";
+    }
+    if (message.toLowerCase().includes("gas")) {
+      return "Transaction failed due to gas issues. Try increasing gas limit.";
+    }
+    if (message.toLowerCase().includes("nonce")) {
+      return "Transaction nonce error. Please try again.";
+    }
+
+    // Return the short message if available, otherwise generic
+    return error.shortMessage || "Failed to send transaction. Please try again.";
+  }
+
+  // Fallback for non-viem errors
+  const message = error.message.toLowerCase();
+  if (message.includes("user rejected") || message.includes("user denied")) {
+    return "Transaction was rejected";
+  }
+  if (message.includes("insufficient")) {
+    return "Insufficient funds in your wallet";
+  }
+
+  return "Failed to send transaction. Please try again.";
 }
 
 export function FundButton({
@@ -29,11 +75,7 @@ export function FundButton({
   // Handle write errors (user rejection, insufficient funds, etc.)
   useEffect(() => {
     if (writeError) {
-      const message = writeError.message.includes("User rejected")
-        ? "Transaction was rejected"
-        : writeError.message.includes("insufficient funds")
-        ? "Insufficient funds in your wallet"
-        : "Failed to send transaction. Please try again.";
+      const message = getErrorMessage(writeError);
       toast.error(message);
       reset();
     }
@@ -42,9 +84,13 @@ export function FundButton({
   // Handle transaction errors
   useEffect(() => {
     if (txError) {
-      toast.error("Transaction failed on chain. Please try again.");
+      const message = getErrorMessage(txError);
+      toast.error(message);
+      // Reset form state on transaction failure
+      setAmount(minContribution.toString());
+      reset();
     }
-  }, [txError]);
+  }, [txError, minContribution, reset]);
 
   // Handle successful transaction
   useEffect(() => {
@@ -52,8 +98,9 @@ export function FundButton({
       toast.success("Thank you for your contribution!");
       setIsOpen(false);
       setAmount(minContribution.toString());
+      reset();
     }
-  }, [isSuccess, minContribution]);
+  }, [isSuccess, minContribution, reset]);
 
   const handleFund = async () => {
     if (!isConnected) {

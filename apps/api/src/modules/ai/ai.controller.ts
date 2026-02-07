@@ -19,6 +19,7 @@ import {
 } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { Response } from "express";
+import { Throttle } from "@nestjs/throttler";
 import { SemanticSearchService } from "./services/semantic-search.service";
 import { ChatService } from "./services/chat.service";
 import { RecommendationService } from "./services/recommendation.service";
@@ -26,6 +27,7 @@ import { EmbeddingService } from "./services/embedding.service";
 import { SemanticSearchDto } from "./dto/search.dto";
 import { SendMessageDto } from "./dto/chat.dto";
 import { RecommendationQueryDto } from "./dto/recommendation.dto";
+import { AdminGuard } from "../../common/guards/admin.guard";
 
 @ApiTags("ai")
 @Controller("ai")
@@ -40,6 +42,7 @@ export class AiController {
   // ============ Search Endpoints ============
 
   @Post("search")
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Semantic video search" })
   @ApiResponse({ status: 200, description: "Search results returned successfully" })
   async search(@Body() dto: SemanticSearchDto) {
@@ -56,6 +59,7 @@ export class AiController {
   @Post("chat")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Send a message to the AI assistant" })
   @ApiResponse({ status: 200, description: "AI response returned" })
   async chat(
@@ -73,6 +77,7 @@ export class AiController {
   @Post("chat/stream")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Send a message with streaming response" })
   @ApiResponse({ status: 200, description: "Streaming AI response" })
   async chatStream(
@@ -141,6 +146,7 @@ export class AiController {
   @Get("recommendations")
   @UseGuards(AuthGuard("jwt"))
   @ApiBearerAuth()
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Get personalized video recommendations" })
   @ApiResponse({ status: 200, description: "Recommendations returned" })
   async getRecommendations(
@@ -155,6 +161,7 @@ export class AiController {
   }
 
   @Get("recommendations/anonymous")
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Get recommendations for non-authenticated users" })
   @ApiResponse({ status: 200, description: "Recommendations returned" })
   async getAnonymousRecommendations(@Query() dto: RecommendationQueryDto) {
@@ -165,6 +172,7 @@ export class AiController {
   }
 
   @Get("recommendations/similar/:videoId")
+  @Throttle({ ai: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: "Get videos similar to a given video" })
   @ApiResponse({ status: 200, description: "Similar videos returned" })
   async getSimilarVideos(
@@ -181,12 +189,12 @@ export class AiController {
   // ============ Admin Endpoints ============
 
   @Post("admin/migrate-embeddings")
-  @UseGuards(AuthGuard("jwt"))
+  @UseGuards(AuthGuard("jwt"), AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Migrate existing videos to have embeddings (admin only)" })
   @ApiResponse({ status: 200, description: "Migration completed" })
+  @ApiResponse({ status: 403, description: "Admin access required" })
   async migrateEmbeddings() {
-    // TODO: Add admin role check
     const result = await this.embeddingService.migrateExistingVideos();
     return result;
   }

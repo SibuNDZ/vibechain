@@ -166,6 +166,22 @@ model Follow {
   @@map("follows")
 }
 
+// Wallet auth nonces to prevent signature replay
+model AuthNonce {
+  id            String   @id @default(cuid())
+  walletAddress String
+  nonce         String
+  used          Boolean  @default(false)
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  usedAt        DateTime?
+
+  @@unique([walletAddress, nonce])
+  @@index([walletAddress])
+  @@index([expiresAt])
+  @@map("auth_nonces")
+}
+
 // AI Chat models
 model ChatConversation {
   id        String   @id @default(cuid())

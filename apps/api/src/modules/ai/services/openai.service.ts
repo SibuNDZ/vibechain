@@ -15,20 +15,22 @@ export interface ChatCompletionOptions {
 @Injectable()
 export class OpenAiService {
   private readonly logger = new Logger(OpenAiService.name);
-  private readonly client: OpenAI;
+  private readonly client: OpenAI | null;
   private readonly embeddingModel: string;
   private readonly chatModel: string;
+  private readonly configured: boolean;
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>("OPENAI_API_KEY");
 
     if (!apiKey) {
       this.logger.warn("OPENAI_API_KEY not configured - AI features will be disabled");
+      this.client = null;
+      this.configured = false;
+    } else {
+      this.client = new OpenAI({ apiKey });
+      this.configured = true;
     }
-
-    this.client = new OpenAI({
-      apiKey: apiKey || "dummy-key",
-    });
 
     this.embeddingModel = this.configService.get<string>(
       "OPENAI_EMBEDDING_MODEL",
@@ -38,16 +40,22 @@ export class OpenAiService {
   }
 
   isConfigured(): boolean {
-    return !!this.configService.get<string>("OPENAI_API_KEY");
+    return this.configured;
   }
 
-  async generateEmbedding(text: string): Promise<number[]> {
-    if (!this.isConfigured()) {
+  private getClient(): OpenAI {
+    if (!this.client) {
       throw new Error("OpenAI API key not configured");
     }
 
+    return this.client;
+  }
+
+  async generateEmbedding(text: string): Promise<number[]> {
+    const client = this.getClient();
+
     try {
-      const response = await this.client.embeddings.create({
+      const response = await client.embeddings.create({
         model: this.embeddingModel,
         input: text.slice(0, 8000), // Limit input to avoid token limits
       });
@@ -60,17 +68,15 @@ export class OpenAiService {
   }
 
   async generateEmbeddings(texts: string[]): Promise<number[][]> {
-    if (!this.isConfigured()) {
-      throw new Error("OpenAI API key not configured");
-    }
+    const client = this.getClient();
 
     try {
-      const response = await this.client.embeddings.create({
+      const response = await client.embeddings.create({
         model: this.embeddingModel,
         input: texts.map((t) => t.slice(0, 8000)),
       });
 
-      return response.data.map((d) => d.embedding);
+      return response.data.map((d: { embedding: number[] }) => d.embedding);
     } catch (error) {
       this.logger.error(`Failed to generate embeddings: ${error}`);
       throw error;
@@ -81,12 +87,10 @@ export class OpenAiService {
     messages: ChatMessage[],
     options: ChatCompletionOptions = {}
   ): Promise<string> {
-    if (!this.isConfigured()) {
-      throw new Error("OpenAI API key not configured");
-    }
+    const client = this.getClient();
 
     try {
-      const response = await this.client.chat.completions.create({
+      const response = await client.chat.completions.create({
         model: this.chatModel,
         messages,
         temperature: options.temperature ?? 0.7,
@@ -104,12 +108,10 @@ export class OpenAiService {
     messages: ChatMessage[],
     options: ChatCompletionOptions = {}
   ): AsyncGenerator<string> {
-    if (!this.isConfigured()) {
-      throw new Error("OpenAI API key not configured");
-    }
+    const client = this.getClient();
 
     try {
-      const stream = await this.client.chat.completions.create({
+      const stream = await client.chat.completions.create({
         model: this.chatModel,
         messages,
         temperature: options.temperature ?? 0.7,

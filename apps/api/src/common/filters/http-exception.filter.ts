@@ -25,6 +25,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    const isProd = process.env.NODE_ENV === 'production';
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
@@ -55,6 +56,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         `Unexpected error: ${exception.message}`,
         exception.stack
       );
+    }
+
+    if (isProd && status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      message = 'Internal server error';
+      error = 'InternalServerError';
     }
 
     const errorResponse: ErrorResponse = {

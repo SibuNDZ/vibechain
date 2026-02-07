@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Upload, X, Film, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
@@ -59,6 +59,16 @@ export function VideoUploader({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
+
+  // Cleanup blob URL on unmount or when preview changes to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
+  }, []);
 
   const validateFile = (file: File): string | null => {
     if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {
@@ -163,8 +173,14 @@ export function VideoUploader({
     setFileName(file.name);
     setError(null);
 
+    // Revoke previous preview URL to prevent memory leak
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+    }
+
     // Create video preview
     const videoUrl = URL.createObjectURL(file);
+    previewUrlRef.current = videoUrl;
     setPreview(videoUrl);
 
     // Start upload
@@ -194,6 +210,11 @@ export function VideoUploader({
   };
 
   const handleReset = () => {
+    // Revoke preview URL to prevent memory leak
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
     setStatus("idle");
     setProgress(0);
     setError(null);

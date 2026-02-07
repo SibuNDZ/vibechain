@@ -40,3 +40,9 @@ export class WalletLoginDto {
   @IsString()
   nonce: string;
 }
+
+export class WalletNonceRequestDto {
+  @ApiProperty()
+  @IsString()
+  walletAddress: string;
+}

@@ -24,8 +24,19 @@ import { LoggingMiddleware } from "./common/middleware/logging.middleware";
     }),
     ThrottlerModule.forRoot([
       {
+        name: "default",
         ttl: 60000, // 1 minute
         limit: 100, // 100 requests per minute
+      },
+      {
+        name: "auth",
+        ttl: 60000, // 1 minute
+        limit: 10, // 10 requests per minute
+      },
+      {
+        name: "ai",
+        ttl: 60000, // 1 minute
+        limit: 30, // 30 requests per minute
       },
     ]),
     DatabaseModule,

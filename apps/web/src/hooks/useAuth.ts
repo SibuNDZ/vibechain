@@ -74,15 +74,21 @@ export function useAuth() {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const response = await api.post<{ access_token: string }>("/auth/login", {
+      const response = await api.post<{
+        access_token?: string;
+        accessToken?: string;
+      }>("/auth/login", {
         email,
         password,
       });
 
-      const { access_token } = response;
-      localStorage.setItem(TOKEN_KEY, access_token);
+      const token = response.access_token || response.accessToken;
+      if (!token) {
+        throw new Error("Missing access token");
+      }
+      localStorage.setItem(TOKEN_KEY, token);
 
-      await fetchUser(access_token);
+      await fetchUser(token);
       router.push("/videos");
     },
     [router]
@@ -90,7 +96,10 @@ export function useAuth() {
 
   const register = useCallback(
     async (username: string, email: string, password: string) => {
-      const response = await api.post<{ access_token: string }>(
+      const response = await api.post<{
+        access_token?: string;
+        accessToken?: string;
+      }>(
         "/auth/register",
         {
           username,
@@ -99,10 +108,13 @@ export function useAuth() {
         }
       );
 
-      const { access_token } = response;
-      localStorage.setItem(TOKEN_KEY, access_token);
+      const token = response.access_token || response.accessToken;
+      if (!token) {
+        throw new Error("Missing access token");
+      }
+      localStorage.setItem(TOKEN_KEY, token);
 
-      await fetchUser(access_token);
+      await fetchUser(token);
       router.push("/videos");
     },
     [router]
@@ -110,7 +122,10 @@ export function useAuth() {
 
   const walletLogin = useCallback(
     async (walletAddress: string, signature: string, nonce: string) => {
-      const response = await api.post<{ access_token: string }>(
+      const response = await api.post<{
+        access_token?: string;
+        accessToken?: string;
+      }>(
         "/auth/wallet",
         {
           walletAddress,
@@ -119,10 +134,13 @@ export function useAuth() {
         }
       );
 
-      const { access_token } = response;
-      localStorage.setItem(TOKEN_KEY, access_token);
+      const token = response.access_token || response.accessToken;
+      if (!token) {
+        throw new Error("Missing access token");
+      }
+      localStorage.setItem(TOKEN_KEY, token);
 
-      await fetchUser(access_token);
+      await fetchUser(token);
       router.push("/videos");
     },
     [router]

@@ -11,6 +11,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { UsersService } from "./users.service";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -48,7 +49,7 @@ export class UsersController {
   @ApiOperation({ summary: "Update current user profile" })
   async updateMe(
     @Request() req: { user: { userId: string } },
-    @Body() body: { username?: string; bio?: string; avatarUrl?: string }
+    @Body() body: UpdateProfileDto
   ) {
     return this.usersService.update(req.user.userId, body);
   }

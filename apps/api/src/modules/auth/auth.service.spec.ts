@@ -4,11 +4,20 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { PrismaService } from '../../database/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: jest.Mocked<UsersService>;
   let jwtService: jest.Mocked<JwtService>;
+  let prismaService: {
+    authNonce: {
+      findFirst: jest.Mock;
+      updateMany: jest.Mock;
+      create: jest.Mock;
+    };
+  };
 
   const mockUser = {
     id: 'user-123',
@@ -35,6 +44,22 @@ describe('AuthService', () => {
           },
         },
         {
+          provide: PrismaService,
+          useValue: {
+            authNonce: {
+              findFirst: jest.fn(),
+              updateMany: jest.fn(),
+              create: jest.fn(),
+            },
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('600000'),
+          },
+        },
+        {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockReturnValue('mock-jwt-token'),
@@ -46,6 +71,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get(UsersService);
     jwtService = module.get(JwtService);
+    prismaService = module.get(PrismaService);
   });
 
   describe('register', () => {
@@ -162,6 +188,16 @@ describe('AuthService', () => {
     const nonce = '123456';
 
     it('should create new user if wallet not registered', async () => {
+      prismaService.authNonce.findFirst.mockResolvedValue({
+        id: 'nonce-1',
+        walletAddress,
+        nonce,
+        used: false,
+        expiresAt: new Date(Date.now() + 60000),
+        createdAt: new Date(),
+      });
+      prismaService.authNonce.updateMany.mockResolvedValue({ count: 1 });
+
       usersService.findByWallet.mockResolvedValue(null);
       usersService.create.mockResolvedValue({
         ...mockUser,
@@ -183,6 +219,16 @@ describe('AuthService', () => {
     });
 
     it('should login existing wallet user', async () => {
+      prismaService.authNonce.findFirst.mockResolvedValue({
+        id: 'nonce-2',
+        walletAddress,
+        nonce,
+        used: false,
+        expiresAt: new Date(Date.now() + 60000),
+        createdAt: new Date(),
+      });
+      prismaService.authNonce.updateMany.mockResolvedValue({ count: 1 });
+
       usersService.findByWallet.mockResolvedValue({
         ...mockUser,
         walletAddress,
@@ -202,6 +248,15 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException for invalid signature', async () => {
+      prismaService.authNonce.findFirst.mockResolvedValue({
+        id: 'nonce-3',
+        walletAddress,
+        nonce,
+        used: false,
+        expiresAt: new Date(Date.now() + 60000),
+        createdAt: new Date(),
+      });
+
       const ethers = require('ethers');
       jest.spyOn(ethers, 'verifyMessage').mockReturnValue('0xdifferentaddress');
 

@@ -7,6 +7,7 @@ import { EmbeddingService } from "./services/embedding.service";
 import { SemanticSearchService } from "./services/semantic-search.service";
 import { ChatService } from "./services/chat.service";
 import { RecommendationService } from "./services/recommendation.service";
+import { AdminGuard } from "../../common/guards/admin.guard";
 
 @Module({
   imports: [ConfigModule, DatabaseModule],
@@ -17,6 +18,7 @@ import { RecommendationService } from "./services/recommendation.service";
     SemanticSearchService,
     ChatService,
     RecommendationService,
+    AdminGuard,
   ],
   exports: [EmbeddingService, SemanticSearchService, RecommendationService],
 })

@@ -6,6 +6,8 @@ interface CreateUserData {
   username: string;
   passwordHash?: string;
   walletAddress?: string;
+  avatarUrl?: string | null;
+  bio?: string | null;
 }
 
 @Injectable()
@@ -38,15 +40,26 @@ export class UsersService {
   }
 
   async findByWallet(walletAddress: string) {
-    return this.prisma.user.findUnique({
-      where: { walletAddress },
+    return this.prisma.user.findFirst({
+      where: {
+        walletAddress: {
+          equals: walletAddress,
+          mode: "insensitive",
+        },
+      },
     });
   }
 
   async update(id: string, data: Partial<CreateUserData>) {
+    const updateData: Partial<CreateUserData> = {};
+
+    if (data.username !== undefined) updateData.username = data.username;
+    if (data.bio !== undefined) updateData.bio = data.bio;
+    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+
     return this.prisma.user.update({
       where: { id },
-      data,
+      data: updateData,
     });
   }
 
