@@ -16,6 +16,7 @@ describe('VotingService', () => {
     videoUrl: 'https://example.com/video.mp4',
     thumbnailUrl: 'https://example.com/thumb.jpg',
     status: 'APPROVED' as const,
+    genre: null,
     userId: 'user-123',
     createdAt: new Date(),
     updatedAt: new Date(),
