@@ -7,6 +7,7 @@ import { Upload, MessageCircle, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserDropdown } from "./UserDropdown";
 import { InstallAppButton } from "./InstallAppButton";
+import { api } from "@/lib/api";
 
 interface User {
   id: string;
@@ -24,6 +25,7 @@ export function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Check auth state on mount
   useEffect(() => {
@@ -72,6 +74,28 @@ export function Header() {
       setUser(null);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        await api.get("/admin/analytics/dashboards");
+        setIsAdmin(true);
+      } catch (err: any) {
+        if (err?.statusCode === 401 || err?.statusCode === 403) {
+          setIsAdmin(false);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    };
+
+    checkAdmin();
+  }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem(TOKEN_KEY);
@@ -124,7 +148,7 @@ export function Header() {
                 </Link>
 
                 {/* User Dropdown */}
-                <UserDropdown user={user} onLogout={handleLogout} />
+                <UserDropdown user={user} onLogout={handleLogout} isAdmin={isAdmin} />
               </>
             ) : (
               <div className="flex items-center gap-2">
@@ -194,6 +218,15 @@ export function Header() {
                   >
                     Settings
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      href="/admin/insights"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
+                    >
+                      Admin Insights
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();

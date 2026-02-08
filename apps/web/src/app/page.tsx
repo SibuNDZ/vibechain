@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Upload, Vote, Coins, TrendingUp, Play, Users } from "lucide-react";
+import { FeaturedVideos } from "@/components/video/FeaturedVideos";
 
 interface User {
   id: string;
@@ -66,6 +67,8 @@ export default function Home() {
             </Link>
           </div>
         </section>
+
+        <FeaturedVideos className="pb-12" />
 
         {/* Feature preview for non-logged-in users */}
         <section className="grid md:grid-cols-3 gap-8 px-6 py-16 max-w-6xl mx-auto">
@@ -138,6 +141,8 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      <FeaturedVideos className="py-10" />
 
       {/* Action Cards */}
       <section className="px-6 py-12 max-w-6xl mx-auto">

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, Video, Settings, LogOut, ChevronDown } from "lucide-react";
+import { User, Video, Settings, LogOut, ChevronDown, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface UserDropdownProps {
@@ -12,9 +12,10 @@ interface UserDropdownProps {
     avatarUrl: string | null;
   };
   onLogout: () => void;
+  isAdmin?: boolean;
 }
 
-export function UserDropdown({ user, onLogout }: UserDropdownProps) {
+export function UserDropdown({ user, onLogout, isAdmin = false }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -88,6 +89,17 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
             <Settings className="w-4 h-4" />
             Settings
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/admin/insights"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-4 py-2 text-slate-600 hover:bg-orange-100 hover:text-slate-900 transition-colors"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Admin Insights
+            </Link>
+          )}
 
           <div className="border-t border-orange-200 mt-2 pt-2">
             <button
