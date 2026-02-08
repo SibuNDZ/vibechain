@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Upload, MessageCircle, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -115,8 +116,21 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-slate-900">VibeChain</span>
+          <Link href="/" className="flex items-center">
+            <div className="flex flex-col items-center leading-none">
+              <div className="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center shadow-sm">
+                <Image
+                  src="/brand/vc-mark.png"
+                  alt="VibeChain"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
+                />
+              </div>
+              <span className="mt-1 text-xs font-semibold text-red-600 tracking-wide">
+                VibeChain
+              </span>
+            </div>
           </Link>
 
           {/* Spacer for centered layout */}
