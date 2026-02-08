@@ -19,6 +19,11 @@ const Header = dynamic(
   { ssr: false }
 );
 
+const PwaRegister = dynamic(
+  () => import("@/components/pwa/PwaRegister").then((mod) => mod.PwaRegister),
+  { ssr: false }
+);
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -71,6 +76,7 @@ export default function RootLayout({
           <ErrorBoundary>
             <main className="pt-16">{children}</main>
           </ErrorBoundary>
+          <PwaRegister />
           <AIChatButton />
         </Providers>
       </body>

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Upload, MessageCircle, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserDropdown } from "./UserDropdown";
+import { InstallAppButton } from "./InstallAppButton";
 
 interface User {
   id: string;
@@ -103,6 +104,8 @@ export function Header() {
               <div className="w-8 h-8 rounded-full bg-gray-800 animate-pulse" />
             ) : user ? (
               <>
+                <InstallAppButton className="hidden sm:inline-flex" />
+
                 {/* Upload Button */}
                 <Link
                   href="/upload"
@@ -125,6 +128,7 @@ export function Header() {
               </>
             ) : (
               <div className="flex items-center gap-2">
+                <InstallAppButton className="hidden sm:inline-flex" />
                 <Link
                   href="/login"
                   className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
@@ -160,6 +164,7 @@ export function Header() {
             <nav className="flex flex-col gap-2">
               {user ? (
                 <>
+                  <InstallAppButton className="w-full justify-center" />
                   <Link
                     href="/upload"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -201,6 +206,7 @@ export function Header() {
                 </>
               ) : (
                 <>
+                  <InstallAppButton className="w-full justify-center" />
                   <Link
                     href="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
