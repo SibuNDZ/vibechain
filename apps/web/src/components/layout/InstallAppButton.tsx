@@ -22,10 +22,19 @@ export function InstallAppButton({
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isIos, setIsIos] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
-    const updateStandalone = () => setIsInstalled(mediaQuery.matches);
+    const ios = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    setIsIos(ios);
+
+    const updateStandalone = () => {
+      const standalone = ios
+        ? Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone)
+        : mediaQuery.matches;
+      setIsInstalled(standalone);
+    };
 
     updateStandalone();
     mediaQuery.addEventListener("change", updateStandalone);
@@ -56,6 +65,13 @@ export function InstallAppButton({
       return;
     }
 
+    if (isIos) {
+      toast(
+        "On iPhone/iPad: tap Share in Safari, then Add to Home Screen."
+      );
+      return;
+    }
+
     if (!deferredPrompt) {
       toast("Install isn’t available yet. Try refreshing or use your browser menu.");
       return;
@@ -71,14 +87,14 @@ export function InstallAppButton({
       type="button"
       onClick={handleInstall}
       className={cn(
-        "inline-flex items-center gap-2 rounded-lg border border-purple-500/60 px-3 py-2 text-sm font-medium text-purple-200 transition-colors hover:border-purple-400 hover:text-white",
+        "inline-flex items-center gap-2 rounded-lg border border-orange-300 px-3 py-2 text-sm font-medium text-orange-700 transition-colors hover:border-orange-400 hover:text-red-600",
         isInstalled && "cursor-default opacity-60",
         className
       )}
       title={isInstalled ? "Already installed" : "Install VibeChain"}
     >
       <Download className="h-4 w-4" />
-      {isInstalled ? "Installed" : label}
+      {isInstalled ? "Installed" : isIos ? "Add to Home Screen" : label}
     </button>
   );
 }

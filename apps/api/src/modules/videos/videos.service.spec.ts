@@ -4,6 +4,7 @@ import { VideosService } from './videos.service';
 import { PrismaService } from '../../database/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
+import { AnalyticsService } from '../../common/analytics/analytics.service';
 
 describe('VideosService', () => {
   let service: VideosService;
@@ -41,6 +42,12 @@ describe('VideosService', () => {
         {
           provide: PrismaService,
           useValue: prisma,
+        },
+        {
+          provide: AnalyticsService,
+          useValue: {
+            track: jest.fn(),
+          },
         },
       ],
     }).compile();

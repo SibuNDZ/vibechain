@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../../database/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { AnalyticsService } from '../../common/analytics/analytics.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -63,6 +64,12 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockReturnValue('mock-jwt-token'),
+          },
+        },
+        {
+          provide: AnalyticsService,
+          useValue: {
+            track: jest.fn(),
           },
         },
       ],

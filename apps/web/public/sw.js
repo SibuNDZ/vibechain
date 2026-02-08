@@ -2,9 +2,8 @@ const CACHE_NAME = "vibechain-pwa-v1";
 const PRECACHE_ASSETS = [
   "/",
   "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/icon-512-maskable.png",
+  "/icon-192.png",
+  "/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {

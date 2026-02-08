@@ -5,10 +5,14 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../../database/prisma.service";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
+import { AnalyticsService } from "../../common/analytics/analytics.service";
 
 @Injectable()
 export class VotingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly analyticsService: AnalyticsService
+  ) {}
 
   async vote(userId: string, videoId: string) {
     try {
@@ -30,9 +34,17 @@ export class VotingService {
         throw new ConflictException("Already voted for this video");
       }
 
-      return await this.prisma.vote.create({
+      const vote = await this.prisma.vote.create({
         data: { userId, videoId },
       });
+
+      void this.analyticsService.track({
+        event: "video_vote",
+        user_id: userId,
+        video_id: videoId,
+      });
+
+      return vote;
     } catch (error) {
       handleDatabaseError(error, "VotingService.vote");
     }

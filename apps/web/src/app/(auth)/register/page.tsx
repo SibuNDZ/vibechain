@@ -87,66 +87,66 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center px-4 py-8">
+    <main className="min-h-screen bg-orange-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-white">
+          <Link href="/" className="text-3xl font-bold text-slate-900">
             VibeChain
           </Link>
-          <p className="text-gray-400 mt-2">Join the community</p>
+          <p className="text-slate-500 mt-2">Join the community</p>
         </div>
 
-        <div className="bg-gray-800/50 rounded-xl p-8">
+        <div className="vc-card p-8">
           {error && (
-            <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Username</label>
+              <label className="block text-sm text-slate-600 mb-2">Username</label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
                 placeholder="yourname"
                 required
                 disabled={isLoading}
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Email</label>
+              <label className="block text-sm text-slate-600 mb-2">Email</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
                 placeholder="you@example.com"
                 required
                 disabled={isLoading}
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Password</label>
+              <label className="block text-sm text-slate-600 mb-2">Password</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
                 placeholder="********"
                 required
                 disabled={isLoading}
                 minLength={8}
               />
-              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+              <p className="text-xs text-slate-500 mt-1">Minimum 8 characters</p>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-2">
+              <label className="block text-sm text-slate-600 mb-2">
                 Confirm Password
               </label>
               <input
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
                 placeholder="********"
                 required
                 disabled={isLoading}
@@ -163,7 +163,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 vc-primary-button rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </button>
@@ -171,10 +171,10 @@ export default function RegisterPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600" />
+              <div className="w-full border-t border-orange-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-800/50 text-gray-400">
+              <span className="px-2 bg-orange-50 text-slate-500">
                 Or sign up with wallet
               </span>
             </div>
@@ -189,15 +189,15 @@ export default function RegisterPage() {
               type="button"
               onClick={handleWalletLogin}
               disabled={isWalletLoading}
-              className="mt-4 w-full py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-4 w-full py-3 vc-outline-button rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isWalletLoading ? "Signing up with wallet..." : "Sign up with wallet"}
             </button>
           )}
 
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-slate-500 text-sm mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-purple-400 hover:underline">
+            <Link href="/login" className="text-red-600 hover:underline">
               Sign in
             </Link>
           </p>

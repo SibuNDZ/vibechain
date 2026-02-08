@@ -3,10 +3,14 @@ import { PrismaService } from "../../database/prisma.service";
 import { CreateCampaignDto, RecordContributionDto } from "./dto/crowdfunding.dto";
 import { Decimal } from "@prisma/client/runtime/library";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
+import { AnalyticsService } from "../../common/analytics/analytics.service";
 
 @Injectable()
 export class CrowdfundingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly analyticsService: AnalyticsService
+  ) {}
 
   async createCampaign(videoId: string, dto: CreateCampaignDto) {
     try {
@@ -23,7 +27,7 @@ export class CrowdfundingService {
         throw new BadRequestException("Campaign already exists for this video");
       }
 
-      return await this.prisma.campaign.create({
+      const campaign = await this.prisma.campaign.create({
         data: {
           videoId,
           goalAmount: dto.goalAmount,
@@ -31,6 +35,17 @@ export class CrowdfundingService {
           contractAddress: dto.contractAddress,
         },
       });
+
+      void this.analyticsService.track({
+        event: "campaign_created",
+        video_id: videoId,
+        campaign_id: campaign.id,
+        properties: {
+          goalAmount: campaign.goalAmount?.toString?.() ?? campaign.goalAmount,
+        },
+      });
+
+      return campaign;
     } catch (error) {
       handleDatabaseError(error, "CrowdfundingService.createCampaign");
     }
@@ -146,6 +161,13 @@ export class CrowdfundingService {
           },
         }),
       ]);
+
+      void this.analyticsService.track({
+        event: "campaign_contribution",
+        user_id: userId,
+        campaign_id: campaignId,
+        amount: typeof dto.amount === "string" ? parseFloat(dto.amount) : dto.amount,
+      });
 
       return contribution;
     } catch (error) {

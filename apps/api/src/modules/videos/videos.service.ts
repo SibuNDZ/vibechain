@@ -3,19 +3,35 @@ import { PrismaService } from "../../database/prisma.service";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
 import { VideoGenre } from "@prisma/client";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
+import { AnalyticsService } from "../../common/analytics/analytics.service";
 
 @Injectable()
 export class VideosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly analyticsService: AnalyticsService
+  ) {}
 
   async create(userId: string, dto: CreateVideoDto) {
     try {
-      return await this.prisma.video.create({
+      const video = await this.prisma.video.create({
         data: {
           ...dto,
           userId,
         },
       });
+
+      void this.analyticsService.track({
+        event: "video_upload",
+        user_id: userId,
+        video_id: video.id,
+        genre: video.genre ?? null,
+        properties: {
+          duration: video.duration,
+        },
+      });
+
+      return video;
     } catch (error) {
       handleDatabaseError(error, "VideosService.create");
     }

@@ -3,27 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+@layer components {
+  .vc-surface {
+    @apply bg-white;
+  }
+
+  .vc-card {
+    @apply bg-orange-50 border border-orange-200 rounded-2xl shadow-sm;
+  }
+
+  .vc-card-muted {
+    @apply bg-orange-50/70 border border-orange-200 rounded-xl;
+  }
+
+  .vc-primary-button {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .vc-secondary-button {
+    @apply bg-orange-500 text-white hover:bg-orange-600;
+  }
+
+  .vc-outline-button {
+    @apply border border-orange-300 text-orange-700 hover:bg-orange-50;
+  }
 }
 
 @layer utilities {

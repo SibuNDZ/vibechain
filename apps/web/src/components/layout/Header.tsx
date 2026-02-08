@@ -87,12 +87,12 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-orange-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-white">VibeChain</span>
+            <span className="text-2xl font-bold text-slate-900">VibeChain</span>
           </Link>
 
           {/* Spacer for centered layout */}
@@ -101,7 +101,7 @@ export function Header() {
           {/* Right Section */}
           <div className="flex items-center gap-3">
             {isLoading ? (
-              <div className="w-8 h-8 rounded-full bg-gray-800 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-orange-100 animate-pulse" />
             ) : user ? (
               <>
                 <InstallAppButton className="hidden sm:inline-flex" />
@@ -109,7 +109,7 @@ export function Header() {
                 {/* Upload Button */}
                 <Link
                   href="/upload"
-                  className="hidden sm:flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 vc-primary-button rounded-lg transition-colors font-medium"
                 >
                   <Upload className="w-4 h-4" />
                   Upload
@@ -118,7 +118,7 @@ export function Header() {
                 {/* Messages */}
                 <Link
                   href="/messages"
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
                 >
                   <MessageCircle className="w-5 h-5" />
                 </Link>
@@ -131,13 +131,13 @@ export function Header() {
                 <InstallAppButton className="hidden sm:inline-flex" />
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                  className="px-4 py-2 text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                  className="px-4 py-2 vc-primary-button rounded-lg transition-colors font-medium"
                 >
                   Sign Up
                 </Link>
@@ -147,7 +147,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              className="md:hidden p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -160,7 +160,7 @@ export function Header() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-800">
+          <div className="md:hidden py-4 border-t border-orange-200">
             <nav className="flex flex-col gap-2">
               {user ? (
                 <>
@@ -168,7 +168,7 @@ export function Header() {
                   <Link
                     href="/upload"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                    className="flex items-center gap-2 px-4 py-2 vc-primary-button rounded-lg transition-colors font-medium"
                   >
                     <Upload className="w-4 h-4" />
                     Upload Video
@@ -176,21 +176,21 @@ export function Header() {
                   <Link
                     href="/messages"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
                   >
                     Messages
                   </Link>
                   <Link
                     href={`/users/${user.id}`}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
                   >
                     My Profile
                   </Link>
                   <Link
                     href="/settings"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
                   >
                     Settings
                   </Link>
@@ -199,7 +199,7 @@ export function Header() {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800/50 transition-colors text-left"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-orange-100 transition-colors text-left"
                   >
                     Logout
                   </button>
@@ -210,14 +210,14 @@ export function Header() {
                   <Link
                     href="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-center"
+                    className="px-4 py-2 vc-primary-button rounded-lg transition-colors font-medium text-center"
                   >
                     Sign Up
                   </Link>

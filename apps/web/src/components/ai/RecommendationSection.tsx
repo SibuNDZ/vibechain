@@ -61,9 +61,9 @@ export function RecommendationSection({ className }: RecommendationSectionProps)
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-400" />
-          <h2 className="text-xl font-semibold text-white">For You</h2>
-          <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">
+          <Sparkles className="w-5 h-5 text-orange-600" />
+          <h2 className="text-xl font-semibold text-slate-900">For You</h2>
+          <span className="text-xs text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full">
             AI Powered
           </span>
         </div>
@@ -71,20 +71,20 @@ export function RecommendationSection({ className }: RecommendationSectionProps)
           <button
             onClick={fetchRecommendations}
             disabled={isLoading}
-            className="p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+            className="p-2 text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
             title="Refresh recommendations"
           >
             <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
           </button>
           <button
             onClick={() => scroll("left")}
-            className="p-2 text-gray-400 hover:text-white transition-colors hidden sm:block"
+            className="p-2 text-slate-500 hover:text-slate-900 transition-colors hidden sm:block"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className="p-2 text-gray-400 hover:text-white transition-colors hidden sm:block"
+            className="p-2 text-slate-500 hover:text-slate-900 transition-colors hidden sm:block"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -99,14 +99,14 @@ export function RecommendationSection({ className }: RecommendationSectionProps)
               key={i}
               className="flex-shrink-0 w-[200px] animate-pulse"
             >
-              <div className="aspect-video bg-gray-800 rounded-lg mb-2" />
-              <div className="h-4 bg-gray-800 rounded w-3/4 mb-1" />
-              <div className="h-3 bg-gray-800 rounded w-1/2" />
+              <div className="aspect-video bg-orange-100 rounded-lg mb-2" />
+              <div className="h-4 bg-orange-100 rounded w-3/4 mb-1" />
+              <div className="h-3 bg-orange-100 rounded w-1/2" />
             </div>
           ))}
         </div>
       ) : recommendations.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-slate-500">
           <p>No recommendations available yet.</p>
           <p className="text-sm">Vote on some videos to get personalized suggestions!</p>
         </div>
@@ -131,7 +131,7 @@ function RecommendationCard({ recommendation }: { recommendation: RecommendedVid
       href={`/videos/${recommendation.id}`}
       className="flex-shrink-0 w-[200px] group"
     >
-      <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-800 mb-2">
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100 mb-2">
         {recommendation.thumbnailUrl ? (
           <Image
             src={recommendation.thumbnailUrl}
@@ -140,17 +140,17 @@ function RecommendationCard({ recommendation }: { recommendation: RecommendedVid
             className="object-cover transition-transform group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-600">
+          <div className="w-full h-full flex items-center justify-center text-slate-400">
             No image
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-      <h3 className="font-medium text-white text-sm truncate group-hover:text-purple-400 transition-colors">
+      <h3 className="font-medium text-slate-900 text-sm truncate group-hover:text-orange-600 transition-colors">
         {recommendation.title}
       </h3>
-      <p className="text-xs text-gray-400 truncate">{recommendation.user.username}</p>
-      <p className="text-xs text-purple-400 mt-1 truncate">{recommendation.reason}</p>
+      <p className="text-xs text-slate-500 truncate">{recommendation.user.username}</p>
+      <p className="text-xs text-orange-600 mt-1 truncate">{recommendation.reason}</p>
     </Link>
   );
 }

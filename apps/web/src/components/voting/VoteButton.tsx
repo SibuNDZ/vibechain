@@ -58,8 +58,8 @@ export function VoteButton({
       className={cn(
         "flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all",
         voted
-          ? "bg-purple-600 text-white"
-          : "bg-gray-700 text-gray-300 hover:bg-purple-600 hover:text-white",
+          ? "bg-red-600 text-white"
+          : "bg-orange-100 text-orange-700 hover:bg-red-600 hover:text-white border border-orange-200",
         (!isConnected || isLoading) && "opacity-50 cursor-not-allowed"
       )}
     >

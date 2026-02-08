@@ -15,6 +15,8 @@ import { UploadModule } from "./modules/upload/upload.module";
 import { DatabaseModule } from "./database/database.module";
 import { HealthModule } from "./health/health.module";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
+import { AnalyticsModule } from "./common/analytics/analytics.module";
+import { AnalyticsAdminModule } from "./modules/analytics/analytics.module";
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { LoggingMiddleware } from "./common/middleware/logging.middleware";
     ]),
     DatabaseModule,
     HealthModule,
+    AnalyticsModule,
     AuthModule,
     UsersModule,
     VideosModule,
@@ -51,6 +54,7 @@ import { LoggingMiddleware } from "./common/middleware/logging.middleware";
     AiModule,
     MessagesModule,
     UploadModule,
+    AnalyticsAdminModule,
   ],
   providers: [
     {

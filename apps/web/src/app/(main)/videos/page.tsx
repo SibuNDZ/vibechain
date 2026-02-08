@@ -45,7 +45,7 @@ export default function VideosPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-900 py-8">
+    <main className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Search Bar */}
         <div className="mb-8">
@@ -59,11 +59,11 @@ export default function VideosPage() {
         {isAuthenticated && <RecommendationSection className="mb-8" />}
 
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-white">Trending Videos</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Trending Videos</h1>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-purple-500"
+            className="bg-white text-slate-900 px-4 py-2 rounded-lg border border-orange-200 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
           >
             <option value="votes">Most Voted</option>
             <option value="createdAt">Newest</option>
@@ -71,7 +71,7 @@ export default function VideosPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
             {error}
           </div>
         )}
@@ -85,8 +85,8 @@ export default function VideosPage() {
         ) : videos.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎬</div>
-            <h2 className="text-xl font-semibold text-white mb-2">No videos yet</h2>
-            <p className="text-gray-400">Be the first to upload a music video!</p>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">No videos yet</h2>
+            <p className="text-slate-500">Be the first to upload a music video!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

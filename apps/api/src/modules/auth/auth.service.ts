@@ -11,6 +11,7 @@ import { randomBytes } from "crypto";
 import { UsersService } from "../users/users.service";
 import { RegisterDto, LoginDto, WalletLoginDto } from "./dto/auth.dto";
 import { PrismaService } from "../../database/prisma.service";
+import { AnalyticsService } from "../../common/analytics/analytics.service";
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly analyticsService: AnalyticsService
   ) {}
 
   async register(dto: RegisterDto) {
@@ -34,6 +36,12 @@ export class AuthService {
       passwordHash,
     });
 
+    void this.analyticsService.track({
+      event: "user_signup",
+      user_id: user.id,
+      method: "email",
+    });
+
     return this.generateToken(user.id);
   }
 
@@ -47,6 +55,12 @@ export class AuthService {
     if (!isValid) {
       throw new UnauthorizedException("Invalid credentials");
     }
+
+    void this.analyticsService.track({
+      event: "user_login",
+      user_id: user.id,
+      method: "password",
+    });
 
     return this.generateToken(user.id);
   }
@@ -86,12 +100,20 @@ export class AuthService {
     }
 
     let user = await this.usersService.findByWallet(walletAddress);
+    let isNewUser = false;
     if (!user) {
+      isNewUser = true;
       user = await this.usersService.create({
         walletAddress,
         username: `user_${walletAddress.slice(2, 8)}`,
       });
     }
+
+    void this.analyticsService.track({
+      event: isNewUser ? "user_signup" : "user_login",
+      user_id: user.id,
+      method: "wallet",
+    });
 
     return this.generateToken(user.id);
   }

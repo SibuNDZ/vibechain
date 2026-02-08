@@ -135,7 +135,7 @@ export function FundButton({
     return (
       <button
         disabled
-        className="w-full py-3 bg-gray-600 text-gray-400 rounded-lg cursor-not-allowed"
+        className="w-full py-3 bg-orange-100 text-orange-400 rounded-lg cursor-not-allowed border border-orange-200"
       >
         Connect Wallet to Fund
       </button>
@@ -153,22 +153,22 @@ export function FundButton({
               onChange={(e) => setAmount(e.target.value)}
               min={minContribution}
               step="0.01"
-              className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+              className="flex-1 px-4 py-2 bg-white border border-orange-200 rounded-lg text-slate-900 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
               placeholder="Amount in MATIC"
             />
-            <span className="text-gray-400">MATIC</span>
+            <span className="text-slate-500">MATIC</span>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setIsOpen(false)}
-              className="flex-1 py-2 border border-gray-600 text-gray-400 rounded-lg hover:bg-gray-700 transition"
+              className="flex-1 py-2 border border-orange-200 text-slate-600 rounded-lg hover:bg-orange-50 transition"
             >
               Cancel
             </button>
             <button
               onClick={handleFund}
               disabled={isPending || isConfirming}
-              className="flex-1 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+              className="flex-1 py-2 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
             >
               {isPending || isConfirming ? "Processing..." : "Confirm"}
             </button>
@@ -177,7 +177,7 @@ export function FundButton({
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:opacity-90 transition"
+          className="w-full py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg font-semibold hover:opacity-90 transition"
         >
           Fund This Project
         </button>

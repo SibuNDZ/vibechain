@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse bg-gray-700 rounded",
+        "animate-pulse bg-orange-200/80 rounded",
         className
       )}
     />
@@ -20,7 +20,7 @@ export function Skeleton({ className }: SkeletonProps) {
 // Pre-built skeleton components for common patterns
 export function VideoCardSkeleton() {
   return (
-    <div className="bg-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-orange-50 rounded-xl overflow-hidden border border-orange-200">
       <Skeleton className="aspect-video w-full" />
       <div className="p-4 space-y-3">
         <Skeleton className="h-5 w-3/4" />
@@ -49,7 +49,7 @@ export function VideoGridSkeleton({ count = 6 }: { count?: number }) {
 
 export function CampaignCardSkeleton() {
   return (
-    <div className="bg-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-orange-50 rounded-xl overflow-hidden border border-orange-200">
       <Skeleton className="aspect-video w-full" />
       <div className="p-4 space-y-3">
         <Skeleton className="h-5 w-3/4" />
@@ -82,7 +82,7 @@ export function CampaignGridSkeleton({ count = 6 }: { count?: number }) {
 
 export function ProfileHeaderSkeleton() {
   return (
-    <div className="bg-gray-800 rounded-xl p-6">
+    <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
         <Skeleton className="w-24 h-24 rounded-full" />
         <div className="flex-1 text-center md:text-left space-y-3">

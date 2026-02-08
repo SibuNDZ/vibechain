@@ -4,6 +4,7 @@ import { CrowdfundingService } from './crowdfunding.service';
 import { PrismaService } from '../../database/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
+import { AnalyticsService } from '../../common/analytics/analytics.service';
 
 describe('CrowdfundingService', () => {
   let service: CrowdfundingService;
@@ -61,6 +62,12 @@ describe('CrowdfundingService', () => {
         {
           provide: PrismaService,
           useValue: prisma,
+        },
+        {
+          provide: AnalyticsService,
+          useValue: {
+            track: jest.fn(),
+          },
         },
       ],
     }).compile();
