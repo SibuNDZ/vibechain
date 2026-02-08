@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../database/prisma.service";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
+import { VideoGenre } from "@prisma/client";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 
 @Injectable()
@@ -20,13 +21,22 @@ export class VideosService {
     }
   }
 
-  async findAll(page = 1, limit = 20, sortBy = "votes") {
+  async findAll(
+    page = 1,
+    limit = 20,
+    sortBy = "votes",
+    genre?: VideoGenre
+  ) {
     try {
       const skip = (page - 1) * limit;
+      const where = {
+        status: "APPROVED" as const,
+        ...(genre ? { genre } : {}),
+      };
 
       const [videos, total] = await Promise.all([
         this.prisma.video.findMany({
-          where: { status: "APPROVED" },
+          where,
           skip,
           take: limit,
           orderBy:
@@ -40,7 +50,7 @@ export class VideosService {
             _count: { select: { votes: true } },
           },
         }),
-        this.prisma.video.count({ where: { status: "APPROVED" } }),
+        this.prisma.video.count({ where }),
       ]);
 
       return {

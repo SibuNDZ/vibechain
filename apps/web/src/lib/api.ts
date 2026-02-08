@@ -142,6 +142,15 @@ class ApiClient {
 export const api = new ApiClient(API_BASE_URL);
 
 // Type definitions for API responses
+export type VideoGenre =
+  | "POP"
+  | "ROCK"
+  | "REGGAE"
+  | "GOSPEL_LOCAL"
+  | "GOSPEL_INTERNATIONAL"
+  | "RNB"
+  | "HIPHOP";
+
 export interface Video {
   id: string;
   title: string;
@@ -149,6 +158,7 @@ export interface Video {
   videoUrl: string;
   thumbnailUrl: string | null;
   status: "PENDING" | "APPROVED" | "REJECTED";
+  genre: VideoGenre | null;
   userId: string;
   createdAt: string;
   user: {

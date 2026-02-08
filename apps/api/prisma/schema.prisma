@@ -44,6 +44,7 @@ model Video {
   thumbnailUrl        String?
   duration            Int      // in seconds
   status              VideoStatus @default(PENDING)
+  genre               VideoGenre?
   cloudinaryPublicId  String?  // Cloudinary public_id for video management
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -59,6 +60,7 @@ model Video {
   comments     Comment[]
 
   @@index([status])
+  @@index([genre])
   @@index([userId])
   @@index([createdAt])
   @@map("videos")
@@ -70,6 +72,16 @@ enum VideoStatus {
   REJECTED
   FUNDING
   FUNDED
+}
+
+enum VideoGenre {
+  POP
+  ROCK
+  REGGAE
+  GOSPEL_LOCAL
+  GOSPEL_INTERNATIONAL
+  RNB
+  HIPHOP
 }
 
 model Vote {

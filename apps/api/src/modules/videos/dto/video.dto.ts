@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsInt, Min } from "class-validator";
+import { IsString, IsOptional, IsInt, Min, IsEnum } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { VideoGenre } from "@prisma/client";
 
 export class CreateVideoDto {
   @ApiProperty({ description: "Video title" })
@@ -29,6 +30,11 @@ export class CreateVideoDto {
   @IsString()
   @IsOptional()
   cloudinaryPublicId?: string;
+
+  @ApiPropertyOptional({ description: "Video genre", enum: VideoGenre })
+  @IsEnum(VideoGenre)
+  @IsOptional()
+  genre?: VideoGenre;
 }
 
 export class UpdateVideoDto {
@@ -46,4 +52,9 @@ export class UpdateVideoDto {
   @IsString()
   @IsOptional()
   thumbnailUrl?: string;
+
+  @ApiPropertyOptional({ enum: VideoGenre })
+  @IsEnum(VideoGenre)
+  @IsOptional()
+  genre?: VideoGenre;
 }

@@ -12,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { VideosService } from "./videos.service";
+import { VideoGenre } from "@prisma/client";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
 
 @ApiTags("videos")
@@ -35,12 +36,14 @@ export class VideosController {
   async findAll(
     @Query("page") page?: string,
     @Query("limit") limit?: string,
-    @Query("sortBy") sortBy?: string
+    @Query("sortBy") sortBy?: string,
+    @Query("genre") genre?: VideoGenre
   ) {
     return this.videosService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 20,
-      sortBy
+      sortBy,
+      genre
     );
   }
 

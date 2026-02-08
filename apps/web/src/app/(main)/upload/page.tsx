@@ -42,6 +42,7 @@ export default function UploadPage() {
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [duration, setDuration] = useState("");
   const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string | null>(null);
+  const [genre, setGenre] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("vibechain_token");
@@ -103,6 +104,7 @@ export default function UploadPage() {
         thumbnailUrl: thumbnailUrl || undefined,
         duration: durationSeconds,
         cloudinaryPublicId: cloudinaryPublicId || undefined,
+        genre: genre || undefined,
       });
 
       toast.success("Video uploaded successfully!");
@@ -286,6 +288,28 @@ export default function UploadPage() {
               placeholder="Enter video title"
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
             />
+          </div>
+
+          {/* Genre */}
+          <div className="bg-gray-800 rounded-xl p-6">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <FileText className="w-4 h-4 text-purple-400" />
+              Genre
+            </label>
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            >
+              <option value="">Select a genre (optional)</option>
+              <option value="POP">Pop</option>
+              <option value="ROCK">Rock</option>
+              <option value="REGGAE">Reggae</option>
+              <option value="GOSPEL_LOCAL">Gospel (Local)</option>
+              <option value="GOSPEL_INTERNATIONAL">Gospel (International)</option>
+              <option value="RNB">R&B</option>
+              <option value="HIPHOP">Hip Hop</option>
+            </select>
           </div>
 
           {/* Description */}

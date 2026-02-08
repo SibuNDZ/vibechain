@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Luckiest_Guy } from "next/font/google";
+import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -19,17 +19,7 @@ const Header = dynamic(
   { ssr: false }
 );
 
-const fredoka = Fredoka({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "600", "700"],
-});
-
-const luckiestGuy = Luckiest_Guy({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: "400",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "VibeChain - Music Video Platform",
@@ -52,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${fredoka.variable} ${luckiestGuy.variable}`}>
+      <body className={inter.className}>
         <Providers>
           <Toaster
             position="top-right"
