@@ -103,6 +103,23 @@ export default function Home() {
             </p>
           </div>
         </section>
+
+        <footer className="px-6 pb-12 max-w-6xl mx-auto">
+          <div className="border-t border-gray-800 pt-6 flex flex-wrap items-center gap-4 text-sm text-gray-400">
+            <Link href="/legal" className="hover:text-gray-200">
+              Legal
+            </Link>
+            <Link href="/terms" className="hover:text-gray-200">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-gray-200">
+              Privacy
+            </Link>
+            <Link href="/cookies" className="hover:text-gray-200">
+              Cookies
+            </Link>
+          </div>
+        </footer>
       </main>
     );
   }
@@ -241,6 +258,23 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      <footer className="px-6 pb-12 max-w-6xl mx-auto">
+        <div className="border-t border-gray-800 pt-6 flex flex-wrap items-center gap-4 text-sm text-gray-400">
+          <Link href="/legal" className="hover:text-gray-200">
+            Legal
+          </Link>
+          <Link href="/terms" className="hover:text-gray-200">
+            Terms
+          </Link>
+          <Link href="/privacy" className="hover:text-gray-200">
+            Privacy
+          </Link>
+          <Link href="/cookies" className="hover:text-gray-200">
+            Cookies
+          </Link>
+        </div>
+      </footer>
 
       {/* Ad Space Placeholder */}
       <section className="px-6 py-8 max-w-6xl mx-auto">
