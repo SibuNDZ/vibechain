@@ -103,7 +103,7 @@ export function VideoUploader({
       formData.append("resource_type", "video");
       // Request thumbnail generation
       formData.append("eager", "c_thumb,w_400,h_225,g_auto");
-      formData.append("eager_async", "false");
+      formData.append("eager_async", "true");
 
       // Step 3: Upload to Cloudinary with progress tracking
       const xhr = new XMLHttpRequest();
