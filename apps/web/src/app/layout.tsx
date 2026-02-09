@@ -32,12 +32,12 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon-192.png",
-    apple: "/icon-192.png",
+    apple: "/icon-512.png",
   },
 };
 
 export const viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#dc2626",
 };
 
 export default function RootLayout({
