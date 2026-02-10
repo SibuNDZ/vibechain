@@ -166,6 +166,7 @@ export interface Video {
   title: string;
   description: string;
   videoUrl: string;
+  streamingUrl?: string;
   thumbnailUrl: string | null;
   status: "PENDING" | "APPROVED" | "REJECTED";
   genre: VideoGenre | null;

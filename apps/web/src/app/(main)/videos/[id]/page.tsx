@@ -126,7 +126,7 @@ export default function VideoDetailPage() {
             {/* Video player */}
             <div className="aspect-video bg-black rounded-xl overflow-hidden">
               <VideoPlayer
-                src={video.videoUrl}
+                src={video.streamingUrl || video.videoUrl}
                 poster={video.thumbnailUrl || undefined}
               />
             </div>

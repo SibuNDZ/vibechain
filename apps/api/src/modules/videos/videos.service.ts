@@ -4,13 +4,32 @@ import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
 import { VideoGenre } from "@prisma/client";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
+import { UploadService } from "../upload/upload.service";
 
 @Injectable()
 export class VideosService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly uploadService: UploadService
   ) {}
+
+  private withStreamingUrl<T extends { cloudinaryPublicId?: string | null }>(
+    video: T
+  ): T & { streamingUrl?: string } {
+    if (!video?.cloudinaryPublicId) {
+      return video;
+    }
+
+    try {
+      return {
+        ...video,
+        streamingUrl: this.uploadService.getStreamingUrl(video.cloudinaryPublicId),
+      };
+    } catch {
+      return video;
+    }
+  }
 
   async create(userId: string, dto: CreateVideoDto) {
     try {
@@ -31,7 +50,7 @@ export class VideosService {
         },
       });
 
-      return video;
+      return this.withStreamingUrl(video);
     } catch (error) {
       handleDatabaseError(error, "VideosService.create");
     }
@@ -70,7 +89,7 @@ export class VideosService {
       ]);
 
       return {
-        data: videos,
+        data: videos.map((video) => this.withStreamingUrl(video)),
         meta: {
           total,
           page,
@@ -100,7 +119,7 @@ export class VideosService {
         throw new NotFoundException("Video not found");
       }
 
-      return video;
+      return this.withStreamingUrl(video);
     } catch (error) {
       handleDatabaseError(error, "VideosService.findById");
     }
@@ -108,13 +127,14 @@ export class VideosService {
 
   async findByUser(userId: string) {
     try {
-      return await this.prisma.video.findMany({
+      const videos = await this.prisma.video.findMany({
         where: { userId },
         include: {
           _count: { select: { votes: true } },
         },
         orderBy: { createdAt: "desc" },
       });
+      return videos.map((video) => this.withStreamingUrl(video));
     } catch (error) {
       handleDatabaseError(error, "VideosService.findByUser");
     }
@@ -141,7 +161,7 @@ export class VideosService {
 
   async getTopVideos(limit = 10) {
     try {
-      return await this.prisma.video.findMany({
+      const videos = await this.prisma.video.findMany({
         where: { status: "APPROVED" },
         take: limit,
         orderBy: { votes: { _count: "desc" } },
@@ -152,6 +172,7 @@ export class VideosService {
           _count: { select: { votes: true } },
         },
       });
+      return videos.map((video) => this.withStreamingUrl(video));
     } catch (error) {
       handleDatabaseError(error, "VideosService.getTopVideos");
     }

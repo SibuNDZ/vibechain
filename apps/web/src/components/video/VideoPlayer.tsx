@@ -15,6 +15,16 @@ export function VideoPlayer({ src, poster, onReady }: VideoPlayerProps) {
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Player | null>(null);
 
+  const getSourceType = (url: string) => {
+    const lower = url.toLowerCase();
+    if (lower.includes(".m3u8")) return "application/x-mpegURL";
+    if (lower.includes(".webm")) return "video/webm";
+    if (lower.includes(".mov")) return "video/quicktime";
+    if (lower.includes(".avi")) return "video/x-msvideo";
+    if (lower.includes(".mkv")) return "video/x-matroska";
+    return "video/mp4";
+  };
+
   useEffect(() => {
     if (!playerRef.current && videoRef.current) {
       const videoElement = document.createElement("video-js");
@@ -30,7 +40,7 @@ export function VideoPlayer({ src, poster, onReady }: VideoPlayerProps) {
         sources: [
           {
             src,
-            type: "application/x-mpegURL",
+            type: getSourceType(src),
           },
         ],
       }));
