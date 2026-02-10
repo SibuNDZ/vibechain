@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable, OnModuleInit, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -26,11 +26,41 @@ export class UploadService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
-    cloudinary.config({
-      cloud_name: this.configService.get<string>("CLOUDINARY_CLOUD_NAME"),
-      api_key: this.configService.get<string>("CLOUDINARY_API_KEY"),
-      api_secret: this.configService.get<string>("CLOUDINARY_API_SECRET"),
-    });
+    const cloudName = this.configService.get<string>("CLOUDINARY_CLOUD_NAME");
+    const apiKey = this.configService.get<string>("CLOUDINARY_API_KEY");
+    const apiSecret = this.configService.get<string>("CLOUDINARY_API_SECRET");
+
+    if (cloudName && apiKey && apiSecret) {
+      cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret,
+      });
+    }
+  }
+
+  private getCloudinaryConfig() {
+    const cloudName = this.configService.get<string>("CLOUDINARY_CLOUD_NAME");
+    const apiKey = this.configService.get<string>("CLOUDINARY_API_KEY");
+    const apiSecret = this.configService.get<string>("CLOUDINARY_API_SECRET");
+
+    const missing = [
+      !cloudName ? "CLOUDINARY_CLOUD_NAME" : null,
+      !apiKey ? "CLOUDINARY_API_KEY" : null,
+      !apiSecret ? "CLOUDINARY_API_SECRET" : null,
+    ].filter(Boolean);
+
+    if (missing.length > 0) {
+      throw new ServiceUnavailableException(
+        `Cloudinary not configured. Missing ${missing.join(", ")}`
+      );
+    }
+
+    return {
+      cloudName: cloudName!,
+      apiKey: apiKey!,
+      apiSecret: apiSecret!,
+    };
   }
 
   /**
@@ -38,12 +68,12 @@ export class UploadService implements OnModuleInit {
    * This allows the frontend to upload directly to Cloudinary without going through our server
    */
   generateUploadSignature(folder = "videos"): UploadSignature {
+    const { cloudName, apiKey, apiSecret } = this.getCloudinaryConfig();
     const timestamp = Math.round(Date.now() / 1000);
 
     const paramsToSign = {
       timestamp,
       folder,
-      resource_type: "video",
       // Enable automatic thumbnail generation
       eager: "c_thumb,w_400,h_225,g_auto",
       eager_async: true,
@@ -51,14 +81,14 @@ export class UploadService implements OnModuleInit {
 
     const signature = cloudinary.utils.api_sign_request(
       paramsToSign,
-      this.configService.get<string>("CLOUDINARY_API_SECRET")!
+      apiSecret
     );
 
     return {
       signature,
       timestamp,
-      cloudName: this.configService.get<string>("CLOUDINARY_CLOUD_NAME")!,
-      apiKey: this.configService.get<string>("CLOUDINARY_API_KEY")!,
+      cloudName,
+      apiKey,
       folder,
     };
   }
@@ -67,6 +97,7 @@ export class UploadService implements OnModuleInit {
    * Generate thumbnail URL from a video public_id
    */
   getThumbnailUrl(publicId: string, options?: { width?: number; height?: number; timestamp?: number }): string {
+    this.getCloudinaryConfig();
     const { width = 400, height = 225, timestamp } = options || {};
 
     const transformations: string[] = [
@@ -92,6 +123,7 @@ export class UploadService implements OnModuleInit {
    * Generate video URL with optional transformations
    */
   getVideoUrl(publicId: string, options?: { quality?: string; format?: string }): string {
+    this.getCloudinaryConfig();
     const { quality = "auto", format = "mp4" } = options || {};
 
     return cloudinary.url(publicId, {
@@ -107,6 +139,7 @@ export class UploadService implements OnModuleInit {
    * Generate HLS streaming URL for adaptive bitrate streaming
    */
   getStreamingUrl(publicId: string): string {
+    this.getCloudinaryConfig();
     return cloudinary.url(publicId, {
       resource_type: "video",
       format: "m3u8",
@@ -118,6 +151,7 @@ export class UploadService implements OnModuleInit {
    * Delete a video from Cloudinary
    */
   async deleteVideo(publicId: string): Promise<void> {
+    this.getCloudinaryConfig();
     await cloudinary.uploader.destroy(publicId, {
       resource_type: "video",
     });
@@ -127,6 +161,7 @@ export class UploadService implements OnModuleInit {
    * Get video details from Cloudinary
    */
   async getVideoDetails(publicId: string): Promise<CloudinaryUploadResult | null> {
+    this.getCloudinaryConfig();
     try {
       const result = await cloudinary.api.resource(publicId, {
         resource_type: "video",

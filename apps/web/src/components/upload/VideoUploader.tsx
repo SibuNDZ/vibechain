@@ -50,6 +50,14 @@ export function VideoUploader({
   onUploadStart,
   maxSizeMB = 500,
 }: VideoUploaderProps) {
+  const getErrorMessage = (err: unknown, fallback = "Upload failed") => {
+    if (err instanceof Error) return err.message;
+    if (err && typeof err === "object" && "message" in err) {
+      return String((err as { message: unknown }).message);
+    }
+    return fallback;
+  };
+
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +100,14 @@ export function VideoUploader({
     try {
       // Step 1: Get upload signature from our API
       const signatureData = await api.get<UploadSignature>("/upload/signature");
+      if (
+        !signatureData?.signature ||
+        !signatureData?.timestamp ||
+        !signatureData?.apiKey ||
+        !signatureData?.cloudName
+      ) {
+        throw new Error("Upload is not configured. Missing Cloudinary credentials.");
+      }
 
       // Step 2: Prepare form data for Cloudinary
       const formData = new FormData();
@@ -125,7 +141,16 @@ export function VideoUploader({
             const response = JSON.parse(xhr.responseText);
             resolve(response);
           } else {
-            reject(new Error("Upload failed"));
+            let message = "Upload failed";
+            try {
+              const data = JSON.parse(xhr.responseText);
+              message = data?.error?.message || data?.message || message;
+            } catch {
+              if (xhr.responseText) {
+                message = xhr.responseText;
+              }
+            }
+            reject(new Error(message));
           }
         });
 
@@ -156,7 +181,7 @@ export function VideoUploader({
       toast.success("Video uploaded successfully!");
     } catch (err) {
       setStatus("error");
-      const message = err instanceof Error ? err.message : "Upload failed";
+      const message = getErrorMessage(err);
       setError(message);
       toast.error(message);
     }

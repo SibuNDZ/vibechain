@@ -4,9 +4,14 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
 }
 
-interface ApiError {
-  message: string;
+class ApiError extends Error {
   statusCode: number;
+
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.name = "ApiError";
+    this.statusCode = statusCode;
+  }
 }
 
 class ApiClient {
@@ -54,17 +59,22 @@ class ApiClient {
       return {} as T;
     }
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const error: ApiError = {
-        message: data.message || `API Error: ${response.status}`,
-        statusCode: response.status,
-      };
-      throw error;
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
     }
 
-    return data;
+    if (!response.ok) {
+      const message =
+        data?.message ||
+        data?.error ||
+        `API Error: ${response.status}`;
+      throw new ApiError(message, response.status);
+    }
+
+    return (data ?? {}) as T;
   }
 
   get<T>(endpoint: string, options?: RequestOptions) {
