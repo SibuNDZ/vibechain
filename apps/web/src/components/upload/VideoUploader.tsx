@@ -266,7 +266,7 @@ export function VideoUploader({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-orange-300 rounded-xl p-8 text-center cursor-pointer hover:border-red-500 hover:bg-orange-50 transition-all"
+          className="border-2 border-dashed border-orange-200 bg-white rounded-xl p-8 text-center cursor-pointer hover:border-red-500 hover:bg-orange-50 transition-all shadow-sm"
         >
           <input
             ref={fileInputRef}
@@ -275,7 +275,7 @@ export function VideoUploader({
             onChange={handleFileInputChange}
             className="hidden"
           />
-          <Upload className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+          <Upload className="w-12 h-12 text-orange-500 mx-auto mb-4" />
           <p className="text-lg font-medium text-slate-900 mb-2">
             Drag and drop your video here
           </p>
@@ -289,8 +289,8 @@ export function VideoUploader({
       {(status === "uploading" || status === "processing") && (
         <div className="vc-card p-6">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Film className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+              <Film className="w-6 h-6 text-red-600" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-slate-900 font-medium truncate">{fileName}</p>
@@ -306,7 +306,7 @@ export function VideoUploader({
             </button>
           </div>
 
-          <div className="relative h-2 bg-orange-100 rounded-full overflow-hidden">
+          <div className="relative h-2 bg-orange-50 rounded-full overflow-hidden">
             <div
               className="absolute inset-y-0 left-0 bg-red-600 transition-all duration-300"
               style={{ width: `${status === "processing" ? 100 : progress}%` }}
@@ -330,7 +330,7 @@ export function VideoUploader({
       {status === "complete" && preview && (
         <div className="vc-card p-6">
           <div className="flex items-start gap-4">
-            <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-orange-100 flex-shrink-0">
+            <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-orange-50 flex-shrink-0">
               <video
                 src={preview}
                 className="w-full h-full object-cover"
@@ -376,7 +376,7 @@ export function VideoUploader({
             </div>
             <button
               onClick={handleReset}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 vc-primary-button rounded-lg transition-colors"
             >
               Try again
             </button>

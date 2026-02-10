@@ -75,6 +75,16 @@ enum VideoStatus {
 }
 
 enum VideoGenre {
+  AMAPIANO
+  KWAITO
+  GQOM
+  MASKANDI
+  MBAQANGA
+  ISICATHAMIYA
+  MARABI
+  KWELA
+  BOEREMUSIEK
+  LEKOMPO
   POP
   ROCK
   REGGAE

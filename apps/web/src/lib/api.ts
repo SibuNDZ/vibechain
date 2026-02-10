@@ -153,6 +153,16 @@ export const api = new ApiClient(API_BASE_URL);
 
 // Type definitions for API responses
 export type VideoGenre =
+  | "AMAPIANO"
+  | "KWAITO"
+  | "GQOM"
+  | "MASKANDI"
+  | "MBAQANGA"
+  | "ISICATHAMIYA"
+  | "MARABI"
+  | "KWELA"
+  | "BOEREMUSIEK"
+  | "LEKOMPO"
   | "POP"
   | "ROCK"
   | "REGGAE"
