@@ -18,17 +18,31 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("vibechain_token");
-    const userData = localStorage.getItem("vibechain_user");
+    const checkAuth = () => {
+      const token = localStorage.getItem("vibechain_token");
+      const userData = localStorage.getItem("vibechain_user");
 
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch {
+      if (token && userData) {
+        try {
+          setUser(JSON.parse(userData));
+        } catch {
+          setUser(null);
+        }
+      } else {
         setUser(null);
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    checkAuth();
+
+    window.addEventListener("storage", checkAuth);
+    window.addEventListener("auth-change", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("auth-change", checkAuth);
+    };
   }, []);
 
   // Loading state

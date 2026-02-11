@@ -180,8 +180,52 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <ConnectButton />
+          <div>
+            <ConnectButton.Custom>
+              {({
+                account,
+                chain,
+                openAccountModal,
+                openChainModal,
+                openConnectModal,
+                mounted,
+              }) => {
+                const ready = mounted;
+                const connected = ready && account && chain;
+
+                return (
+                  <div
+                    className={!ready ? "opacity-0 pointer-events-none select-none" : ""}
+                  >
+                    {!connected ? (
+                      <button
+                        type="button"
+                        onClick={openConnectModal}
+                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                      >
+                        Connect Wallet
+                      </button>
+                    ) : chain?.unsupported ? (
+                      <button
+                        type="button"
+                        onClick={openChainModal}
+                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                      >
+                        Wrong network
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={openAccountModal}
+                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                      >
+                        {account.displayName}
+                      </button>
+                    )}
+                  </div>
+                );
+              }}
+            </ConnectButton.Custom>
           </div>
 
           {isConnected && (

@@ -95,11 +95,11 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-2xl mx-auto px-4">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 w-48 bg-gray-800 rounded" />
-            <div className="h-64 bg-gray-800 rounded-xl" />
+            <div className="h-8 w-48 bg-orange-100 rounded" />
+            <div className="h-64 bg-orange-50 border border-orange-100 rounded-xl" />
           </div>
         </div>
       </div>
@@ -109,26 +109,26 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Back Button */}
         <Link
           href={`/users/${user.id}`}
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Profile
         </Link>
 
-        <h1 className="text-3xl font-bold text-white mb-8">Settings</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-8">Settings</h1>
 
         {/* Success/Error Message */}
         {message && (
           <div
             className={`p-4 rounded-lg mb-6 ${
               message.type === "success"
-                ? "bg-green-900/50 text-green-300 border border-green-700"
-                : "bg-red-900/50 text-red-300 border border-red-700"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-600 border border-red-200"
             }`}
           >
             {message.text}
@@ -136,10 +136,10 @@ export default function SettingsPage() {
         )}
 
         {/* Profile Settings */}
-        <div className="bg-gray-800 rounded-xl p-6 mb-6">
+        <div className="vc-card p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <User className="w-5 h-5 text-purple-400" />
-            <h2 className="text-xl font-semibold text-white">Profile Settings</h2>
+            <User className="w-5 h-5 text-red-600" />
+            <h2 className="text-xl font-semibold text-slate-900">Profile Settings</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -149,18 +149,18 @@ export default function SettingsPage() {
                 <img
                   src={avatarUrl}
                   alt="Avatar preview"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-700"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-orange-200"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-20 h-20 rounded-full bg-red-600 flex items-center justify-center text-white text-2xl font-bold">
                   {username.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-600 mb-1">
                   Avatar URL
                 </label>
                 <input
@@ -168,14 +168,14 @@ export default function SettingsPage() {
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-2 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
                 />
               </div>
             </div>
 
             {/* Username */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-slate-600 mb-1">
                 Username
               </label>
               <input
@@ -184,13 +184,13 @@ export default function SettingsPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 minLength={3}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
               />
             </div>
 
             {/* Bio */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-slate-600 mb-1">
                 Bio
               </label>
               <textarea
@@ -198,23 +198,23 @@ export default function SettingsPage() {
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
                 placeholder="Tell us about yourself..."
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full px-4 py-2 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 resize-none"
               />
             </div>
 
             {/* Email (read-only) */}
             {user.email && (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-600 mb-1">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-400 cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg text-slate-500 cursor-not-allowed"
                 />
-                <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
+                <p className="mt-1 text-xs text-slate-500">Email cannot be changed</p>
               </div>
             )}
 
@@ -222,7 +222,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="flex items-center justify-center gap-2 w-full px-6 py-3 vc-primary-button rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {isSaving ? (
                 <>
@@ -240,37 +240,81 @@ export default function SettingsPage() {
         </div>
 
         {/* Wallet Settings */}
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="vc-card p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Wallet className="w-5 h-5 text-purple-400" />
-            <h2 className="text-xl font-semibold text-white">Wallet Settings</h2>
+            <Wallet className="w-5 h-5 text-orange-600" />
+            <h2 className="text-xl font-semibold text-slate-900">Wallet Settings</h2>
           </div>
 
           <div className="space-y-4">
             {user.walletAddress ? (
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-600 mb-1">
                   Connected Wallet
                 </label>
                 <div className="flex items-center gap-3">
-                  <code className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 font-mono text-sm">
+                  <code className="flex-1 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg text-slate-700 font-mono text-sm">
                     {formatAddress(user.walletAddress)}
                   </code>
-                  <span className="px-3 py-1 bg-green-900/50 text-green-400 text-sm rounded-full border border-green-700">
+                  <span className="px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full border border-green-200">
                     Connected
                   </span>
                 </div>
               </div>
             ) : (
               <div>
-                <p className="text-gray-400 mb-4">
+                <p className="text-slate-600 mb-4">
                   Connect a wallet to vote and contribute to crowdfunding campaigns.
                 </p>
               </div>
             )}
 
-            <div className="pt-4 border-t border-gray-700">
-              <ConnectButton />
+            <div className="pt-4 border-t border-orange-100">
+              <ConnectButton.Custom>
+                {({
+                  account,
+                  chain,
+                  openAccountModal,
+                  openChainModal,
+                  openConnectModal,
+                  mounted,
+                }) => {
+                  const ready = mounted;
+                  const connected = ready && account && chain;
+
+                  return (
+                    <div
+                      className={!ready ? "opacity-0 pointer-events-none select-none" : ""}
+                    >
+                      {!connected ? (
+                        <button
+                          type="button"
+                          onClick={openConnectModal}
+                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                        >
+                          Connect Wallet
+                        </button>
+                      ) : chain?.unsupported ? (
+                        <button
+                          type="button"
+                          onClick={openChainModal}
+                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                        >
+                          Wrong network
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={openAccountModal}
+                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
+                        >
+                          {account.displayName}
+                        </button>
+                      )}
+                    </div>
+                  );
+                }}
+              </ConnectButton.Custom>
             </div>
           </div>
         </div>
