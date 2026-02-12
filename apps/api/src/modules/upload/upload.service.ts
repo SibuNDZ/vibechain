@@ -35,6 +35,7 @@ export class UploadService implements OnModuleInit {
         cloud_name: cloudName,
         api_key: apiKey,
         api_secret: apiSecret,
+        secure: true,
       });
     }
   }
@@ -116,6 +117,7 @@ export class UploadService implements OnModuleInit {
       resource_type: "video",
       transformation: transformations.join(","),
       format: "jpg",
+      secure: true,
     });
   }
 
@@ -132,6 +134,7 @@ export class UploadService implements OnModuleInit {
         { quality },
         { fetch_format: format },
       ],
+      secure: true,
     });
   }
 
@@ -144,6 +147,7 @@ export class UploadService implements OnModuleInit {
       resource_type: "video",
       format: "m3u8",
       streaming_profile: "auto",
+      secure: true,
     });
   }
 
