@@ -76,7 +76,7 @@ export class UploadService implements OnModuleInit {
       timestamp,
       folder,
       // Enable automatic thumbnail generation
-      eager: "c_thumb,w_400,h_225,g_auto",
+      eager: "c_thumb,w_1280,h_720,g_auto",
       eager_async: true,
     };
 
@@ -99,7 +99,7 @@ export class UploadService implements OnModuleInit {
    */
   getThumbnailUrl(publicId: string, options?: { width?: number; height?: number; timestamp?: number }): string {
     this.getCloudinaryConfig();
-    const { width = 400, height = 225, timestamp } = options || {};
+    const { width = 1280, height = 720, timestamp } = options || {};
 
     const transformations: string[] = [
       `c_thumb`,

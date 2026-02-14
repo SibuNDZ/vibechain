@@ -163,10 +163,27 @@ export function VideoUploader({
 
       const response = await uploadPromise;
 
-      // Generate thumbnail URL from the video
-      const thumbnailUrl =
+      // Generate high-res thumbnail URL from the video
+      let thumbnailUrl =
         response.eager?.[0]?.secure_url ||
         response.secure_url.replace(/\.[^.]+$/, ".jpg");
+
+      if (response.public_id) {
+        try {
+          const thumbResponse = await api.get<{ url: string }>("/upload/thumbnail-url", {
+            params: {
+              publicId: response.public_id,
+              width: "1280",
+              height: "720",
+            },
+          });
+          if (thumbResponse?.url) {
+            thumbnailUrl = thumbResponse.url;
+          }
+        } catch {
+          // Fall back to eager or derived thumbnail URL
+        }
+      }
 
       setUploadedData(response);
       setStatus("complete");

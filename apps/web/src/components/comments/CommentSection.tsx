@@ -184,7 +184,7 @@ export function CommentSection({
 
     return (
       <div className={cn("flex gap-3", isReply && "ml-8 mt-3")}>
-        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
           {comment.user.avatarUrl ? (
             <img
               src={comment.user.avatarUrl}
@@ -199,20 +199,20 @@ export function CommentSection({
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-white text-sm">
+            <span className="font-semibold text-slate-900 text-sm">
               {comment.user.username}
             </span>
-            <span className="text-gray-500 text-xs">
+            <span className="text-slate-500 text-xs">
               {formatTimeAgo(comment.createdAt)}
             </span>
           </div>
-          <p className="text-gray-300 text-sm mt-1">{comment.content}</p>
+          <p className="text-slate-700 text-sm mt-1">{comment.content}</p>
 
           <div className="flex items-center gap-4 mt-2">
             {isAuthenticated && !isReply && (
               <button
                 onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                className="text-gray-500 text-xs hover:text-purple-400 transition-colors"
+                className="text-slate-500 text-xs hover:text-red-600 transition-colors"
               >
                 Reply
               </button>
@@ -220,7 +220,7 @@ export function CommentSection({
             {canDelete && (
               <button
                 onClick={() => handleDeleteComment(comment.id, comment.parentId)}
-                className="text-gray-500 text-xs hover:text-red-400 transition-colors flex items-center gap-1"
+                className="text-slate-500 text-xs hover:text-red-600 transition-colors flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" />
                 Delete
@@ -236,7 +236,7 @@ export function CommentSection({
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="Write a reply..."
-                className="flex-1 bg-gray-700 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="flex-1 bg-white text-slate-900 text-sm rounded-lg px-3 py-2 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -247,7 +247,7 @@ export function CommentSection({
               <button
                 onClick={() => handleSubmitReply(comment.id)}
                 disabled={isSubmitting || !replyContent.trim()}
-                className="bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="vc-primary-button px-3 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -258,7 +258,7 @@ export function CommentSection({
           {!isReply && replyCount > 0 && (
             <button
               onClick={() => toggleReplies(comment.id)}
-              className="text-purple-400 text-xs mt-2 flex items-center gap-1 hover:text-purple-300"
+              className="text-orange-600 text-xs mt-2 flex items-center gap-1 hover:text-red-600"
             >
               {isExpanded ? (
                 <>
@@ -288,10 +288,10 @@ export function CommentSection({
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6">
+    <div className="vc-card p-6">
       <div className="flex items-center gap-2 mb-6">
-        <MessageCircle className="w-5 h-5 text-purple-400" />
-        <h2 className="text-xl font-semibold text-white">
+        <MessageCircle className="w-5 h-5 text-orange-500" />
+        <h2 className="text-xl font-semibold text-slate-900">
           Comments {comments.length > 0 && `(${comments.length})`}
         </h2>
       </div>
@@ -305,12 +305,12 @@ export function CommentSection({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 bg-white text-slate-900 rounded-lg px-4 py-3 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
             />
             <button
               type="submit"
               disabled={isSubmitting || !newComment.trim()}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="vc-primary-button px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Send className="w-4 h-4" />
               Post
@@ -318,10 +318,10 @@ export function CommentSection({
           </div>
         </form>
       ) : (
-        <div className="mb-6 p-4 bg-gray-700 rounded-lg text-center">
-          <p className="text-gray-400">
+        <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-center">
+          <p className="text-slate-600">
             Please{" "}
-            <a href="/login" className="text-purple-400 hover:underline">
+            <a href="/login" className="text-red-600 hover:underline">
               sign in
             </a>{" "}
             to leave a comment
@@ -334,18 +334,18 @@ export function CommentSection({
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex gap-3 animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-gray-700" />
+              <div className="w-8 h-8 rounded-full bg-orange-100" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-700 rounded w-24" />
-                <div className="h-3 bg-gray-700 rounded w-3/4" />
+                <div className="h-4 bg-orange-100 rounded w-24" />
+                <div className="h-3 bg-orange-100 rounded w-3/4" />
               </div>
             </div>
           ))}
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8">
-          <MessageCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+          <MessageCircle className="w-12 h-12 text-orange-200 mx-auto mb-3" />
+          <p className="text-slate-500">No comments yet. Be the first to comment!</p>
         </div>
       ) : (
         <div className="space-y-6">

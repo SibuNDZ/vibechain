@@ -82,7 +82,7 @@ export function FollowButton({
         href="/login"
         className={cn(
           "inline-flex items-center gap-2 font-semibold rounded-full transition-all",
-          "bg-purple-600 text-white hover:bg-purple-700",
+          "bg-red-600 text-white hover:bg-red-700",
           size === "sm" && "px-3 py-1.5 text-sm",
           size === "md" && "px-4 py-2",
           size === "lg" && "px-6 py-3 text-lg"
@@ -100,7 +100,7 @@ export function FollowButton({
         disabled
         className={cn(
           "inline-flex items-center gap-2 font-semibold rounded-full transition-all",
-          "bg-gray-700 text-gray-400 cursor-wait",
+          "bg-orange-100 text-orange-400 cursor-wait",
           size === "sm" && "px-3 py-1.5 text-sm",
           size === "md" && "px-4 py-2",
           size === "lg" && "px-6 py-3 text-lg"
@@ -118,8 +118,8 @@ export function FollowButton({
       className={cn(
         "inline-flex items-center gap-2 font-semibold rounded-full transition-all",
         isFollowing
-          ? "bg-gray-700 text-white hover:bg-red-600 hover:text-white group"
-          : "bg-purple-600 text-white hover:bg-purple-700",
+          ? "bg-orange-100 text-orange-700 border border-orange-200 hover:bg-red-600 hover:text-white group"
+          : "bg-red-600 text-white hover:bg-red-700",
         isLoading && "opacity-50 cursor-not-allowed",
         size === "sm" && "px-3 py-1.5 text-sm",
         size === "md" && "px-4 py-2",

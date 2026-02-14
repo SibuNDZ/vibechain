@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import "video.js/dist/video-js.css";
 import "./globals.css";
 
 const Providers = dynamic(() => import("@/providers").then((mod) => mod.Providers), {

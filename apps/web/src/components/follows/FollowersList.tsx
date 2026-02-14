@@ -83,24 +83,21 @@ export function FollowersList({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-slate-900/60" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative bg-gray-800 rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden">
+      <div className="relative bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-orange-200">
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-purple-400" />
-            <h2 className="text-lg font-semibold text-white capitalize">
+            <Users className="w-5 h-5 text-orange-500" />
+            <h2 className="text-lg font-semibold text-slate-900 capitalize">
               {type}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-slate-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -112,18 +109,18 @@ export function FollowersList({
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="w-10 h-10 rounded-full bg-gray-700" />
+                  <div className="w-10 h-10 rounded-full bg-orange-100" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-700 rounded w-24" />
-                    <div className="h-3 bg-gray-700 rounded w-16" />
+                    <div className="h-4 bg-orange-100 rounded w-24" />
+                    <div className="h-3 bg-orange-100 rounded w-16" />
                   </div>
                 </div>
               ))}
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-8">
-              <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500">
+              <Users className="w-12 h-12 text-orange-200 mx-auto mb-3" />
+              <p className="text-slate-500">
                 {type === "followers"
                   ? "No followers yet"
                   : "Not following anyone yet"}
@@ -134,7 +131,7 @@ export function FollowersList({
               {users.map((user) => (
                 <div key={user.id} className="flex items-center gap-3">
                   <a href={`/users/${user.id}`} className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center overflow-hidden">
                       {user.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
@@ -151,11 +148,11 @@ export function FollowersList({
                   <div className="flex-1 min-w-0">
                     <a
                       href={`/users/${user.id}`}
-                      className="font-semibold text-white hover:text-purple-400 truncate block"
+                      className="font-semibold text-slate-900 hover:text-red-600 truncate block"
                     >
                       {user.username}
                     </a>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-slate-500">
                       {user._count.followers} followers
                     </p>
                   </div>
@@ -172,7 +169,7 @@ export function FollowersList({
                 <button
                   onClick={loadMore}
                   disabled={isLoading}
-                  className="w-full py-2 text-purple-400 hover:text-purple-300 text-sm font-medium disabled:opacity-50"
+                  className="w-full py-2 text-orange-600 hover:text-red-600 text-sm font-medium disabled:opacity-50"
                 >
                   {isLoading ? "Loading..." : "Load more"}
                 </button>

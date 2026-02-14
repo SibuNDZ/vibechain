@@ -72,15 +72,34 @@ export default function VideoDetailPage() {
     });
   };
 
+  const sources = video
+    ? [
+        ...(video.streamingUrl
+          ? [
+              {
+                src: video.streamingUrl,
+                type: "application/x-mpegURL",
+                label: "Auto (HLS)",
+                isAuto: true,
+              },
+            ]
+          : []),
+        {
+          src: video.videoUrl,
+          label: "MP4 (Original)",
+        },
+      ]
+    : [];
+
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-900 py-8">
+      <main className="min-h-screen bg-white py-8">
         <div className="max-w-6xl mx-auto px-6">
           <div className="animate-pulse">
-            <div className="aspect-video bg-gray-800 rounded-xl mb-6" />
-            <div className="h-8 bg-gray-800 rounded w-1/2 mb-4" />
-            <div className="h-4 bg-gray-800 rounded w-1/4 mb-8" />
-            <div className="h-32 bg-gray-800 rounded" />
+            <div className="aspect-video bg-orange-100 rounded-xl mb-6" />
+            <div className="h-8 bg-gray-200 rounded w-1/2 mb-4" />
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8" />
+            <div className="h-32 bg-gray-200 rounded" />
           </div>
         </div>
       </main>
@@ -89,19 +108,19 @@ export default function VideoDetailPage() {
 
   if (error || !video) {
     return (
-      <main className="min-h-screen bg-gray-900 py-8">
+      <main className="min-h-screen bg-white py-8">
         <div className="max-w-6xl mx-auto px-6">
           <Link
             href="/videos"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6"
+            className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to videos
           </Link>
           <div className="text-center py-16">
             <div className="text-6xl mb-4">404</div>
-            <h1 className="text-2xl font-bold text-white mb-2">Video not found</h1>
-            <p className="text-gray-400">{error || "This video doesn't exist or has been removed."}</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Video not found</h1>
+            <p className="text-slate-500">{error || "This video doesn't exist or has been removed."}</p>
           </div>
         </div>
       </main>
@@ -109,12 +128,12 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-900 py-8">
+    <main className="min-h-screen bg-white py-8">
       <div className="max-w-6xl mx-auto px-6">
         {/* Back button */}
         <Link
           href="/videos"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to videos
@@ -126,15 +145,15 @@ export default function VideoDetailPage() {
             {/* Video player */}
             <div className="aspect-video bg-black rounded-xl overflow-hidden">
               <VideoPlayer
-                src={video.streamingUrl || video.videoUrl}
+                sources={sources}
                 poster={video.thumbnailUrl || undefined}
               />
             </div>
 
             {/* Video info */}
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">{video.title}</h1>
-              <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">{video.title}</h1>
+              <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
                 <span className="flex items-center gap-1">
                   <Heart className="w-4 h-4" />
                   {video._count.votes.toLocaleString()} votes
@@ -156,8 +175,8 @@ export default function VideoDetailPage() {
 
               {/* Description */}
               {video.description && (
-                <div className="bg-gray-800 rounded-xl p-4">
-                  <p className="text-gray-300 whitespace-pre-wrap">{video.description}</p>
+                <div className="vc-card p-4">
+                  <p className="text-slate-700 whitespace-pre-wrap">{video.description}</p>
                 </div>
               )}
             </div>
@@ -172,12 +191,12 @@ export default function VideoDetailPage() {
 
           {/* Sidebar - Artist info */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-800 rounded-xl p-6 sticky top-8">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+            <div className="vc-card p-6 sticky top-8">
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">
                 Artist
               </h3>
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-purple-600 flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center overflow-hidden">
                   {video.user.avatarUrl ? (
                     <img
                       src={video.user.avatarUrl}
@@ -193,22 +212,22 @@ export default function VideoDetailPage() {
                 <div>
                   <Link
                     href={`/users/${video.user.id}`}
-                    className="font-semibold text-white hover:text-purple-400 transition-colors"
+                    className="font-semibold text-slate-900 hover:text-red-600 transition-colors"
                   >
                     {video.user.username}
                   </Link>
                   {followCounts && (
-                    <div className="flex items-center gap-3 text-sm text-gray-400 mt-1">
+                    <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
                       <button
                         onClick={() => setShowFollowers("followers")}
-                        className="hover:text-purple-400 transition-colors"
+                        className="hover:text-red-600 transition-colors"
                       >
                         {followCounts.followers.toLocaleString()} followers
                       </button>
                       <span>|</span>
                       <button
                         onClick={() => setShowFollowers("following")}
-                        className="hover:text-purple-400 transition-colors"
+                        className="hover:text-red-600 transition-colors"
                       >
                         {followCounts.following.toLocaleString()} following
                       </button>
