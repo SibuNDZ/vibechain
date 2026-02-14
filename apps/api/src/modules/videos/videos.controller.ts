@@ -14,6 +14,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { VideosService } from "./videos.service";
 import { VideoGenre } from "@prisma/client";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
+import { AdminGuard } from "../../common/guards/admin.guard";
 
 @ApiTags("videos")
 @Controller("videos")
@@ -59,6 +60,14 @@ export class VideosController {
   @ApiOperation({ summary: "Get current user's uploads (all statuses)" })
   async findMine(@Request() req: { user: { userId: string } }) {
     return this.videosService.findByUser(req.user.userId);
+  }
+
+  @Post("admin/regenerate-thumbnails")
+  @UseGuards(AuthGuard("jwt"), AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Regenerate video thumbnails (admin only)" })
+  async regenerateThumbnails(@Query("force") force?: string) {
+    return this.videosService.regenerateThumbnails(force === "true");
   }
 
   @Get(":id")

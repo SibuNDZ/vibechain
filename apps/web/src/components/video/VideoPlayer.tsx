@@ -26,6 +26,7 @@ export function VideoPlayer({
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Player | null>(null);
+  const [resolvedPoster, setResolvedPoster] = useState<string | undefined>(undefined);
 
   const getSourceType = (url: string) => {
     const lower = url.toLowerCase();
@@ -61,6 +62,29 @@ export function VideoPlayer({
   }, [normalizedSources]);
 
   useEffect(() => {
+    if (!poster) {
+      setResolvedPoster(undefined);
+      return;
+    }
+
+    let cancelled = false;
+    const img = new Image();
+
+    img.onload = () => {
+      if (!cancelled) setResolvedPoster(poster);
+    };
+    img.onerror = () => {
+      if (!cancelled) setResolvedPoster("/placeholder-video.jpg");
+    };
+
+    img.src = poster;
+
+    return () => {
+      cancelled = true;
+    };
+  }, [poster]);
+
+  useEffect(() => {
     if (!playerRef.current && videoRef.current) {
       const videoElement = document.createElement("video-js");
       videoElement.classList.add("video-js", "vjs-big-play-centered");
@@ -73,7 +97,7 @@ export function VideoPlayer({
         fluid: true,
         playsinline: true,
         preload: "auto",
-        poster,
+        poster: resolvedPoster,
         sources: normalizedSources,
       }));
 
@@ -112,10 +136,12 @@ export function VideoPlayer({
         }
       });
     }
-    if (poster) {
-      player.poster(poster);
+    if (resolvedPoster) {
+      player.poster(resolvedPoster);
+    } else {
+      player.poster("");
     }
-  }, [normalizedSources, selectedIndex, poster]);
+  }, [normalizedSources, selectedIndex, resolvedPoster]);
 
   const showSelector = showQualitySelector && normalizedSources.length > 1;
 

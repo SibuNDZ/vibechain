@@ -181,4 +181,49 @@ export class VideosService {
       handleDatabaseError(error, "VideosService.getTopVideos");
     }
   }
+
+  async regenerateThumbnails(force = false) {
+    try {
+      const where = force
+        ? { cloudinaryPublicId: { not: null } }
+        : {
+            cloudinaryPublicId: { not: null },
+            OR: [{ thumbnailUrl: null }, { thumbnailUrl: "" }],
+          };
+
+      const videos = await this.prisma.video.findMany({
+        where,
+        select: { id: true, cloudinaryPublicId: true },
+      });
+
+      let updated = 0;
+      let failed = 0;
+
+      for (const video of videos) {
+        if (!video.cloudinaryPublicId) continue;
+        try {
+          const thumbnailUrl = this.uploadService.getThumbnailUrl(
+            video.cloudinaryPublicId,
+            { width: 1280, height: 720 }
+          );
+          await this.prisma.video.update({
+            where: { id: video.id },
+            data: { thumbnailUrl },
+          });
+          updated += 1;
+        } catch {
+          failed += 1;
+        }
+      }
+
+      return {
+        total: videos.length,
+        updated,
+        failed,
+        force,
+      };
+    } catch (error) {
+      handleDatabaseError(error, "VideosService.regenerateThumbnails");
+    }
+  }
 }
