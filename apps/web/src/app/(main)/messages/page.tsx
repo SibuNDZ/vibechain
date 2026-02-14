@@ -95,13 +95,13 @@ export default function MessagesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 py-8">
+      <div className="min-h-screen bg-white py-8">
         <div className="max-w-2xl mx-auto px-4">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 w-48 bg-gray-800 rounded" />
-            <div className="h-12 bg-gray-800 rounded-lg" />
+            <div className="h-8 w-48 bg-orange-100 rounded" />
+            <div className="h-12 bg-orange-100 rounded-lg" />
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-800 rounded-xl" />
+              <div key={i} className="h-20 bg-orange-100 rounded-xl" />
             ))}
           </div>
         </div>
@@ -110,41 +110,41 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-white py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Link
               href="/videos"
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <h1 className="text-2xl font-bold text-white">Messages</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
           </div>
         </div>
 
         {/* Search */}
         <div className="relative mb-6">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-orange-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
           />
         </div>
 
         {/* Conversations List */}
         {filteredConversations.length === 0 ? (
-          <div className="bg-gray-800 rounded-xl p-12 text-center">
-            <MessageCircle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 mb-2">
+          <div className="vc-card p-12 text-center">
+            <MessageCircle className="w-12 h-12 text-orange-200 mx-auto mb-4" />
+            <p className="text-slate-600 mb-2">
               {searchQuery ? "No conversations found" : "No messages yet"}
             </p>
-            <p className="text-gray-500 text-sm">
+            <p className="text-slate-500 text-sm">
               Start a conversation from someone's profile
             </p>
           </div>
@@ -154,7 +154,7 @@ export default function MessagesPage() {
               <Link
                 key={conv.id}
                 href={`/messages/${conv.id}`}
-                className="flex items-center gap-4 p-4 bg-gray-800 hover:bg-gray-750 rounded-xl transition-colors"
+                className="flex items-center gap-4 p-4 bg-orange-50 border border-orange-200 hover:bg-orange-100 rounded-xl transition-colors"
               >
                 {/* Avatar */}
                 {conv.otherUser.avatarUrl ? (
@@ -164,7 +164,7 @@ export default function MessagesPage() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
+                  <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
                     {conv.otherUser.username.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -172,19 +172,19 @@ export default function MessagesPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-white">
+                    <span className="font-medium text-slate-900">
                       {conv.otherUser.username}
                     </span>
                     {conv.lastMessage && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-slate-500">
                         {formatTimeAgo(conv.lastMessage.createdAt)}
                       </span>
                     )}
                   </div>
                   {conv.lastMessage && (
-                    <p className="text-sm text-gray-400 truncate">
+                    <p className="text-sm text-slate-600 truncate">
                       {conv.lastMessage.isOwn && (
-                        <span className="text-gray-500">You: </span>
+                        <span className="text-slate-500">You: </span>
                       )}
                       {conv.lastMessage.content}
                     </p>
@@ -193,7 +193,7 @@ export default function MessagesPage() {
 
                 {/* Unread Badge */}
                 {conv.unreadCount > 0 && (
-                  <span className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
+                  <span className="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded-full">
                     {conv.unreadCount}
                   </span>
                 )}

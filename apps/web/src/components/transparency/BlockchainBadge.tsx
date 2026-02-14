@@ -53,7 +53,7 @@ export function BlockchainBadge({
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-900/30 border border-green-700/50 rounded-full text-xs font-medium text-green-400 hover:bg-green-900/50 transition-colors",
+          "inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 border border-green-200 rounded-full text-xs font-medium text-green-700 hover:bg-green-100 transition-colors",
           className
         )}
       >
@@ -72,8 +72,8 @@ export function BlockchainBadge({
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
         verified
-          ? "bg-green-900/30 border border-green-700/50 text-green-400"
-          : "bg-gray-800 border border-gray-700 text-gray-400",
+          ? "bg-green-50 border border-green-200 text-green-700"
+          : "bg-orange-50 border border-orange-200 text-slate-500",
         className
       )}
     >

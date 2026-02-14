@@ -45,33 +45,33 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-red-400" />
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
               Something went wrong
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-slate-500 mb-6">
               We encountered an unexpected error. Please try again or refresh the page.
             </p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
                 Try Again
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-orange-100 text-slate-700 rounded-lg hover:bg-orange-200 transition-colors"
               >
                 Refresh Page
               </button>
             </div>
             {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-6 text-left">
-                <summary className="text-gray-500 cursor-pointer hover:text-gray-400">
+                <summary className="text-slate-500 cursor-pointer hover:text-slate-700">
                   Error Details
                 </summary>
-                <pre className="mt-2 p-4 bg-gray-800 rounded-lg text-red-400 text-sm overflow-auto">
+                <pre className="mt-2 p-4 bg-orange-50 rounded-lg text-red-600 text-sm overflow-auto">
                   {this.state.error.message}
                   {"\n\n"}
                   {this.state.error.stack}
@@ -97,29 +97,29 @@ export function PageErrorBoundary({ children, pageName }: PageErrorBoundaryProps
   return (
     <ErrorBoundary
       fallback={
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-white flex items-center justify-center p-6">
           <div className="text-center max-w-md">
             <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="w-10 h-10 text-red-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
               {pageName ? `Error loading ${pageName}` : "Page Error"}
             </h1>
-            <p className="text-gray-400 mb-6">
+            <p className="text-slate-500 mb-6">
               We're sorry, but something went wrong loading this page.
               Please try refreshing or go back to the home page.
             </p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </button>
               <a
                 href="/videos"
-                className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="px-6 py-3 bg-orange-100 text-slate-700 rounded-lg hover:bg-orange-200 transition-colors"
               >
                 Go Home
               </a>
@@ -143,16 +143,16 @@ export function SectionErrorBoundary({ children, sectionName }: SectionErrorBoun
   return (
     <ErrorBoundary
       fallback={
-        <div className="bg-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-          <p className="text-gray-400 mb-4">
+          <p className="text-slate-500 mb-4">
             {sectionName
               ? `Failed to load ${sectionName}`
               : "This section encountered an error"}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="text-purple-400 hover:text-purple-300 text-sm flex items-center gap-1 mx-auto"
+            className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1 mx-auto"
           >
             <RefreshCw className="w-3 h-3" />
             Reload

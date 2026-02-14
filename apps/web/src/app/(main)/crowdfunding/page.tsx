@@ -47,19 +47,19 @@ export default function CrowdfundingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-900 py-8">
+    <main className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Active Campaigns
           </h1>
-          <p className="text-gray-400">
+          <p className="text-slate-500">
             Support top-voted artists in creating their next masterpiece
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
             {error}
           </div>
         )}
@@ -73,10 +73,10 @@ export default function CrowdfundingPage() {
         ) : campaigns.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎬</div>
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
               No active campaigns
             </h2>
-            <p className="text-gray-400">
+            <p className="text-slate-500">
               Check back soon for new crowdfunding opportunities!
             </p>
           </div>

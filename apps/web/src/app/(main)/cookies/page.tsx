@@ -2,10 +2,10 @@
 
 export default function CookiesPage() {
   return (
-    <div className="min-h-screen bg-gray-900 py-10">
-      <div className="max-w-3xl mx-auto px-4 text-gray-200">
-        <h1 className="text-3xl font-bold text-white mb-2">Cookie Policy</h1>
-        <p className="text-sm text-gray-400 mb-8">Last updated: February 8, 2026</p>
+    <div className="min-h-screen bg-white py-10">
+      <div className="max-w-3xl mx-auto px-4 text-slate-700">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Cookie Policy</h1>
+        <p className="text-sm text-slate-500 mb-8">Last updated: February 8, 2026</p>
 
         <section className="space-y-6 text-sm leading-6">
           <p>
@@ -14,7 +14,7 @@ export default function CookiesPage() {
           </p>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">1. What Are Cookies?</h2>
+            <h2 className="text-lg font-semibold text-slate-900">1. What Are Cookies?</h2>
             <p>
               Cookies are small text files placed on your device to store
               information about your visit and preferences.
@@ -22,7 +22,7 @@ export default function CookiesPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">2. How We Use Cookies</h2>
+            <h2 className="text-lg font-semibold text-slate-900">2. How We Use Cookies</h2>
             <ul className="list-disc pl-6 space-y-1">
               <li>Essential functionality (authentication, security).</li>
               <li>Performance and analytics.</li>
@@ -31,7 +31,7 @@ export default function CookiesPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">3. Managing Cookies</h2>
+            <h2 className="text-lg font-semibold text-slate-900">3. Managing Cookies</h2>
             <p>
               You can control cookies through your browser settings. Disabling
               cookies may affect some features of the service.
@@ -39,7 +39,7 @@ export default function CookiesPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">4. Updates</h2>
+            <h2 className="text-lg font-semibold text-slate-900">4. Updates</h2>
             <p>
               We may update this Cookie Policy. We will post the updated policy
               and revise the "Last updated" date above.
@@ -47,10 +47,10 @@ export default function CookiesPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">5. Contact</h2>
+            <h2 className="text-lg font-semibold text-slate-900">5. Contact</h2>
             <p>
               For questions about this Cookie Policy, contact us at{" "}
-              <span className="text-gray-100">[PRIVACY_EMAIL]</span>.
+              <span className="text-slate-900">info@dsnresearch.com</span>.
             </p>
           </div>
         </section>

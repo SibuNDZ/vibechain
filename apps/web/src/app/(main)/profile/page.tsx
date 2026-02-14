@@ -23,8 +23,8 @@ export default function ProfileRedirect() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div className="animate-pulse text-gray-400">Redirecting to profile...</div>
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="animate-pulse text-slate-500">Redirecting to profile...</div>
     </div>
   );
 }

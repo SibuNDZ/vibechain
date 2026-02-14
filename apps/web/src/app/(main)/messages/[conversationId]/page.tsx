@@ -150,8 +150,8 @@ export default function ConversationPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
       </div>
     );
   }
@@ -173,13 +173,13 @@ export default function ConversationPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <div className="sticky top-16 z-40 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-orange-200">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
             href="/messages"
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -194,11 +194,11 @@ export default function ConversationPage() {
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
                 {conversation.otherUser.username.charAt(0).toUpperCase()}
               </div>
             )}
-            <span className="font-medium text-white">
+            <span className="font-medium text-slate-900">
               {conversation.otherUser.username}
             </span>
           </Link>
@@ -212,7 +212,7 @@ export default function ConversationPage() {
             <div key={groupIndex}>
               {/* Date Separator */}
               <div className="flex items-center justify-center mb-4">
-                <span className="px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded-full">
+                <span className="px-3 py-1 bg-orange-100 text-slate-600 text-xs rounded-full">
                   {group.date}
                 </span>
               </div>
@@ -227,8 +227,8 @@ export default function ConversationPage() {
                     <div
                       className={`max-w-[75%] ${
                         msg.isOwn
-                          ? "bg-purple-600 text-white rounded-2xl rounded-br-md"
-                          : "bg-gray-800 text-white rounded-2xl rounded-bl-md"
+                          ? "bg-red-600 text-white rounded-2xl rounded-br-md"
+                          : "bg-orange-50 border border-orange-200 text-slate-800 rounded-2xl rounded-bl-md"
                       } px-4 py-2`}
                     >
                       <p className="whitespace-pre-wrap break-words">
@@ -236,7 +236,7 @@ export default function ConversationPage() {
                       </p>
                       <p
                         className={`text-xs mt-1 ${
-                          msg.isOwn ? "text-purple-200" : "text-gray-400"
+                          msg.isOwn ? "text-orange-100" : "text-slate-500"
                         }`}
                       >
                         {formatTime(msg.createdAt)}
@@ -252,7 +252,7 @@ export default function ConversationPage() {
       </div>
 
       {/* Input */}
-      <div className="sticky bottom-0 bg-gray-900 border-t border-gray-800">
+      <div className="sticky bottom-0 bg-white border-t border-orange-200">
         <form
           onSubmit={handleSend}
           className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3"
@@ -263,12 +263,12 @@ export default function ConversationPage() {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+            className="flex-1 px-4 py-3 bg-white border border-orange-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || isSending}
-            className="p-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSending ? (
               <Loader2 className="w-5 h-5 animate-spin" />

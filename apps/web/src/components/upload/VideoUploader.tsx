@@ -341,6 +341,9 @@ export function VideoUploader({
               )}
             </span>
           </div>
+          <p className="mt-3 text-xs text-slate-500">
+            Large videos can take a few minutes to upload and process. Please keep this tab open.
+          </p>
         </div>
       )}
 
