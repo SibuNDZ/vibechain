@@ -53,6 +53,14 @@ export class VideosController {
     return this.videosService.getTopVideos(limit ? parseInt(limit) : 10);
   }
 
+  @Get("mine")
+  @UseGuards(AuthGuard("jwt"))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get current user's uploads (all statuses)" })
+  async findMine(@Request() req: { user: { userId: string } }) {
+    return this.videosService.findByUser(req.user.userId);
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get video by ID" })
   async findOne(@Param("id") id: string) {

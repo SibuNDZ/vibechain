@@ -212,6 +212,13 @@ export function Header() {
                     Upload Video
                   </Link>
                   <Link
+                    href="/my-uploads"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"
+                  >
+                    My Uploads
+                  </Link>
+                  <Link
                     href="/messages"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-orange-100 transition-colors"

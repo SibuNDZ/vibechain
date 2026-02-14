@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, Video, Settings, LogOut, ChevronDown, BarChart3 } from "lucide-react";
+import { User, Video, Settings, LogOut, ChevronDown, BarChart3, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface UserDropdownProps {
@@ -79,6 +79,15 @@ export function UserDropdown({ user, onLogout, isAdmin = false }: UserDropdownPr
           >
             <Video className="w-4 h-4" />
             My Videos
+          </Link>
+
+          <Link
+            href="/my-uploads"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 px-4 py-2 text-slate-600 hover:bg-orange-100 hover:text-slate-900 transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            My Uploads
           </Link>
 
           <Link

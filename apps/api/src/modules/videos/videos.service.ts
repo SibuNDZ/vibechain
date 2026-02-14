@@ -36,6 +36,7 @@ export class VideosService {
       const video = await this.prisma.video.create({
         data: {
           ...dto,
+          status: "APPROVED",
           userId,
         },
       });
@@ -130,6 +131,9 @@ export class VideosService {
       const videos = await this.prisma.video.findMany({
         where: { userId },
         include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
           _count: { select: { votes: true } },
         },
         orderBy: { createdAt: "desc" },
