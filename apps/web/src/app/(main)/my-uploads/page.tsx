@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api, Video } from "@/lib/api";
 import { VideoCardSkeleton } from "@/components/ui/Skeleton";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 type StatusInfo = {
   label: string;
@@ -128,11 +128,12 @@ export default function MyUploadsPage() {
               return (
                 <Link key={video.id} href={`/videos/${video.id}`} className="group">
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100">
-                    <Image
-                      src={video.thumbnailUrl || "/placeholder-video.jpg"}
+                    <SafeImage
+                      src={video.thumbnailUrl}
                       alt={video.title}
                       fill
                       className="object-cover transition-transform group-hover:scale-105"
+                      fallbackSrc="/placeholder-video.jpg"
                     />
                     <div
                       className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${status.className}`}

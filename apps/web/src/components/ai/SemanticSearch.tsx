@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Search, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { api, SearchResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface SemanticSearchProps {
   onResults?: (results: SearchResult[]) => void;
@@ -114,18 +114,13 @@ export function SemanticSearch({
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 transition-colors"
                   >
                     <div className="relative w-20 h-12 rounded overflow-hidden bg-orange-100 flex-shrink-0">
-                      {result.thumbnailUrl ? (
-                        <Image
-                          src={result.thumbnailUrl}
-                          alt={result.title}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-400">
-                          No image
-                        </div>
-                      )}
+                      <SafeImage
+                        src={result.thumbnailUrl}
+                        alt={result.title}
+                        fill
+                        className="object-cover"
+                        fallbackSrc="/placeholder-video.jpg"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-slate-900 font-medium truncate">

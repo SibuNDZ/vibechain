@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface CampaignCardProps {
   id: string;
@@ -28,11 +28,12 @@ export function CampaignCard({
     <Link href={`/crowdfunding/${id}`} className="group">
       <div className="bg-orange-50 border border-orange-200 rounded-xl overflow-hidden">
         <div className="relative aspect-video">
-          <Image
+          <SafeImage
             src={thumbnailUrl}
             alt={title}
             fill
             className="object-cover transition-transform group-hover:scale-105"
+            fallbackSrc="/placeholder-campaign.jpg"
           />
           <div className="absolute top-2 right-2 bg-green-500 px-2 py-1 rounded text-xs font-semibold text-white">
             {daysLeft} days left

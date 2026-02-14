@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { api, PaginatedResponse, Video } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface FeaturedVideosProps {
   className?: string;
@@ -100,18 +100,13 @@ export function FeaturedVideos({
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
                   <div className="relative aspect-video rounded-2xl overflow-hidden bg-orange-100">
-                    {video.thumbnailUrl ? (
-                      <Image
-                        src={video.thumbnailUrl}
-                        alt={video.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-400">
-                        No image
-                      </div>
-                    )}
+                    <SafeImage
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      fallbackSrc="/placeholder-video.jpg"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-80" />
                     <div className="absolute bottom-3 left-3 right-3 text-white">
                       <h3 className="font-semibold text-sm truncate">

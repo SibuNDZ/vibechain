@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { Sparkles, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { api, RecommendedVideo } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface RecommendationSectionProps {
   className?: string;
@@ -132,18 +132,13 @@ function RecommendationCard({ recommendation }: { recommendation: RecommendedVid
       className="flex-shrink-0 w-[200px] group"
     >
       <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100 mb-2">
-        {recommendation.thumbnailUrl ? (
-          <Image
-            src={recommendation.thumbnailUrl}
-            alt={recommendation.title}
-            fill
-            className="object-cover transition-transform group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-400">
-            No image
-          </div>
-        )}
+        <SafeImage
+          src={recommendation.thumbnailUrl}
+          alt={recommendation.title}
+          fill
+          className="object-cover transition-transform group-hover:scale-105"
+          fallbackSrc="/placeholder-video.jpg"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
       <h3 className="font-medium text-slate-900 text-sm truncate group-hover:text-orange-600 transition-colors">

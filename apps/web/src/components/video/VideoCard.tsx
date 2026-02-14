@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, Play } from "lucide-react";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface VideoCardProps {
   id: string;
@@ -22,11 +22,12 @@ export function VideoCard({
   return (
     <Link href={`/videos/${id}`} className="group">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100">
-        <Image
+        <SafeImage
           src={thumbnailUrl}
           alt={title}
           fill
           className="object-cover transition-transform group-hover:scale-105"
+          fallbackSrc="/placeholder-video.jpg"
         />
         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Play className="w-12 h-12 text-white" />

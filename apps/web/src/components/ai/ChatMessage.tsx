@@ -2,9 +2,9 @@
 
 import { Bot, User } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { AIChatMessage, SearchResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { SafeImage } from "@/components/ui/SafeImage";
 
 interface ChatMessageProps {
   message: AIChatMessage;
@@ -95,18 +95,13 @@ function VideoCard({ video }: { video: SearchResult }) {
       className="flex items-center gap-3 p-2 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
     >
       <div className="relative w-16 h-10 rounded overflow-hidden bg-orange-100 flex-shrink-0">
-        {video.thumbnailUrl ? (
-          <Image
-            src={video.thumbnailUrl}
-            alt={video.title}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">
-            No img
-          </div>
-        )}
+        <SafeImage
+          src={video.thumbnailUrl}
+          alt={video.title}
+          fill
+          className="object-cover"
+          fallbackSrc="/placeholder-video.jpg"
+        />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-slate-900 font-medium truncate">{video.title}</p>
