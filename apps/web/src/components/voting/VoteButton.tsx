@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Heart } from "lucide-react";
-import { useAccount } from "wagmi";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -22,10 +22,10 @@ export function VoteButton({
   const [votes, setVotes] = useState(initialVotes);
   const [voted, setVoted] = useState(hasVoted);
   const [isLoading, setIsLoading] = useState(false);
-  const { isConnected } = useAccount();
+  const { connected } = useWallet();
 
   const handleVote = async () => {
-    if (!isConnected) {
+    if (!connected) {
       toast.error("Please connect your wallet to vote");
       return;
     }
@@ -54,13 +54,13 @@ export function VoteButton({
   return (
     <button
       onClick={handleVote}
-      disabled={!isConnected || voted || isLoading}
+      disabled={!connected || voted || isLoading}
       className={cn(
         "flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all",
         voted
           ? "bg-red-600 text-white"
           : "bg-orange-100 text-orange-700 hover:bg-red-600 hover:text-white border border-orange-200",
-        (!isConnected || isLoading) && "opacity-50 cursor-not-allowed"
+        (!connected || isLoading) && "opacity-50 cursor-not-allowed"
       )}
     >
       <Heart className={cn("w-5 h-5", voted && "fill-current")} />

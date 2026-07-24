@@ -3,20 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
-    "deploy:testnet": "hardhat run scripts/deploy.ts --network polygonAmoy",
-    "deploy:mainnet": "hardhat run scripts/deploy.ts --network polygon",
-    "verify": "hardhat verify",
-    "clean": "hardhat clean && rm -rf cache artifacts typechain-types"
+    "build": "anchor build",
+    "test": "anchor test",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "deploy:mainnet": "anchor deploy --provider.cluster mainnet",
+    "clean": "rm -rf target .anchor"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/web3.js": "^1.95.0"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@openzeppelin/contracts": "^5.0.0",
-    "@types/node": "^20.12.0",
-    "dotenv": "^17.2.3",
-    "hardhat": "^2.22.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "chai": "^4.4.0",
+    "mocha": "^10.7.0",
+    "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.4.0"
   }

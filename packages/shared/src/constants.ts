@@ -1,17 +1,24 @@
-export const SUPPORTED_CHAINS = {
-  POLYGON: 137,
-  POLYGON_AMOY: 80002,
+export const SOLANA_CLUSTERS = {
+  MAINNET: "mainnet-beta",
+  DEVNET: "devnet",
 } as const;
 
-export const CONTRACT_ADDRESSES = {
-  [SUPPORTED_CHAINS.POLYGON]: {
-    CROWDFUNDING: "" as `0x${string}`,
-    VOTING: "" as `0x${string}`,
+export type SolanaCluster = (typeof SOLANA_CLUSTERS)[keyof typeof SOLANA_CLUSTERS];
+
+export const PROGRAM_IDS = {
+  [SOLANA_CLUSTERS.MAINNET]: {
+    CROWDFUNDING: "" as string,
+    VOTING: "" as string,
   },
-  [SUPPORTED_CHAINS.POLYGON_AMOY]: {
-    CROWDFUNDING: "0x049a85B23dCba662A66644eaf982F04A34aec095" as `0x${string}`,
-    VOTING: "" as `0x${string}`,
+  [SOLANA_CLUSTERS.DEVNET]: {
+    CROWDFUNDING: "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS" as string,
+    VOTING: "HmbTLCmaGtYhSJaoxkmD54y4QhhGERbCGMKhbV2V3uEp" as string,
   },
+} as const;
+
+export const SOLANA_RPC_URLS = {
+  [SOLANA_CLUSTERS.MAINNET]: "https://api.mainnet-beta.solana.com",
+  [SOLANA_CLUSTERS.DEVNET]: "https://api.devnet.solana.com",
 } as const;
 
 export const VIDEO_CONSTRAINTS = {

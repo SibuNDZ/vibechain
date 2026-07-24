@@ -32,11 +32,11 @@ class EnvironmentVariables {
 
   @IsString()
   @IsOptional()
-  POLYGON_RPC_URL?: string;
+  SOLANA_RPC_URL?: string;
 
   @IsString()
   @IsOptional()
-  POLYGON_AMOY_RPC_URL?: string;
+  SOLANA_CLUSTER?: string;
 
   @IsNumber()
   @IsOptional()

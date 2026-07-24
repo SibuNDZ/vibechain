@@ -32,10 +32,9 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
-# Blockchain
-packages/contracts/cache/
-packages/contracts/artifacts/
-packages/contracts/typechain-types/
+# Blockchain (Solana/Anchor)
+packages/contracts/target/
+packages/contracts/.anchor/
 
 # Misc
 *.tsbuildinfo

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   InternalServerErrorException,
   Logger,
   NotFoundException,
@@ -13,6 +14,13 @@ export function handleDatabaseError(error: unknown, context?: string): never {
   if (context) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error(`${context}: ${message}`, error instanceof Error ? error.stack : undefined);
+  }
+
+  // Callers deliberately throw well-formed HTTP exceptions (e.g. NotFoundException
+  // for "video not found") from inside the same try block this feeds -- those
+  // aren't database errors and must pass through unchanged, not get masked as 500.
+  if (error instanceof HttpException) {
+    throw error;
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

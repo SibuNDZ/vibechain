@@ -14,7 +14,7 @@ export class CreateCampaignDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  contractAddress?: string;
+  programAddress?: string;
 }
 
 export class RecordContributionDto {
@@ -23,7 +23,7 @@ export class RecordContributionDto {
   @Min(0)
   amount: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: "Solana transaction signature (base58)" })
   @IsString()
-  txHash: string;
+  txSignature: string;
 }

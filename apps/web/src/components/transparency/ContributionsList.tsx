@@ -130,10 +130,10 @@ export function ContributionsList({
 
                   <div className="flex items-center gap-3">
                     <span className="font-semibold text-green-600">
-                      {parseFloat(contrib.amount).toFixed(2)} MATIC
+                      {parseFloat(contrib.amount).toFixed(2)} SOL
                     </span>
                     <a
-                      href={getExplorerUrl(contrib.txHash, "amoy")}
+                      href={getExplorerUrl(contrib.txHash, "devnet")}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded transition-colors"

@@ -83,7 +83,7 @@ describe('CrowdfundingService', () => {
       const result = await service.createCampaign('video-123', {
         goalAmount: 10000,
         endDate: '2025-12-31',
-        contractAddress: '0x1234567890abcdef',
+        programAddress: '0x1234567890abcdef',
       });
 
       expect(result).toEqual(mockCampaign);
@@ -175,13 +175,16 @@ describe('CrowdfundingService', () => {
         ...mockCampaign,
         raisedAmount: 5100,
       } as any);
+      // $transaction([opA, opB]) resolves the array of already-mocked op
+      // promises -- mockDeep doesn't know to do this on its own.
+      prisma.$transaction.mockImplementation(((ops: unknown[]) => Promise.all(ops)) as any);
 
       const result = await service.recordContribution(
         'campaign-123',
         'user-123',
         {
           amount: 100,
-          txHash: '0xabcdef123456',
+          txSignature: '0xabcdef123456',
         }
       );
 
@@ -208,7 +211,7 @@ describe('CrowdfundingService', () => {
       await expect(
         service.recordContribution('nonexistent', 'user-123', {
           amount: 100,
-          txHash: '0xabcdef',
+          txSignature: '0xabcdef',
         })
       ).rejects.toThrow(NotFoundException);
     });
@@ -222,7 +225,7 @@ describe('CrowdfundingService', () => {
       await expect(
         service.recordContribution('campaign-123', 'user-123', {
           amount: 100,
-          txHash: '0xabcdef',
+          txSignature: '0xabcdef',
         })
       ).rejects.toThrow(BadRequestException);
     });

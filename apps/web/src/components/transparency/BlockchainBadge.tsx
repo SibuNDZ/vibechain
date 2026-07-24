@@ -6,18 +6,18 @@ import { cn } from "@/lib/utils";
 
 interface BlockchainBadgeProps {
   type: "vote" | "contribution" | "contract";
-  txHash?: string;
+  txSignature?: string;
   contractAddress?: string;
-  network?: "polygon" | "amoy";
+  network?: "mainnet-beta" | "devnet";
   verified?: boolean;
   className?: string;
 }
 
 export function BlockchainBadge({
   type,
-  txHash,
+  txSignature,
   contractAddress,
-  network = "amoy",
+  network = "devnet",
   verified = true,
   className,
 }: BlockchainBadgeProps) {
@@ -25,8 +25,8 @@ export function BlockchainBadge({
     if (type === "contract" && contractAddress) {
       return getContractExplorerUrl(contractAddress, network);
     }
-    if (txHash) {
-      return getExplorerUrl(txHash, network);
+    if (txSignature) {
+      return getExplorerUrl(txSignature, network);
     }
     return null;
   };
@@ -40,7 +40,7 @@ export function BlockchainBadge({
       case "contribution":
         return "On-Chain";
       case "contract":
-        return "Smart Contract";
+        return "Solana Program";
       default:
         return "Verified";
     }
@@ -61,7 +61,7 @@ export function BlockchainBadge({
         {type === "contract" && contractAddress && (
           <span className="font-mono">{formatAddress(contractAddress)}</span>
         )}
-        {txHash && <span className="font-mono">{formatAddress(txHash)}</span>}
+        {txSignature && <span className="font-mono">{formatAddress(txSignature)}</span>}
         <ExternalLink className="w-3 h-3" />
       </a>
     );

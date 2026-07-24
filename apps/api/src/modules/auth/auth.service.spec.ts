@@ -191,7 +191,7 @@ describe('AuthService', () => {
   });
 
   describe('walletAuth', () => {
-    const walletAddress = '0x1234567890abcdef1234567890abcdef12345678';
+    const walletAddress = 'FJhq3J2KzCGRxfS7UkWtCsQBhGHPZzjkD3sYVqmXpNcN';
     const nonce = '123456';
 
     it('should create new user if wallet not registered', async () => {
@@ -211,13 +211,13 @@ describe('AuthService', () => {
         walletAddress,
       });
 
-      // Mock ethers.verifyMessage - we need to mock the module
-      const ethers = require('ethers');
-      jest.spyOn(ethers, 'verifyMessage').mockReturnValue(walletAddress);
+      // Mock nacl.sign.detached.verify to return true for valid signature
+      const nacl = require('tweetnacl');
+      jest.spyOn(nacl.sign.detached, 'verify').mockReturnValue(true);
 
       const result = await service.walletAuth({
         walletAddress,
-        signature: 'valid-signature',
+        signature: 'MockSignatureBase58Test9xzK2pQ7',
         nonce,
       });
 
@@ -241,12 +241,12 @@ describe('AuthService', () => {
         walletAddress,
       });
 
-      const ethers = require('ethers');
-      jest.spyOn(ethers, 'verifyMessage').mockReturnValue(walletAddress);
+      const nacl = require('tweetnacl');
+      jest.spyOn(nacl.sign.detached, 'verify').mockReturnValue(true);
 
       const result = await service.walletAuth({
         walletAddress,
-        signature: 'valid-signature',
+        signature: 'MockSignatureBase58Test9xzK2pQ7',
         nonce,
       });
 
@@ -264,13 +264,13 @@ describe('AuthService', () => {
         createdAt: new Date(),
       });
 
-      const ethers = require('ethers');
-      jest.spyOn(ethers, 'verifyMessage').mockReturnValue('0xdifferentaddress');
+      const nacl = require('tweetnacl');
+      jest.spyOn(nacl.sign.detached, 'verify').mockReturnValue(false);
 
       await expect(
         service.walletAuth({
           walletAddress,
-          signature: 'invalid-signature',
+          signature: 'WrongSignatureXeon2pQR8zK',
           nonce,
         })
       ).rejects.toThrow(UnauthorizedException);

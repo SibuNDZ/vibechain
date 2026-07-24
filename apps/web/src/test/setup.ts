@@ -2,17 +2,18 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import React from 'react';
 
-// Mock wagmi hooks
-vi.mock('wagmi', () => ({
-  useAccount: vi.fn(() => ({ isConnected: false, address: undefined })),
-  useWriteContract: vi.fn(() => ({
-    writeContract: vi.fn(),
-    data: undefined,
-    isPending: false,
+// Mock Solana wallet adapter hooks
+vi.mock('@solana/wallet-adapter-react', () => ({
+  useWallet: vi.fn(() => ({
+    connected: false,
+    publicKey: null,
+    signMessage: vi.fn(),
+    sendTransaction: vi.fn(),
   })),
-  useWaitForTransactionReceipt: vi.fn(() => ({
-    isLoading: false,
-    isSuccess: false,
+  useConnection: vi.fn(() => ({
+    connection: {
+      confirmTransaction: vi.fn(),
+    },
   })),
 }));
 

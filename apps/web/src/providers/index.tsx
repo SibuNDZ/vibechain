@@ -1,35 +1,27 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { useState, useEffect } from "react";
-import { createWagmiConfig } from "@/lib/wagmi";
-import "@rainbow-me/rainbowkit/styles.css";
+import { useState, useMemo } from "react";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { getSolanaEndpoint, getWallets } from "@/lib/solana";
+
+import "@solana/wallet-adapter-react-ui/styles.css";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
-  const [mounted, setMounted] = useState(false);
-  const [wagmiConfig, setWagmiConfig] = useState<ReturnType<typeof createWagmiConfig> | null>(
-    null
-  );
-
-  useEffect(() => {
-    setMounted(true);
-    setWagmiConfig(createWagmiConfig());
-  }, []);
-
-  if (!mounted || !wagmiConfig) {
-    return null;
-  }
+  const endpoint = useMemo(() => getSolanaEndpoint(), []);
+  const wallets = useMemo(() => getWallets(), []);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          {children}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }

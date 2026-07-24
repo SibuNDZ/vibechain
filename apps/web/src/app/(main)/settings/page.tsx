@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, User, Wallet, Save, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatAddress } from "@/lib/utils";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 interface UserProfile {
   id: string;
@@ -270,51 +270,7 @@ export default function SettingsPage() {
             )}
 
             <div className="pt-4 border-t border-orange-100">
-              <ConnectButton.Custom>
-                {({
-                  account,
-                  chain,
-                  openAccountModal,
-                  openChainModal,
-                  openConnectModal,
-                  mounted,
-                }) => {
-                  const ready = mounted;
-                  const connected = ready && account && chain;
-
-                  return (
-                    <div
-                      className={!ready ? "opacity-0 pointer-events-none select-none" : ""}
-                    >
-                      {!connected ? (
-                        <button
-                          type="button"
-                          onClick={openConnectModal}
-                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                        >
-                          Connect Wallet
-                        </button>
-                      ) : chain?.unsupported ? (
-                        <button
-                          type="button"
-                          onClick={openChainModal}
-                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                        >
-                          Wrong network
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={openAccountModal}
-                          className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                        >
-                          {account.displayName}
-                        </button>
-                      )}
-                    </div>
-                  );
-                }}
-              </ConnectButton.Custom>
+              <WalletMultiButton className="!bg-gradient-to-r !from-red-600 !to-orange-500 !rounded-lg !py-3 !font-semibold !w-full !justify-center" />
             </div>
           </div>
         </div>

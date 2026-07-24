@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { VoteButton } from './VoteButton';
-import { useAccount } from 'wagmi';
+import { useWallet } from '@solana/wallet-adapter-react';
 
-vi.mock('wagmi');
+vi.mock('@solana/wallet-adapter-react');
 
 describe('VoteButton', () => {
   const mockOnVote = vi.fn();
@@ -14,7 +14,7 @@ describe('VoteButton', () => {
   });
 
   it('renders with initial vote count', () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     render(
       <VoteButton videoId="video1" initialVotes={42} onVote={mockOnVote} />
@@ -25,7 +25,7 @@ describe('VoteButton', () => {
   });
 
   it('disables button when not connected', () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: false });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: false });
 
     render(
       <VoteButton videoId="video1" initialVotes={10} onVote={mockOnVote} />
@@ -36,7 +36,7 @@ describe('VoteButton', () => {
   });
 
   it('shows "Voted" state when hasVoted is true', () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     render(
       <VoteButton
@@ -51,7 +51,7 @@ describe('VoteButton', () => {
   });
 
   it('calls onVote and updates count on click', async () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     render(
       <VoteButton videoId="video1" initialVotes={10} onVote={mockOnVote} />
@@ -69,7 +69,7 @@ describe('VoteButton', () => {
   });
 
   it('shows "Voted" after successful vote', async () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     render(
       <VoteButton videoId="video1" initialVotes={10} onVote={mockOnVote} />
@@ -83,7 +83,7 @@ describe('VoteButton', () => {
   });
 
   it('handles vote failure gracefully', async () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
     mockOnVote.mockRejectedValue(new Error('Vote failed'));
 
     render(
@@ -101,7 +101,7 @@ describe('VoteButton', () => {
   });
 
   it('prevents multiple clicks while loading', async () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     // Make the vote take some time
     mockOnVote.mockImplementation(
@@ -126,7 +126,7 @@ describe('VoteButton', () => {
   });
 
   it('disables button after voting', async () => {
-    (useAccount as ReturnType<typeof vi.fn>).mockReturnValue({ isConnected: true });
+    (useWallet as ReturnType<typeof vi.fn>).mockReturnValue({ connected: true });
 
     render(
       <VoteButton videoId="video1" initialVotes={10} onVote={mockOnVote} />

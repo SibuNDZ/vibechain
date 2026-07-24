@@ -32,7 +32,7 @@ export class CrowdfundingService {
           videoId,
           goalAmount: dto.goalAmount,
           endDate: new Date(dto.endDate),
-          contractAddress: dto.contractAddress,
+          contractAddress: dto.programAddress,
         },
       });
 
@@ -149,7 +149,7 @@ export class CrowdfundingService {
             campaignId,
             userId,
             amount: dto.amount,
-            txHash: dto.txHash,
+            txHash: dto.txSignature,
           },
         }),
         this.prisma.campaign.update({

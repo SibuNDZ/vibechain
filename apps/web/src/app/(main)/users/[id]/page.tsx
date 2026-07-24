@@ -236,7 +236,7 @@ export default function UserProfilePage() {
                       {formatAddress(user.walletAddress)}
                     </span>
                     <a
-                      href={`https://amoy.polygonscan.com/address/${user.walletAddress}`}
+                      href={`https://solscan.io/account/${user.walletAddress}?cluster=devnet`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-red-600"

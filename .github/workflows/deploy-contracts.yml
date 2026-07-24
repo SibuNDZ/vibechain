@@ -1,31 +1,27 @@
-name: Deploy Contracts
+name: Deploy Solana Programs
 
 on:
   workflow_dispatch:
     inputs:
-      network:
-        description: 'Network to deploy to'
+      cluster:
+        description: 'Solana cluster to deploy to'
         required: true
-        default: 'polygonAmoy'
+        default: 'devnet'
         type: choice
         options:
-          - polygonAmoy
-          - polygon
-      verify:
-        description: 'Verify contracts on Polygonscan'
-        required: false
-        default: true
-        type: boolean
+          - devnet
+          - mainnet
 
 env:
   PNPM_VERSION: '9'
   NODE_VERSION: '20'
+  ANCHOR_VERSION: '0.30.1'
 
 jobs:
   deploy:
-    name: Deploy Contracts
+    name: Deploy Solana Programs
     runs-on: ubuntu-latest
-    environment: ${{ inputs.network }}
+    environment: ${{ inputs.cluster }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,43 +37,47 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install Anchor CLI
+        run: cargo install --git https://github.com/coral-xyz/anchor avm --locked --force && avm install ${{ env.ANCHOR_VERSION }} && avm use ${{ env.ANCHOR_VERSION }}
+
+      - name: Setup Solana keypair
+        run: |
+          mkdir -p ~/.config/solana
+          echo '${{ secrets.SOLANA_KEYPAIR }}' > ~/.config/solana/id.json
+          solana config set --url ${{ inputs.cluster == 'mainnet' && 'mainnet-beta' || 'devnet' }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Compile contracts
-        run: pnpm --filter @vibechain/contracts compile
+      - name: Build programs
+        working-directory: packages/contracts
+        run: anchor build
 
-      - name: Run tests before deployment
-        run: pnpm --filter @vibechain/contracts test
-
-      - name: Deploy contracts
-        id: deploy
-        run: |
-          if [ "${{ inputs.network }}" = "polygon" ]; then
-            pnpm --filter @vibechain/contracts deploy:mainnet
-          else
-            pnpm --filter @vibechain/contracts deploy:testnet
-          fi
+      - name: Run tests
+        working-directory: packages/contracts
+        run: anchor test --skip-local-validator
         env:
-          PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
-          POLYGON_AMOY_RPC_URL: ${{ secrets.POLYGON_AMOY_RPC_URL }}
-          POLYGON_RPC_URL: ${{ secrets.POLYGON_RPC_URL }}
-          POLYGONSCAN_API_KEY: ${{ secrets.POLYGONSCAN_API_KEY }}
+          ANCHOR_PROVIDER_URL: ${{ inputs.cluster == 'mainnet' && secrets.SOLANA_RPC_URL || 'https://api.devnet.solana.com' }}
 
-      - name: Verify contracts
-        if: inputs.verify
+      - name: Deploy programs
+        working-directory: packages/contracts
         run: |
-          echo "Contract verification would run here"
-          # pnpm --filter @vibechain/contracts verify
+          anchor deploy --provider.cluster ${{ inputs.cluster == 'mainnet' && 'mainnet' || 'devnet' }}
         env:
-          POLYGONSCAN_API_KEY: ${{ secrets.POLYGONSCAN_API_KEY }}
-        continue-on-error: true
+          ANCHOR_WALLET: ~/.config/solana/id.json
 
       - name: Summary
         run: |
-          echo "## Contract Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Solana Program Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Network:** ${{ inputs.network }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Verified:** ${{ inputs.verify }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Cluster:** ${{ inputs.cluster }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Check the logs above for deployed contract addresses." >> $GITHUB_STEP_SUMMARY
+          echo "Check the logs above for deployed program IDs." >> $GITHUB_STEP_SUMMARY

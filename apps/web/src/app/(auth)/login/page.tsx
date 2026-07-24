@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useAuth } from "@/hooks/useAuth";
-import { useAccount, useSignMessage } from "wagmi";
 import { api } from "@/lib/api";
+import bs58 from "bs58";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, walletLogin, isAuthenticated } = useAuth();
-  const { address, isConnected } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { publicKey, signMessage, connected } = useWallet();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -41,7 +41,7 @@ export default function LoginPage() {
   };
 
   const handleWalletLogin = async () => {
-    if (!address) {
+    if (!publicKey || !signMessage) {
       setError("Please connect your wallet first.");
       return;
     }
@@ -50,13 +50,16 @@ export default function LoginPage() {
     setIsWalletLoading(true);
 
     try {
+      const walletAddress = publicKey.toBase58();
       const nonceResponse = await api.get<{ nonce: string }>(
         "/auth/wallet/nonce",
-        { params: { walletAddress: address } }
+        { params: { walletAddress } }
       );
       const message = `Sign this message to authenticate with VibeChain: ${nonceResponse.nonce}`;
-      const signature = await signMessageAsync({ message });
-      await walletLogin(address, signature, nonceResponse.nonce);
+      const messageBytes = new TextEncoder().encode(message);
+      const signatureBytes = await signMessage(messageBytes);
+      const signature = bs58.encode(signatureBytes);
+      await walletLogin(walletAddress, signature, nonceResponse.nonce);
     } catch (err: unknown) {
       const error = err as { message?: string };
       setError(error.message || "Wallet login failed. Please try again.");
@@ -127,55 +130,11 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div>
-            <ConnectButton.Custom>
-              {({
-                account,
-                chain,
-                openAccountModal,
-                openChainModal,
-                openConnectModal,
-                mounted,
-              }) => {
-                const ready = mounted;
-                const connected = ready && account && chain;
-
-                return (
-                  <div
-                    className={!ready ? "opacity-0 pointer-events-none select-none" : ""}
-                  >
-                    {!connected ? (
-                      <button
-                        type="button"
-                        onClick={openConnectModal}
-                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                      >
-                        Connect Wallet
-                      </button>
-                    ) : chain?.unsupported ? (
-                      <button
-                        type="button"
-                        onClick={openChainModal}
-                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                      >
-                        Wrong network
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={openAccountModal}
-                        className="w-full vc-primary-button rounded-lg py-3 font-semibold"
-                      >
-                        {account.displayName}
-                      </button>
-                    )}
-                  </div>
-                );
-              }}
-            </ConnectButton.Custom>
+          <div className="flex justify-center">
+            <WalletMultiButton className="!bg-gradient-to-r !from-red-600 !to-orange-500 !rounded-lg !py-3 !font-semibold !w-full !justify-center" />
           </div>
 
-          {isConnected && (
+          {connected && (
             <button
               type="button"
               onClick={handleWalletLogin}

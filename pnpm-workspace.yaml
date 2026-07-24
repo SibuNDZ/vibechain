@@ -1,3 +1,9 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# bcrypt needs its native binding compiled at install time (used directly by
+# AuthService for password hashing) -- without this, pnpm skips the postinstall
+# build script and the module fails to load at runtime/test time.
+onlyBuiltDependencies:
+  - bcrypt

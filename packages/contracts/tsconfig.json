@@ -1,15 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "types": ["mocha", "chai"],
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2015"],
     "module": "commonjs",
-    "strict": true,
+    "target": "es6",
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true
-  },
-  "include": ["./scripts", "./test", "./hardhat.config.ts"],
-  "files": ["./hardhat.config.ts"]
+    "resolveJsonModule": true
+  }
 }

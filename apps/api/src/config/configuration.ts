@@ -21,8 +21,8 @@ export interface ThrottleConfig {
 }
 
 export interface BlockchainConfig {
-  polygonRpcUrl: string;
-  polygonAmoyRpcUrl: string;
+  solanaRpcUrl: string;
+  solanaCluster: string;
 }
 
 export interface Config {
@@ -57,9 +57,9 @@ export default (): Config => ({
   },
 
   blockchain: {
-    polygonRpcUrl:
-      process.env.POLYGON_RPC_URL || 'https://polygon-rpc.com',
-    polygonAmoyRpcUrl:
-      process.env.POLYGON_AMOY_RPC_URL || 'https://rpc-amoy.polygon.technology',
+    solanaRpcUrl:
+      process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+    solanaCluster:
+      process.env.SOLANA_CLUSTER || 'devnet',
   },
 });

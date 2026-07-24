@@ -5,6 +5,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 import { AnalyticsService } from '../../common/analytics/analytics.service';
+import { UploadService } from '../upload/upload.service';
 
 describe('VideosService', () => {
   let service: VideosService;
@@ -49,6 +50,10 @@ describe('VideosService', () => {
             track: jest.fn(),
           },
         },
+        {
+          provide: UploadService,
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -72,6 +77,8 @@ describe('VideosService', () => {
           title: 'Test Video',
           description: 'Test description',
           videoUrl: 'https://example.com/video.mp4',
+          duration: 120,
+          status: 'APPROVED',
           userId: 'user-123',
         },
       });
@@ -166,7 +173,10 @@ describe('VideosService', () => {
       expect(result).toEqual(userVideos);
       expect(prisma.video.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-123' },
-        include: { _count: { select: { votes: true } } },
+        include: {
+          user: { select: { id: true, username: true, avatarUrl: true } },
+          _count: { select: { votes: true } },
+        },
         orderBy: { createdAt: 'desc' },
       });
     });

@@ -36,23 +36,19 @@ export function formatRelativeTime(dateString: string): string {
 }
 
 export function getExplorerUrl(
-  txHash: string,
-  network: "polygon" | "amoy" = "polygon"
+  txSignature: string,
+  network: "mainnet-beta" | "devnet" = "mainnet-beta"
 ): string {
-  const baseUrls = {
-    polygon: "https://polygonscan.com/tx/",
-    amoy: "https://amoy.polygonscan.com/tx/",
-  };
-  return `${baseUrls[network]}${txHash}`;
+  const base = "https://solscan.io/tx/";
+  const cluster = network === "devnet" ? "?cluster=devnet" : "";
+  return `${base}${txSignature}${cluster}`;
 }
 
 export function getContractExplorerUrl(
   address: string,
-  network: "polygon" | "amoy" = "polygon"
+  network: "mainnet-beta" | "devnet" = "mainnet-beta"
 ): string {
-  const baseUrls = {
-    polygon: "https://polygonscan.com/address/",
-    amoy: "https://amoy.polygonscan.com/address/",
-  };
-  return `${baseUrls[network]}${address}`;
+  const base = "https://solscan.io/account/";
+  const cluster = network === "devnet" ? "?cluster=devnet" : "";
+  return `${base}${address}${cluster}`;
 }
