@@ -61,13 +61,15 @@ export class VideosService {
     page = 1,
     limit = 20,
     sortBy = "votes",
-    genre?: VideoGenre
+    genre?: VideoGenre,
+    userId?: string
   ) {
     try {
       const skip = (page - 1) * limit;
       const where = {
         status: "APPROVED" as const,
         ...(genre ? { genre } : {}),
+        ...(userId ? { userId } : {}),
       };
 
       const [videos, total] = await Promise.all([

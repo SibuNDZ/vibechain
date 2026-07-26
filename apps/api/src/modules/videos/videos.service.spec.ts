@@ -121,6 +121,32 @@ describe('VideosService', () => {
       );
     });
 
+    it('should filter by userId when provided, without leaking other statuses', async () => {
+      prisma.video.findMany.mockResolvedValue([]);
+      prisma.video.count.mockResolvedValue(0);
+
+      await service.findAll(1, 20, 'votes', undefined, 'user-123');
+
+      expect(prisma.video.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'APPROVED', userId: 'user-123' },
+        })
+      );
+    });
+
+    it('should not filter by userId when it is not provided', async () => {
+      prisma.video.findMany.mockResolvedValue([]);
+      prisma.video.count.mockResolvedValue(0);
+
+      await service.findAll(1, 20, 'votes');
+
+      expect(prisma.video.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'APPROVED' },
+        })
+      );
+    });
+
     it('should calculate pagination correctly', async () => {
       prisma.video.findMany.mockResolvedValue([]);
       prisma.video.count.mockResolvedValue(45);

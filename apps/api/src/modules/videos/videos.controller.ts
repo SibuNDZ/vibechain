@@ -38,13 +38,15 @@ export class VideosController {
     @Query("page") page?: string,
     @Query("limit") limit?: string,
     @Query("sortBy") sortBy?: string,
-    @Query("genre") genre?: VideoGenre
+    @Query("genre") genre?: VideoGenre,
+    @Query("userId") userId?: string
   ) {
     return this.videosService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 20,
       sortBy,
-      genre
+      genre,
+      userId
     );
   }
 
