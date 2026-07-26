@@ -264,6 +264,30 @@ export interface FollowStatus {
   isFollowing: boolean;
 }
 
+export type AppNotificationType =
+  | "FOLLOW"
+  | "COMMENT"
+  | "MENTION"
+  | "VOTE_MILESTONE"
+  | "CONTRIBUTION";
+
+export interface AppNotification {
+  id: string;
+  type: AppNotificationType;
+  read: boolean;
+  metadata: { milestone?: number } | null;
+  createdAt: string;
+  actor: { id: string; username: string; avatarUrl: string | null };
+  video: { id: string; title: string } | null;
+  comment: { id: string; content: string } | null;
+  campaign: { id: string; video: { id: string; title: string } } | null;
+}
+
+export interface NotificationsPage {
+  data: AppNotification[];
+  nextCursor: string | null;
+}
+
 // AI-related types
 export interface SearchResult extends Video {
   similarity: number;

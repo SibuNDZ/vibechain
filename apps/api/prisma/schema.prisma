@@ -35,6 +35,10 @@ model User {
   conversationsAsUser2  DirectConversation[] @relation("ConversationUser2")
   sentMessages          DirectMessage[]
 
+  // Notifications
+  notificationsSent     Notification[] @relation("NotificationActor")
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+
   @@map("users")
 }
 
@@ -76,6 +80,7 @@ model Video {
   votes        Vote[]
   campaign     Campaign?
   comments     Comment[]
+  notifications Notification[]
 
   @@index([status])
   @@index([genre])
@@ -141,6 +146,7 @@ model Campaign {
   videoId       String   @unique
   video         Video    @relation(fields: [videoId], references: [id])
   contributions Contribution[]
+  notifications Notification[]
 
   @@index([status])
   @@map("campaigns")
@@ -185,6 +191,8 @@ model Comment {
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("CommentReplies")
 
+  notifications Notification[]
+
   @@index([videoId])
   @@index([userId])
   @@index([parentId])
@@ -204,6 +212,42 @@ model Follow {
   @@index([followerId])
   @@index([followingId])
   @@map("follows")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  type        NotificationType
+  read        Boolean          @default(false)
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  actorId     String
+  actor       User             @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  videoId     String?
+  video       Video?           @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  commentId   String?
+  comment     Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    Campaign?        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, read])
+  @@index([recipientId, createdAt])
+  @@index([actorId])
+  @@index([videoId])
+  @@index([commentId])
+  @@index([campaignId])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  FOLLOW
+  COMMENT
+  MENTION
+  VOTE_MILESTONE
+  CONTRIBUTION
 }
 
 // Wallet auth nonces to prevent signature replay

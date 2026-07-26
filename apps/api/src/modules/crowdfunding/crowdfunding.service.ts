@@ -4,12 +4,14 @@ import { CreateCampaignDto, RecordContributionDto } from "./dto/crowdfunding.dto
 import { Decimal } from "@prisma/client/runtime/library";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class CrowdfundingService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly notificationsService: NotificationsService
   ) {}
 
   async createCampaign(videoId: string, dto: CreateCampaignDto) {
@@ -132,6 +134,7 @@ export class CrowdfundingService {
     try {
       const campaign = await this.prisma.campaign.findUnique({
         where: { id: campaignId },
+        include: { video: { select: { userId: true } } },
       });
 
       if (!campaign) {
@@ -168,6 +171,12 @@ export class CrowdfundingService {
         campaign_id: campaignId,
         amount: typeof dto.amount === "string" ? parseFloat(dto.amount) : dto.amount,
       });
+
+      void this.notificationsService.notifyContribution(
+        userId,
+        campaign.video.userId,
+        campaignId
+      );
 
       return contribution;
     } catch (error) {

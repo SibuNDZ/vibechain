@@ -9,6 +9,7 @@ import { VotingModule } from "./modules/voting/voting.module";
 import { CrowdfundingModule } from "./modules/crowdfunding/crowdfunding.module";
 import { CommentsModule } from "./modules/comments/comments.module";
 import { FollowsModule } from "./modules/follows/follows.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { AiModule } from "./modules/ai/ai.module";
 import { MessagesModule } from "./modules/messages/messages.module";
 import { UploadModule } from "./modules/upload/upload.module";
@@ -51,6 +52,7 @@ import { AnalyticsAdminModule } from "./modules/analytics/analytics.module";
     CrowdfundingModule,
     CommentsModule,
     FollowsModule,
+    NotificationsModule,
     AiModule,
     MessagesModule,
     UploadModule,

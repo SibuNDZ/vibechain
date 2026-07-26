@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Upload, MessageCircle, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserDropdown } from "./UserDropdown";
+import { NotificationsBell } from "./NotificationsBell";
 import { InstallAppButton } from "./InstallAppButton";
 import { api } from "@/lib/api";
 
@@ -171,6 +172,8 @@ export function Header() {
                 >
                   <MessageCircle className="w-5 h-5" />
                 </Link>
+
+                <NotificationsBell />
 
                 <UserDropdown user={user} onLogout={handleLogout} isAdmin={isAdmin} />
               </>

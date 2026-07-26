@@ -5,6 +5,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 import { AnalyticsService } from '../../common/analytics/analytics.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('CrowdfundingService', () => {
   let service: CrowdfundingService;
@@ -67,6 +68,12 @@ describe('CrowdfundingService', () => {
           provide: AnalyticsService,
           useValue: {
             track: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationsService,
+          useValue: {
+            notifyContribution: jest.fn(),
           },
         },
       ],

@@ -5,10 +5,14 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../../database/prisma.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class FollowsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService
+  ) {}
 
   async follow(followerId: string, followingId: string) {
     // Can't follow yourself
@@ -47,6 +51,8 @@ export class FollowsService {
         },
       },
     });
+
+    void this.notificationsService.notifyFollow(followerId, followingId);
 
     return {
       message: "Successfully followed user",

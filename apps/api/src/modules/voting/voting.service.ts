@@ -6,12 +6,14 @@ import {
 import { PrismaService } from "../../database/prisma.service";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class VotingService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly notificationsService: NotificationsService
   ) {}
 
   async vote(userId: string, videoId: string) {
@@ -43,6 +45,12 @@ export class VotingService {
         user_id: userId,
         video_id: videoId,
       });
+
+      void this.notificationsService.checkVoteMilestone(
+        userId,
+        video.userId,
+        videoId
+      );
 
       return vote;
     } catch (error) {

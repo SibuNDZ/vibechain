@@ -5,6 +5,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 import { AnalyticsService } from '../../common/analytics/analytics.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('VotingService', () => {
   let service: VotingService;
@@ -53,6 +54,12 @@ describe('VotingService', () => {
           provide: AnalyticsService,
           useValue: {
             track: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationsService,
+          useValue: {
+            checkVoteMilestone: jest.fn(),
           },
         },
       ],

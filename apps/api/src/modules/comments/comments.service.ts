@@ -5,10 +5,14 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../../database/prisma.service";
 import { CreateCommentDto, UpdateCommentDto } from "./dto/comment.dto";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class CommentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService
+  ) {}
 
   async create(userId: string, videoId: string, dto: CreateCommentDto) {
     // Verify video exists
@@ -37,7 +41,7 @@ export class CommentsService {
       }
     }
 
-    return this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         content: dto.content,
         userId,
@@ -50,6 +54,15 @@ export class CommentsService {
         },
       },
     });
+
+    void this.notificationsService.notifyComment(
+      userId,
+      video.userId,
+      videoId,
+      comment.id
+    );
+
+    return comment;
   }
 
   async findByVideo(videoId: string, page = 1, limit = 20) {
