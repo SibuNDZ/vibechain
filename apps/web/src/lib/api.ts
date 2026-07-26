@@ -4,7 +4,7 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   statusCode: number;
 
   constructor(message: string, statusCode: number) {

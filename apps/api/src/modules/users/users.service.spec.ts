@@ -16,6 +16,7 @@ describe('UsersService', () => {
     walletAddress: '0x1234567890abcdef',
     avatarUrl: 'https://example.com/avatar.png',
     bio: 'Test bio',
+    lastUsernameChangeAt: null,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
   };
@@ -155,16 +156,80 @@ describe('UsersService', () => {
 
   describe('update', () => {
     it('should update user data', async () => {
-      const updatedUser = { ...mockUser, username: 'newusername' };
+      const updatedUser = { ...mockUser, username: 'newusername', lastUsernameChangeAt: new Date() };
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(null);
+      prisma.usernameHistory.findFirst.mockResolvedValue(null);
       prisma.user.update.mockResolvedValue(updatedUser);
+      prisma.usernameHistory.create.mockResolvedValue({} as any);
+      (prisma.$transaction as jest.Mock).mockImplementation((ops: Promise<unknown>[]) =>
+        Promise.all(ops)
+      );
 
       const result = await service.update('user-123', { username: 'newusername' });
 
       expect(result).toEqual(updatedUser);
-      expect(prisma.user.update).toHaveBeenCalledWith({
-        where: { id: 'user-123' },
-        data: { username: 'newusername' },
+      expect(prisma.usernameHistory.create).toHaveBeenCalledWith({
+        data: { userId: 'user-123', oldUsername: mockUser.username, newUsername: 'newusername' },
       });
+    });
+
+    it('rejects an invalid username format', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+
+      await expect(
+        service.update('user-123', { username: 'AB' })
+      ).rejects.toThrow('Username must be 3-30 characters: lowercase letters, numbers, and underscores only');
+    });
+
+    it('rejects a reserved username', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+
+      await expect(
+        service.update('user-123', { username: 'admin' })
+      ).rejects.toThrow('This username is reserved');
+    });
+
+    it('rejects a username change within the 30-day cooldown', async () => {
+      const recentChange = { ...mockUser, lastUsernameChangeAt: new Date() };
+      prisma.user.findUnique.mockResolvedValue(recentChange);
+
+      await expect(
+        service.update('user-123', { username: 'newusername' })
+      ).rejects.toThrow('Username can only be changed once every 30 days.');
+    });
+
+    it('rejects a username held by another account', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(null);
+      prisma.usernameHistory.findFirst.mockResolvedValue({
+        id: 'history-1',
+      } as any);
+
+      await expect(
+        service.update('user-123', { username: 'newusername' })
+      ).rejects.toThrow(
+        'This username was recently released by another account and is on hold for 30 days'
+      );
+    });
+
+    it('excludes the requesting user\'s own history when checking the hold window', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.user.findFirst.mockResolvedValue(null);
+      prisma.usernameHistory.findFirst.mockResolvedValue(null);
+      prisma.user.update.mockResolvedValue({ ...mockUser, username: 'newusername' });
+      prisma.usernameHistory.create.mockResolvedValue({} as any);
+      (prisma.$transaction as jest.Mock).mockImplementation((ops: Promise<unknown>[]) =>
+        Promise.all(ops)
+      );
+
+      await service.update('user-123', { username: 'newusername' });
+
+      expect(prisma.usernameHistory.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({ NOT: { userId: 'user-123' } }),
+        })
+      );
     });
   });
 

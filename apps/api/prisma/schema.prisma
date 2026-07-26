@@ -8,21 +8,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String?   @unique
-  username      String    @unique
-  passwordHash  String?
-  walletAddress String?   @unique
-  avatarUrl     String?
-  bio           String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  email                String?   @unique
+  username             String    @unique
+  passwordHash         String?
+  walletAddress        String?   @unique
+  avatarUrl            String?
+  bio                  String?
+  lastUsernameChangeAt DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   videos        Video[]
   votes         Vote[]
   contributions Contribution[]
   comments      Comment[]
   chatConversations ChatConversation[]
+  usernameHistory      UsernameHistory[]
 
   // Follow relationships
   followers     Follow[]  @relation("Following")
@@ -34,6 +36,22 @@ model User {
   sentMessages          DirectMessage[]
 
   @@map("users")
+}
+
+// Every username change is recorded so a released handle can be held for a
+// cooldown window -- without this, someone could rename to a just-vacated
+// popular handle within minutes and impersonate its previous owner.
+model UsernameHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  oldUsername String
+  newUsername String
+  changedAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([oldUsername])
+  @@map("username_history")
 }
 
 model Video {

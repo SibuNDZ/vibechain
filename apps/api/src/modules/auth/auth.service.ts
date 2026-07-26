@@ -9,10 +9,12 @@ import * as nacl from "tweetnacl";
 import bs58 from "bs58";
 import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
+import { Prisma } from "@prisma/client";
 import { UsersService } from "../users/users.service";
 import { RegisterDto, LoginDto, WalletLoginDto } from "./dto/auth.dto";
 import { PrismaService } from "../../database/prisma.service";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
+import { toUsernameSeed } from "../../common/username/username-policy";
 
 @Injectable()
 export class AuthService {
@@ -29,6 +31,8 @@ export class AuthService {
     if (existing) {
       throw new ConflictException("Email already registered");
     }
+
+    await this.usersService.assertUsernameAvailableForRegistration(dto.username);
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.create({
@@ -123,10 +127,27 @@ export class AuthService {
     let isNewUser = false;
     if (!user) {
       isNewUser = true;
-      user = await this.usersService.create({
-        walletAddress,
-        username: `user_${walletAddress.slice(0, 6)}`,
-      });
+      // Wallet addresses are mixed-case base58 -- must seed through the same
+      // slugifier the username policy enforces everywhere else, or this
+      // auto-provisioned handle would violate its own charset rule.
+      const seed = toUsernameSeed(walletAddress).slice(0, 6);
+      try {
+        user = await this.usersService.create({
+          walletAddress,
+          username: `user_${seed}`,
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+          // Extremely unlikely address-prefix collision -- disambiguate and retry once.
+          const suffix = randomBytes(2).toString("hex");
+          user = await this.usersService.create({
+            walletAddress,
+            username: `user_${seed}_${suffix}`,
+          });
+        } else {
+          throw error;
+        }
+      }
     }
 
     void this.analyticsService.track({

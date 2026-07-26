@@ -28,6 +28,7 @@ describe('AuthService', () => {
     walletAddress: null,
     avatarUrl: null,
     bio: null,
+    lastUsernameChangeAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -42,6 +43,7 @@ describe('AuthService', () => {
             findByEmail: jest.fn(),
             findByWallet: jest.fn(),
             create: jest.fn(),
+            assertUsernameAvailableForRegistration: jest.fn(),
           },
         },
         {

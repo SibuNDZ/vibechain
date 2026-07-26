@@ -1,5 +1,6 @@
-import { IsEmail, IsString, MinLength, IsOptional } from "class-validator";
+import { IsEmail, IsString, Matches, MaxLength, MinLength, IsOptional } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { USERNAME_FORMAT_MESSAGE, USERNAME_REGEX } from "../../../common/username/username-policy";
 
 export class RegisterDto {
   @ApiProperty()
@@ -9,6 +10,8 @@ export class RegisterDto {
   @ApiProperty()
   @IsString()
   @MinLength(3)
+  @MaxLength(30)
+  @Matches(USERNAME_REGEX, { message: USERNAME_FORMAT_MESSAGE })
   username: string;
 
   @ApiProperty()

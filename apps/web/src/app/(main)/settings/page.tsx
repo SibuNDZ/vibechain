@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User, Wallet, Save, Loader2 } from "lucide-react";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { formatAddress } from "@/lib/utils";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
@@ -23,6 +23,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
 
   // Form state
   const [username, setUsername] = useState("");
@@ -56,8 +57,10 @@ export default function SettingsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setIsSaving(true);
     setMessage(null);
+    setUsernameError(null);
 
     try {
       const updatedUser = await api.patch<UserProfile>("/users/me", {
@@ -86,8 +89,16 @@ export default function SettingsPage() {
 
       setMessage({ type: "success", text: "Profile updated successfully!" });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update profile";
-      setMessage({ type: "error", text: errorMessage });
+      const usernameChanged = username !== user.username;
+      const isUsernameStatus =
+        err instanceof ApiError && [400, 409, 429].includes(err.statusCode);
+
+      if (usernameChanged && isUsernameStatus) {
+        setUsernameError((err as ApiError).message);
+      } else {
+        const errorMessage = err instanceof Error ? err.message : "Failed to update profile";
+        setMessage({ type: "error", text: errorMessage });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -181,11 +192,28 @@ export default function SettingsPage() {
               <input
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (usernameError) setUsernameError(null);
+                }}
                 required
                 minLength={3}
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
+                maxLength={30}
+                pattern="[a-z0-9_]{3,30}"
+                aria-invalid={usernameError ? true : undefined}
+                className={`w-full px-4 py-2 bg-white/5 border rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 ${
+                  usernameError
+                    ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/30"
+                    : "border-white/10 focus:border-primary-400 focus:ring-primary-400/30"
+                }`}
               />
+              {usernameError ? (
+                <p className="mt-1 text-xs text-red-300">{usernameError}</p>
+              ) : (
+                <p className="mt-1 text-xs text-white/40">
+                  Lowercase letters, numbers, and underscores only. Can be changed once every 30 days.
+                </p>
+              )}
             </div>
 
             {/* Bio */}
