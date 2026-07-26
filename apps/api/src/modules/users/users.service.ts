@@ -57,6 +57,18 @@ export class UsersService {
     });
   }
 
+  private static readonly PROFILE_SELECT = {
+    id: true,
+    email: true,
+    username: true,
+    walletAddress: true,
+    avatarUrl: true,
+    bio: true,
+    lastUsernameChangeAt: true,
+    createdAt: true,
+    updatedAt: true,
+  } as const;
+
   async update(id: string, data: Partial<CreateUserData>) {
     const current = await this.prisma.user.findUnique({
       where: { id },
@@ -74,7 +86,11 @@ export class UsersService {
       data.username !== undefined && data.username !== current.username;
 
     if (!isUsernameChange) {
-      return this.prisma.user.update({ where: { id }, data: updateData });
+      return this.prisma.user.update({
+        where: { id },
+        data: updateData,
+        select: UsersService.PROFILE_SELECT,
+      });
     }
 
     const newUsername = data.username as string;
@@ -89,6 +105,7 @@ export class UsersService {
       this.prisma.user.update({
         where: { id },
         data: { ...updateData, username: newUsername, lastUsernameChangeAt: now },
+        select: UsersService.PROFILE_SELECT,
       }),
       this.prisma.usernameHistory.create({
         data: { userId: id, oldUsername: current.username, newUsername },
