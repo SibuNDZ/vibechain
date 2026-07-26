@@ -195,6 +195,7 @@ export default function UploadPage() {
               <VideoUploader
                 onUploadComplete={handleUploadComplete}
                 onUploadStart={() => setIsUploading(true)}
+                onUploadError={() => setIsUploading(false)}
                 maxSizeMB={500}
               />
               {videoUrl && uploadMode === "file" && (

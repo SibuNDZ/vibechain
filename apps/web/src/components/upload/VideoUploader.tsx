@@ -32,6 +32,7 @@ interface VideoUploaderProps {
     cloudinaryPublicId: string;
   }) => void;
   onUploadStart?: () => void;
+  onUploadError?: () => void;
   maxSizeMB?: number;
 }
 
@@ -48,6 +49,7 @@ const ACCEPTED_VIDEO_TYPES = [
 export function VideoUploader({
   onUploadComplete,
   onUploadStart,
+  onUploadError,
   maxSizeMB = 500,
 }: VideoUploaderProps) {
   const getErrorMessage = (err: unknown, fallback = "Upload failed") => {
@@ -117,8 +119,12 @@ export function VideoUploader({
       formData.append("signature", signatureData.signature);
       formData.append("folder", signatureData.folder);
       formData.append("resource_type", "video");
-      // Request thumbnail generation
-      formData.append("eager", "c_thumb,w_400,h_225,g_auto");
+      // Must match the eager transformation the server signed in
+      // generateUploadSignature() EXACTLY -- Cloudinary recomputes the
+      // signature from whatever params actually arrive in this request, so
+      // any mismatch (including the crop dimensions) fails as "Invalid
+      // Signature" even though the signature itself is correctly formed.
+      formData.append("eager", "c_thumb,w_1280,h_720,g_auto");
       formData.append("eager_async", "true");
 
       // Step 3: Upload to Cloudinary with progress tracking
@@ -201,6 +207,10 @@ export function VideoUploader({
       const message = getErrorMessage(err);
       setError(message);
       toast.error(message);
+      // onUploadStart flipped the parent's isUploading true; without this,
+      // a failed upload leaves the Publish button permanently stuck/disabled
+      // even after switching to Paste URL mode or picking a new file.
+      onUploadError?.();
     }
   };
 
