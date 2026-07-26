@@ -1,21 +1,25 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useMemo, FormEvent } from "react";
+import Link from "next/link";
 import { MessageCircle, Send, Trash2, ChevronDown, ChevronUp } from "lucide-react";
-import { api, Comment, PaginatedResponse } from "@/lib/api";
+import { api, Comment, MentionSuggestion, PaginatedResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { MentionInput } from "./MentionInput";
 import toast from "react-hot-toast";
 
 interface CommentSectionProps {
   videoId: string;
   isAuthenticated: boolean;
   currentUserId?: string;
+  videoOwner?: { id: string; username: string; avatarUrl: string | null };
 }
 
 export function CommentSection({
   videoId,
   isAuthenticated,
   currentUserId,
+  videoOwner,
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,10 +29,50 @@ export function CommentSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
   const [loadedReplies, setLoadedReplies] = useState<Record<string, Comment[]>>({});
+  const [following, setFollowing] = useState<MentionSuggestion[]>([]);
 
   useEffect(() => {
     fetchComments();
   }, [videoId]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !currentUserId) {
+      setFollowing([]);
+      return;
+    }
+
+    api
+      .get<PaginatedResponse<MentionSuggestion>>(`/users/${currentUserId}/following`, {
+        params: { limit: "50" },
+      })
+      .then((res) => setFollowing(res.data))
+      .catch(() => setFollowing([]));
+  }, [isAuthenticated, currentUserId]);
+
+  // Ranked mention candidates: follows > video owner > everyone else who has
+  // commented on this thread, self excluded, deduped keeping first (highest
+  // priority) occurrence.
+  const mentionSuggestions = useMemo(() => {
+    const threadCommenters = comments.flatMap((c) => [
+      c.user,
+      ...(c.replies?.map((r) => r.user) || []),
+    ]);
+
+    const candidates = [
+      ...following,
+      ...(videoOwner ? [videoOwner] : []),
+      ...threadCommenters,
+    ];
+
+    const seen = new Set<string>();
+    const ranked: MentionSuggestion[] = [];
+    for (const user of candidates) {
+      if (user.id === currentUserId || seen.has(user.id)) continue;
+      seen.add(user.id);
+      ranked.push(user);
+    }
+    return ranked;
+  }, [following, videoOwner, comments, currentUserId]);
 
   const fetchComments = async () => {
     try {
@@ -176,6 +220,52 @@ export function CommentSection({
     return date.toLocaleDateString();
   };
 
+  // Renders @mentions as profile links, driven only by the comment's stored
+  // CommentMention rows -- never re-parses arbitrary @text, and never injects
+  // raw HTML. Links route by id so they survive the mentioned user renaming.
+  const renderCommentContent = (comment: Comment) => {
+    if (!comment.mentions || comment.mentions.length === 0) {
+      return comment.content;
+    }
+
+    const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const usernameToId = new Map(
+      comment.mentions.map((m) => [m.mentionedUser.username, m.mentionedUserId])
+    );
+    const pattern = new RegExp(
+      `@(${[...usernameToId.keys()].map(escapeRegex).join("|")})(?![a-z0-9_])`,
+      "g"
+    );
+
+    const nodes: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let key = 0;
+
+    for (const match of comment.content.matchAll(pattern)) {
+      const [full, username] = match;
+      const index = match.index ?? 0;
+      if (index > lastIndex) {
+        nodes.push(comment.content.slice(lastIndex, index));
+      }
+      const userId = usernameToId.get(username);
+      nodes.push(
+        <Link
+          key={`mention-${key++}`}
+          href={`/users/${userId}`}
+          className="text-primary-400 hover:underline"
+        >
+          {full}
+        </Link>
+      );
+      lastIndex = index + full.length;
+    }
+    if (lastIndex < comment.content.length) {
+      nodes.push(comment.content.slice(lastIndex));
+    }
+
+    return nodes;
+  };
+
   const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => {
     const replies = loadedReplies[comment.id] || comment.replies || [];
     const replyCount = comment._count?.replies || 0;
@@ -206,7 +296,7 @@ export function CommentSection({
               {formatTimeAgo(comment.createdAt)}
             </span>
           </div>
-          <p className="text-white/80 text-sm mt-1">{comment.content}</p>
+          <p className="text-white/80 text-sm mt-1">{renderCommentContent(comment)}</p>
 
           <div className="flex items-center gap-4 mt-2">
             {isAuthenticated && !isReply && (
@@ -231,13 +321,13 @@ export function CommentSection({
           {/* Reply input */}
           {replyingTo === comment.id && (
             <div className="mt-3 flex gap-2">
-              <input
-                type="text"
+              <MentionInput
                 value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
+                onChange={setReplyContent}
                 placeholder="Write a reply..."
-                className="flex-1 bg-white/5 text-white text-sm rounded-lg px-3 py-2 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
-                onKeyDown={(e) => {
+                suggestions={mentionSuggestions}
+                className="w-full bg-white/5 text-white text-sm rounded-lg px-3 py-2 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
+                onKeyDownWhenIdle={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSubmitReply(comment.id);
@@ -300,12 +390,12 @@ export function CommentSection({
       {isAuthenticated ? (
         <form onSubmit={handleSubmitComment} className="mb-6">
           <div className="flex gap-3">
-            <input
-              type="text"
+            <MentionInput
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={setNewComment}
               placeholder="Add a comment..."
-              className="flex-1 bg-white/5 text-white placeholder-white/30 rounded-lg px-4 py-3 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
+              suggestions={mentionSuggestions}
+              className="w-full bg-white/5 text-white placeholder-white/30 rounded-lg px-4 py-3 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
             />
             <button
               type="submit"

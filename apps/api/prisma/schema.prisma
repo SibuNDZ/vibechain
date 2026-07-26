@@ -39,6 +39,8 @@ model User {
   notificationsSent     Notification[] @relation("NotificationActor")
   notificationsReceived Notification[] @relation("NotificationRecipient")
 
+  mentionedInComments CommentMention[]
+
   @@map("users")
 }
 
@@ -192,11 +194,27 @@ model Comment {
   replies   Comment[] @relation("CommentReplies")
 
   notifications Notification[]
+  mentions      CommentMention[]
 
   @@index([videoId])
   @@index([userId])
   @@index([parentId])
   @@map("comments")
+}
+
+model CommentMention {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  commentId       String
+  comment         Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  mentionedUserId String
+  mentionedUser   User    @relation(fields: [mentionedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, mentionedUserId])
+  @@index([commentId])
+  @@index([mentionedUserId])
+  @@map("comment_mentions")
 }
 
 model Follow {

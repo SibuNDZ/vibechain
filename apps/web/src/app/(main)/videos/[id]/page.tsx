@@ -186,6 +186,7 @@ export default function VideoDetailPage() {
               videoId={video.id}
               isAuthenticated={isAuthenticated}
               currentUserId={currentUserId}
+              videoOwner={video.user}
             />
           </div>
 

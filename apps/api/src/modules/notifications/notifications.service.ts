@@ -49,6 +49,21 @@ export class NotificationsService {
     });
   }
 
+  async notifyMention(
+    actorId: string,
+    recipientId: string,
+    videoId: string,
+    commentId: string
+  ) {
+    return this.create({
+      type: "MENTION",
+      actorId,
+      recipientId,
+      videoId,
+      commentId,
+    });
+  }
+
   async notifyContribution(
     actorId: string,
     recipientId: string,

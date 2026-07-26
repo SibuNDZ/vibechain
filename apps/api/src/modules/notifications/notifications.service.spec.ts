@@ -77,6 +77,30 @@ describe('NotificationsService', () => {
     });
   });
 
+  describe('notifyMention', () => {
+    it('creates a MENTION notification for the mentioned user', async () => {
+      prisma.notification.create.mockResolvedValue({} as any);
+
+      await service.notifyMention('commenter-1', 'mentioned-1', 'video-1', 'comment-1');
+
+      expect(prisma.notification.create).toHaveBeenCalledWith({
+        data: {
+          type: 'MENTION',
+          actorId: 'commenter-1',
+          recipientId: 'mentioned-1',
+          videoId: 'video-1',
+          commentId: 'comment-1',
+        },
+      });
+    });
+
+    it('skips notifying yourself when mentioning yourself', async () => {
+      await service.notifyMention('user-1', 'user-1', 'video-1', 'comment-1');
+
+      expect(prisma.notification.create).not.toHaveBeenCalled();
+    });
+  });
+
   describe('notifyContribution', () => {
     it('creates a CONTRIBUTION notification for the campaign video owner', async () => {
       prisma.notification.create.mockResolvedValue({} as any);

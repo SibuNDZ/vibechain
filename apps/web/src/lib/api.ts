@@ -238,10 +238,20 @@ export interface Comment {
     username: string;
     avatarUrl: string | null;
   };
+  mentions?: {
+    mentionedUserId: string;
+    mentionedUser: { id: string; username: string };
+  }[];
   replies?: Comment[];
   _count?: {
     replies: number;
   };
+}
+
+export interface MentionSuggestion {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
 }
 
 export interface UserProfile {

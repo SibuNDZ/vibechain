@@ -6,6 +6,17 @@ import {
 import { PrismaService } from "../../database/prisma.service";
 import { CreateCommentDto, UpdateCommentDto } from "./dto/comment.dto";
 import { NotificationsService } from "../notifications/notifications.service";
+import {
+  MAX_MENTIONS_PER_COMMENT,
+  extractMentionCandidates,
+} from "../../common/mentions/mention-parser";
+
+const MENTIONS_INCLUDE = {
+  select: {
+    mentionedUserId: true,
+    mentionedUser: { select: { id: true, username: true } },
+  },
+} as const;
 
 @Injectable()
 export class CommentsService {
@@ -55,14 +66,68 @@ export class CommentsService {
       },
     });
 
-    void this.notificationsService.notifyComment(
-      userId,
-      video.userId,
-      videoId,
-      comment.id
-    );
+    const mentions = await this.createMentions(comment.id, userId, dto.content);
 
-    return comment;
+    for (const mention of mentions) {
+      void this.notificationsService.notifyMention(
+        userId,
+        mention.id,
+        videoId,
+        comment.id
+      );
+    }
+
+    const mentionedUserIds = new Set(mentions.map((m) => m.id));
+    if (!mentionedUserIds.has(video.userId)) {
+      void this.notificationsService.notifyComment(
+        userId,
+        video.userId,
+        videoId,
+        comment.id
+      );
+    }
+
+    return {
+      ...comment,
+      mentions: mentions.map((m) => ({
+        mentionedUserId: m.id,
+        mentionedUser: { id: m.id, username: m.username },
+      })),
+    };
+  }
+
+  /**
+   * Resolves @username tokens against real users, drops the author's own
+   * handle (no self-mention row/notification), and caps at
+   * MAX_MENTIONS_PER_COMMENT resolved mentions in order of first appearance.
+   */
+  private async createMentions(
+    commentId: string,
+    authorId: string,
+    content: string
+  ) {
+    const candidates = extractMentionCandidates(content);
+    if (candidates.length === 0) return [];
+
+    const matchedUsers = await this.prisma.user.findMany({
+      where: { username: { in: candidates } },
+      select: { id: true, username: true },
+    });
+    const byUsername = new Map(matchedUsers.map((u) => [u.username, u]));
+
+    const resolved = candidates
+      .map((username) => byUsername.get(username))
+      .filter((u): u is { id: string; username: string } => !!u && u.id !== authorId)
+      .slice(0, MAX_MENTIONS_PER_COMMENT);
+
+    if (resolved.length === 0) return [];
+
+    await this.prisma.commentMention.createMany({
+      data: resolved.map((u) => ({ commentId, mentionedUserId: u.id })),
+      skipDuplicates: true,
+    });
+
+    return resolved;
   }
 
   async findByVideo(videoId: string, page = 1, limit = 20) {
@@ -82,11 +147,13 @@ export class CommentsService {
           user: {
             select: { id: true, username: true, avatarUrl: true },
           },
+          mentions: MENTIONS_INCLUDE,
           replies: {
             include: {
               user: {
                 select: { id: true, username: true, avatarUrl: true },
               },
+              mentions: MENTIONS_INCLUDE,
             },
             orderBy: { createdAt: "asc" },
             take: 3, // Show first 3 replies
@@ -125,6 +192,7 @@ export class CommentsService {
           user: {
             select: { id: true, username: true, avatarUrl: true },
           },
+          mentions: MENTIONS_INCLUDE,
         },
       }),
       this.prisma.comment.count({
