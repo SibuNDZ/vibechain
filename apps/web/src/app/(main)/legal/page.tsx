@@ -4,10 +4,10 @@ import Link from "next/link";
 
 export default function LegalPage() {
   return (
-    <div className="min-h-screen bg-white py-10">
-      <div className="max-w-3xl mx-auto px-4 text-slate-700">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Legal</h1>
-        <p className="text-sm text-slate-500 mb-8">Last updated: February 8, 2026</p>
+    <div className="min-h-screen bg-[#050505] py-10">
+      <div className="max-w-3xl mx-auto px-4 text-white/80">
+        <h1 className="text-3xl font-bold text-white mb-2">Legal</h1>
+        <p className="text-sm text-white/50 mb-8">Last updated: February 8, 2026</p>
 
         <section className="space-y-4 text-sm leading-6">
           <p>
@@ -17,20 +17,20 @@ export default function LegalPage() {
           </p>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-slate-900">Key documents</h2>
+            <h2 className="text-lg font-semibold text-white">Key documents</h2>
             <ul className="list-disc pl-6 space-y-1">
               <li>
-                <Link href="/terms" className="text-red-600 hover:text-red-700">
+                <Link href="/terms" className="text-primary-400 hover:text-primary-300">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-red-600 hover:text-red-700">
+                <Link href="/privacy" className="text-primary-400 hover:text-primary-300">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-red-600 hover:text-red-700">
+                <Link href="/cookies" className="text-primary-400 hover:text-primary-300">
                   Cookie Policy
                 </Link>
               </li>
@@ -38,7 +38,7 @@ export default function LegalPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-slate-900">Copyright and IP</h2>
+            <h2 className="text-lg font-semibold text-white">Copyright and IP</h2>
             <p>
               You may only upload content you own or are authorized to use. We may
               remove content that infringes intellectual property rights.
@@ -46,10 +46,10 @@ export default function LegalPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold text-slate-900">Contact</h2>
+            <h2 className="text-lg font-semibold text-white">Contact</h2>
             <p>
               For legal inquiries, contact us at{" "}
-              <span className="text-slate-900">info@dsnresearch.com</span>.
+              <span className="text-white">info@dsnresearch.com</span>.
             </p>
           </div>
         </section>

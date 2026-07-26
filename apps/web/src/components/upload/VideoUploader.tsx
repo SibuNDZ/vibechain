@@ -293,7 +293,7 @@ export function VideoUploader({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-orange-200 bg-white rounded-xl p-8 text-center cursor-pointer hover:border-red-500 hover:bg-orange-50 transition-all shadow-sm"
+          className="border-2 border-dashed border-white/20 bg-white/[0.03] rounded-xl p-8 text-center cursor-pointer hover:border-primary-400 hover:bg-white/5 transition-all"
         >
           <input
             ref={fileInputRef}
@@ -302,12 +302,12 @@ export function VideoUploader({
             onChange={handleFileInputChange}
             className="hidden"
           />
-          <Upload className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-          <p className="text-lg font-medium text-slate-900 mb-2">
+          <Upload className="w-12 h-12 text-primary-400 mx-auto mb-4" />
+          <p className="text-lg font-medium text-white mb-2">
             Drag and drop your video here
           </p>
-          <p className="text-slate-500 mb-4">or click to browse</p>
-          <p className="text-sm text-slate-500">
+          <p className="text-white/50 mb-4">or click to browse</p>
+          <p className="text-sm text-white/50">
             Supports MP4, WebM, MOV, AVI, MKV (max {maxSizeMB}MB)
           </p>
         </div>
@@ -316,31 +316,31 @@ export function VideoUploader({
       {(status === "uploading" || status === "processing") && (
         <div className="vc-card p-6">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-              <Film className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center">
+              <Film className="w-6 h-6 text-primary-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-slate-900 font-medium truncate">{fileName}</p>
-              <p className="text-sm text-slate-500">
+              <p className="text-white font-medium truncate">{fileName}</p>
+              <p className="text-sm text-white/50">
                 {status === "uploading" ? "Uploading..." : "Processing video..."}
               </p>
             </div>
             <button
               onClick={handleReset}
-              className="p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
+              className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="relative h-2 bg-orange-50 rounded-full overflow-hidden">
+          <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="absolute inset-y-0 left-0 bg-red-600 transition-all duration-300"
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary-400 to-primary-700 transition-all duration-300"
               style={{ width: `${status === "processing" ? 100 : progress}%` }}
             />
           </div>
           <div className="flex justify-between mt-2 text-sm">
-            <span className="text-slate-500">
+            <span className="text-white/50">
               {status === "processing" ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -351,7 +351,7 @@ export function VideoUploader({
               )}
             </span>
           </div>
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-white/40">
             Large videos can take a few minutes to upload and process. Please keep this tab open.
           </p>
         </div>
@@ -360,7 +360,7 @@ export function VideoUploader({
       {status === "complete" && preview && (
         <div className="vc-card p-6">
           <div className="flex items-start gap-4">
-            <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-orange-50 flex-shrink-0">
+            <div className="relative w-40 aspect-video rounded-lg overflow-hidden bg-white/10 flex-shrink-0">
               <video
                 src={preview}
                 className="w-full h-full object-cover"
@@ -376,9 +376,9 @@ export function VideoUploader({
                 <CheckCircle className="w-5 h-5" />
                 <span className="font-medium">Upload complete!</span>
               </div>
-              <p className="text-slate-900 font-medium truncate mb-1">{fileName}</p>
+              <p className="text-white font-medium truncate mb-1">{fileName}</p>
               {uploadedData && (
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-white/50">
                   Duration: {Math.floor(uploadedData.duration / 60)}:
                   {String(Math.round(uploadedData.duration % 60)).padStart(2, "0")} •{" "}
                   {uploadedData.width}x{uploadedData.height}
@@ -387,7 +387,7 @@ export function VideoUploader({
             </div>
             <button
               onClick={handleReset}
-              className="p-2 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded-lg transition-colors"
+              className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
               title="Upload a different video"
             >
               <X className="w-5 h-5" />
@@ -397,12 +397,12 @@ export function VideoUploader({
       )}
 
       {status === "error" && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+            <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-red-700 font-medium mb-1">Upload failed</p>
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-300 font-medium mb-1">Upload failed</p>
+              <p className="text-red-300/80 text-sm">{error}</p>
             </div>
             <button
               onClick={handleReset}

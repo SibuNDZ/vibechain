@@ -21,7 +21,7 @@ export function VideoCard({
 }: VideoCardProps) {
   return (
     <Link href={`/videos/${id}`} className="group">
-      <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100">
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-white/10">
         <SafeImage
           src={thumbnailUrl}
           alt={title}
@@ -39,9 +39,9 @@ export function VideoCard({
         )}
       </div>
       <div className="mt-3">
-        <h3 className="font-semibold text-slate-900 truncate">{title}</h3>
-        <p className="text-sm text-slate-500">{artist}</p>
-        <div className="flex items-center gap-1 mt-1 text-sm text-orange-600">
+        <h3 className="font-semibold text-white truncate">{title}</h3>
+        <p className="text-sm text-white/50">{artist}</p>
+        <div className="flex items-center gap-1 mt-1 text-sm text-primary-400">
           <Heart className="w-4 h-4" />
           <span>{voteCount.toLocaleString()} votes</span>
         </div>

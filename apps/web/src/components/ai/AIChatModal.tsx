@@ -129,26 +129,26 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-900/50"
+        className="absolute inset-0 bg-black/60"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-white w-full sm:w-[480px] h-[600px] sm:h-[700px] sm:max-h-[90vh] sm:rounded-2xl overflow-hidden flex flex-col shadow-2xl border border-orange-200">
+      <div className="relative bg-[#0A0A0A] w-full sm:w-[480px] h-[600px] sm:h-[700px] sm:max-h-[90vh] sm:rounded-2xl overflow-hidden flex flex-col shadow-2xl shadow-black/50 border border-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-orange-200">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-700 rounded-full flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="font-semibold text-slate-900">VibeChain AI</h2>
-              <p className="text-xs text-slate-500">Your music video assistant</p>
+              <h2 className="font-semibold text-white">VibeChain AI</h2>
+              <p className="text-xs text-white/50">Your music video assistant</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-900 transition-colors p-2"
+            className="text-white/40 hover:text-white transition-colors p-2"
           >
             <X className="w-5 h-5" />
           </button>
@@ -158,11 +158,11 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && !streamingContent ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <MessageCircle className="w-12 h-12 text-orange-200 mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">
+              <MessageCircle className="w-12 h-12 text-white/20 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">
                 How can I help you today?
               </h3>
-              <p className="text-slate-500 text-sm mb-6 max-w-[280px]">
+              <p className="text-white/50 text-sm mb-6 max-w-[280px]">
                 Ask me about music videos, get recommendations, or discover new artists.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
@@ -170,7 +170,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
                   <button
                     key={prompt}
                     onClick={() => handleQuickPrompt(prompt)}
-                    className="px-3 py-1.5 bg-orange-50 text-slate-700 text-sm rounded-full border border-orange-200 hover:bg-orange-100 transition-colors"
+                    className="px-3 py-1.5 bg-white/5 text-white/70 text-sm rounded-full border border-white/10 hover:bg-white/10 transition-colors"
                   >
                     {prompt}
                   </button>
@@ -199,7 +199,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
 
               {/* Loading indicator */}
               {isLoading && !streamingContent && (
-                <div className="flex items-center gap-2 text-slate-500">
+                <div className="flex items-center gap-2 text-white/50">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span className="text-sm">Thinking...</span>
                 </div>
@@ -213,7 +213,7 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
         {/* Input */}
         <form
           onSubmit={handleSubmit}
-          className="p-4 border-t border-orange-200 bg-white"
+          className="p-4 border-t border-white/10 bg-[#0A0A0A]"
         >
           <div className="flex gap-2">
             <input
@@ -222,12 +222,12 @@ export function AIChatModal({ isOpen, onClose }: AIChatModalProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about music videos..."
               disabled={isLoading}
-              className="flex-1 bg-white text-slate-900 rounded-xl px-4 py-3 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500 disabled:opacity-50"
+              className="flex-1 bg-white/5 text-white placeholder-white/30 rounded-xl px-4 py-3 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="bg-red-600 text-white p-3 rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-gradient-to-r from-primary-400 to-primary-700 text-white p-3 rounded-xl hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

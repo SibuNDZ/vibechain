@@ -38,6 +38,42 @@ export function VideoPlayer({
     return "video/mp4";
   };
 
+  // video.js only plays direct media files/streams -- a youtube.com or
+  // vimeo.com page URL isn't one, and silently defaulted to "video/mp4"
+  // above, which fails as MEDIA_ERR_SRC_NOT_SUPPORTED. Detect those and
+  // render an iframe embed instead, since the upload form advertises
+  // YouTube/Vimeo URL support but nothing ever implemented it.
+  const getEmbedUrl = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, "");
+
+      if (host === "youtu.be") {
+        const id = u.pathname.slice(1);
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+      if (host === "youtube.com" || host === "m.youtube.com") {
+        const id = u.searchParams.get("v");
+        if (id) return `https://www.youtube.com/embed/${id}`;
+        if (u.pathname.startsWith("/embed/")) return url;
+        if (u.pathname.startsWith("/shorts/")) {
+          return `https://www.youtube.com/embed/${u.pathname.split("/")[2]}`;
+        }
+        return null;
+      }
+      if (host === "vimeo.com") {
+        const id = u.pathname.split("/").filter(Boolean)[0];
+        return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
+      }
+      if (host === "player.vimeo.com") {
+        return url;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   const normalizedSources = useMemo(() => {
     return sources
       .filter((source) => Boolean(source?.src))
@@ -48,6 +84,11 @@ export function VideoPlayer({
         isAuto: source.isAuto,
       }));
   }, [sources]);
+
+  const embedUrl = useMemo(() => {
+    const primary = normalizedSources[0];
+    return primary ? getEmbedUrl(primary.src) : null;
+  }, [normalizedSources]);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -85,6 +126,7 @@ export function VideoPlayer({
   }, [poster]);
 
   useEffect(() => {
+    if (embedUrl) return;
     if (!playerRef.current && videoRef.current) {
       const videoElement = document.createElement("video-js");
       videoElement.classList.add("video-js", "vjs-big-play-centered");
@@ -143,6 +185,20 @@ export function VideoPlayer({
     }
   }, [normalizedSources, selectedIndex, resolvedPoster]);
 
+  if (embedUrl) {
+    return (
+      <div className="w-full aspect-video rounded-lg overflow-hidden bg-black">
+        <iframe
+          src={embedUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          title="Video player"
+        />
+      </div>
+    );
+  }
+
   const showSelector = showQualitySelector && normalizedSources.length > 1;
 
   return (
@@ -156,8 +212,8 @@ export function VideoPlayer({
               onClick={() => setSelectedIndex(index)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 index === selectedIndex
-                  ? "bg-red-600 text-white"
-                  : "bg-orange-100 text-orange-700 border border-orange-200 hover:bg-red-600 hover:text-white"
+                  ? "bg-gradient-to-r from-primary-400 to-primary-700 text-white"
+                  : "bg-white/10 text-white/70 border border-white/10 hover:bg-white/20"
               }`}
             >
               {source.label ||

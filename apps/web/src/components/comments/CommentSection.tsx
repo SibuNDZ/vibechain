@@ -184,7 +184,7 @@ export function CommentSection({
 
     return (
       <div className={cn("flex gap-3", isReply && "ml-8 mt-3")}>
-        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center flex-shrink-0">
           {comment.user.avatarUrl ? (
             <img
               src={comment.user.avatarUrl}
@@ -199,20 +199,20 @@ export function CommentSection({
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-900 text-sm">
+            <span className="font-semibold text-white text-sm">
               {comment.user.username}
             </span>
-            <span className="text-slate-500 text-xs">
+            <span className="text-white/40 text-xs">
               {formatTimeAgo(comment.createdAt)}
             </span>
           </div>
-          <p className="text-slate-700 text-sm mt-1">{comment.content}</p>
+          <p className="text-white/80 text-sm mt-1">{comment.content}</p>
 
           <div className="flex items-center gap-4 mt-2">
             {isAuthenticated && !isReply && (
               <button
                 onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                className="text-slate-500 text-xs hover:text-red-600 transition-colors"
+                className="text-white/50 text-xs hover:text-primary-400 transition-colors"
               >
                 Reply
               </button>
@@ -220,7 +220,7 @@ export function CommentSection({
             {canDelete && (
               <button
                 onClick={() => handleDeleteComment(comment.id, comment.parentId)}
-                className="text-slate-500 text-xs hover:text-red-600 transition-colors flex items-center gap-1"
+                className="text-white/50 text-xs hover:text-red-400 transition-colors flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" />
                 Delete
@@ -236,7 +236,7 @@ export function CommentSection({
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="Write a reply..."
-                className="flex-1 bg-white text-slate-900 text-sm rounded-lg px-3 py-2 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
+                className="flex-1 bg-white/5 text-white text-sm rounded-lg px-3 py-2 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -258,7 +258,7 @@ export function CommentSection({
           {!isReply && replyCount > 0 && (
             <button
               onClick={() => toggleReplies(comment.id)}
-              className="text-orange-600 text-xs mt-2 flex items-center gap-1 hover:text-red-600"
+              className="text-primary-400 text-xs mt-2 flex items-center gap-1 hover:text-primary-300"
             >
               {isExpanded ? (
                 <>
@@ -290,8 +290,8 @@ export function CommentSection({
   return (
     <div className="vc-card p-6">
       <div className="flex items-center gap-2 mb-6">
-        <MessageCircle className="w-5 h-5 text-orange-500" />
-        <h2 className="text-xl font-semibold text-slate-900">
+        <MessageCircle className="w-5 h-5 text-primary-400" />
+        <h2 className="text-xl font-semibold text-white">
           Comments {comments.length > 0 && `(${comments.length})`}
         </h2>
       </div>
@@ -305,7 +305,7 @@ export function CommentSection({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 bg-white text-slate-900 rounded-lg px-4 py-3 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-500"
+              className="flex-1 bg-white/5 text-white placeholder-white/30 rounded-lg px-4 py-3 border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400"
             />
             <button
               type="submit"
@@ -318,10 +318,10 @@ export function CommentSection({
           </div>
         </form>
       ) : (
-        <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-center">
-          <p className="text-slate-600">
+        <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-lg text-center">
+          <p className="text-white/60">
             Please{" "}
-            <a href="/login" className="text-red-600 hover:underline">
+            <a href="/login" className="text-primary-400 hover:underline">
               sign in
             </a>{" "}
             to leave a comment
@@ -334,18 +334,18 @@ export function CommentSection({
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex gap-3 animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-orange-100" />
+              <div className="w-8 h-8 rounded-full bg-white/10" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-orange-100 rounded w-24" />
-                <div className="h-3 bg-orange-100 rounded w-3/4" />
+                <div className="h-4 bg-white/10 rounded w-24" />
+                <div className="h-3 bg-white/10 rounded w-3/4" />
               </div>
             </div>
           ))}
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-8">
-          <MessageCircle className="w-12 h-12 text-orange-200 mx-auto mb-3" />
-          <p className="text-slate-500">No comments yet. Be the first to comment!</p>
+          <MessageCircle className="w-12 h-12 text-white/20 mx-auto mb-3" />
+          <p className="text-white/50">No comments yet. Be the first to comment!</p>
         </div>
       ) : (
         <div className="space-y-6">

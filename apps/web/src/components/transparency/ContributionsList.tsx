@@ -56,46 +56,46 @@ export function ContributionsList({
   };
 
   return (
-    <div className="bg-orange-50 border border-orange-200 rounded-xl overflow-hidden">
+    <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl overflow-hidden backdrop-blur-md">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-orange-100 transition-colors"
+        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-orange-500" />
-          <span className="font-medium text-slate-900">
+          <Users className="w-4 h-4 text-primary-400" />
+          <span className="font-medium text-white">
             Contributors {total > 0 && `(${total})`}
           </span>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-slate-400" />
+          <ChevronUp className="w-4 h-4 text-white/40" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-slate-400" />
+          <ChevronDown className="w-4 h-4 text-white/40" />
         )}
       </button>
 
       {/* List */}
       {isExpanded && (
-        <div className="border-t border-orange-200">
+        <div className="border-t border-white/10">
           {isLoading ? (
             <div className="p-4 space-y-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-orange-100" />
+                  <div className="w-8 h-8 rounded-full bg-white/10" />
                   <div className="flex-1">
-                    <div className="h-4 w-24 bg-orange-100 rounded" />
-                    <div className="h-3 w-16 bg-orange-100 rounded mt-1" />
+                    <div className="h-4 w-24 bg-white/10 rounded" />
+                    <div className="h-3 w-16 bg-white/10 rounded mt-1" />
                   </div>
                 </div>
               ))}
             </div>
           ) : contributions.length === 0 ? (
-            <div className="p-6 text-center text-slate-500">
+            <div className="p-6 text-center text-white/50">
               No contributions yet. Be the first!
             </div>
           ) : (
-            <div className="divide-y divide-orange-200">
+            <div className="divide-y divide-white/10">
               {contributions.map((contrib) => (
                 <div
                   key={contrib.id}
@@ -110,7 +110,7 @@ export function ContributionsList({
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-sm font-semibold">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center text-white text-sm font-semibold">
                           {contrib.user.username.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -118,25 +118,25 @@ export function ContributionsList({
                     <div>
                       <Link
                         href={`/users/${contrib.user.id}`}
-                        className="font-medium text-slate-900 hover:text-red-600 transition-colors"
+                        className="font-medium text-white hover:text-primary-400 transition-colors"
                       >
                         {contrib.user.username}
                       </Link>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-white/40">
                         {formatRelativeTime(contrib.createdAt)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-semibold text-green-600">
+                    <span className="font-semibold text-green-400">
                       {parseFloat(contrib.amount).toFixed(2)} SOL
                     </span>
                     <a
                       href={getExplorerUrl(contrib.txHash, "devnet")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-orange-100 rounded transition-colors"
+                      className="p-1.5 text-white/50 hover:text-white hover:bg-white/10 rounded transition-colors"
                       title="View on Explorer"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -148,12 +148,12 @@ export function ContributionsList({
           )}
 
           {total > contributions.length && (
-            <div className="p-4 border-t border-orange-200">
+            <div className="p-4 border-t border-white/10">
               <button
                 onClick={() => {
                   /* Could load more here */
                 }}
-                className="w-full text-center text-orange-600 hover:text-red-600 text-sm transition-colors"
+                className="w-full text-center text-primary-400 hover:text-primary-300 text-sm transition-colors"
               >
                 View all {total} contributors
               </button>

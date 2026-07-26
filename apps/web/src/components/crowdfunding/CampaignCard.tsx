@@ -26,7 +26,7 @@ export function CampaignCard({
 
   return (
     <Link href={`/crowdfunding/${id}`} className="group">
-      <div className="bg-orange-50 border border-orange-200 rounded-xl overflow-hidden">
+      <div className="bg-white/[0.03] border border-white/[0.08] rounded-xl overflow-hidden backdrop-blur-md">
         <div className="relative aspect-video">
           <SafeImage
             src={thumbnailUrl}
@@ -40,24 +40,24 @@ export function CampaignCard({
           </div>
         </div>
         <div className="p-4">
-          <h3 className="font-semibold text-slate-900 truncate">{title}</h3>
-          <p className="text-sm text-slate-500 mb-3">{artist}</p>
+          <h3 className="font-semibold text-white truncate">{title}</h3>
+          <p className="text-sm text-white/50 mb-3">{artist}</p>
 
-          <div className="w-full bg-orange-100 rounded-full h-2 mb-2">
+          <div className="w-full bg-white/10 rounded-full h-2 mb-2">
             <div
-              className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all"
+              className="bg-gradient-to-r from-primary-400 to-primary-700 h-2 rounded-full transition-all"
               style={{ width: `${Math.min(progress, 100)}%` }}
             />
           </div>
 
           <div className="flex justify-between text-sm">
             <div>
-              <span className="text-slate-900 font-semibold">
+              <span className="text-white font-semibold">
                 ${raisedAmount.toLocaleString()}
               </span>
-              <span className="text-slate-500"> of ${goalAmount.toLocaleString()}</span>
+              <span className="text-white/50"> of ${goalAmount.toLocaleString()}</span>
             </div>
-            <span className="text-slate-500">{backerCount} backers</span>
+            <span className="text-white/50">{backerCount} backers</span>
           </div>
         </div>
       </div>

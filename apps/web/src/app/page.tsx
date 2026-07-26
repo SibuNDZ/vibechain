@@ -74,8 +74,8 @@ export default function Home() {
   // Loading state
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-orange-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }
@@ -291,20 +291,20 @@ export default function Home() {
 
   // Homepage for authenticated users
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[#050505]">
       {/* Welcome Section */}
-      <section className="bg-orange-50 px-6 py-12 border-b border-orange-100">
+      <section className="bg-white/[0.03] px-6 py-12 border-b border-white/10">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Welcome back, {user.username}!
           </h1>
-          <p className="text-slate-600">
+          <p className="text-white/60">
             What would you like to do today?
           </p>
         </div>
       </section>
 
-      <FeaturedVideos className="py-10" />
+      <FeaturedVideos variant="dark" className="py-10" />
 
       {/* Action Cards */}
       <section className="px-6 py-12 max-w-6xl mx-auto">
@@ -312,18 +312,18 @@ export default function Home() {
           {/* Upload & Share Card */}
           <button
             onClick={() => router.push("/upload")}
-            className="group vc-card p-8 text-left transition-all duration-200 hover:shadow-lg hover:shadow-orange-200/60"
+            className="group vc-card p-8 text-left transition-all duration-200 hover:border-primary-400/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10"
           >
-            <div className="w-16 h-16 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mb-6 transition-colors">
-              <Upload className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 bg-primary-500/10 group-hover:bg-primary-500/20 rounded-full flex items-center justify-center mb-6 transition-colors">
+              <Upload className="w-8 h-8 text-primary-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Upload & Share
             </h3>
-            <p className="text-slate-600 mb-4">
+            <p className="text-white/60 mb-4">
               Share your music videos with a global audience and build your fanbase.
             </p>
-            <span className="text-red-600 font-medium group-hover:text-red-700 transition-colors">
+            <span className="text-primary-400 font-medium group-hover:text-primary-300 transition-colors">
               Upload a video →
             </span>
           </button>
@@ -331,18 +331,18 @@ export default function Home() {
           {/* Community Voting Card */}
           <button
             onClick={() => router.push("/videos")}
-            className="group vc-card p-8 text-left transition-all duration-200 hover:shadow-lg hover:shadow-orange-200/60"
+            className="group vc-card p-8 text-left transition-all duration-200 hover:border-primary-400/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10"
           >
-            <div className="w-16 h-16 bg-orange-100 group-hover:bg-orange-200 rounded-full flex items-center justify-center mb-6 transition-colors">
-              <Vote className="w-8 h-8 text-orange-600" />
+            <div className="w-16 h-16 bg-primary-500/10 group-hover:bg-primary-500/20 rounded-full flex items-center justify-center mb-6 transition-colors">
+              <Vote className="w-8 h-8 text-primary-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Community Voting
             </h3>
-            <p className="text-slate-600 mb-4">
+            <p className="text-white/60 mb-4">
               Vote for your favorite videos. Top voted content enters the funding phase.
             </p>
-            <span className="text-orange-600 font-medium group-hover:text-orange-700 transition-colors">
+            <span className="text-primary-400 font-medium group-hover:text-primary-300 transition-colors">
               Browse & vote →
             </span>
           </button>
@@ -350,18 +350,18 @@ export default function Home() {
           {/* Blockchain Funding Card */}
           <button
             onClick={() => router.push("/crowdfunding")}
-            className="group vc-card p-8 text-left transition-all duration-200 hover:shadow-lg hover:shadow-orange-200/60"
+            className="group vc-card p-8 text-left transition-all duration-200 hover:border-primary-400/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-500/10"
           >
-            <div className="w-16 h-16 bg-red-100 group-hover:bg-red-200 rounded-full flex items-center justify-center mb-6 transition-colors">
-              <Coins className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 bg-primary-500/10 group-hover:bg-primary-500/20 rounded-full flex items-center justify-center mb-6 transition-colors">
+              <Coins className="w-8 h-8 text-primary-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Blockchain Funding
             </h3>
-            <p className="text-slate-600 mb-4">
+            <p className="text-white/60 mb-4">
               Transparent crowdfunding powered by smart contracts. Support creators you love.
             </p>
-            <span className="text-red-600 font-medium group-hover:text-red-700 transition-colors">
+            <span className="text-primary-400 font-medium group-hover:text-primary-300 transition-colors">
               View campaigns →
             </span>
           </button>
@@ -370,74 +370,74 @@ export default function Home() {
 
       {/* Quick Stats Section */}
       <section className="px-6 py-8 max-w-6xl mx-auto">
-        <h2 className="text-xl font-semibold text-slate-900 mb-6">Quick Links</h2>
+        <h2 className="text-xl font-semibold text-white mb-6">Quick Links</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             href="/videos?sort=trending"
-            className="flex items-center gap-4 p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl transition-colors"
+            className="flex items-center gap-4 p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-xl transition-colors"
           >
-            <div className="p-3 bg-orange-200 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-orange-700" />
+            <div className="p-3 bg-primary-500/10 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="font-medium text-slate-900">Trending</p>
-              <p className="text-sm text-slate-500">Hot videos now</p>
+              <p className="font-medium text-white">Trending</p>
+              <p className="text-sm text-white/50">Hot videos now</p>
             </div>
           </Link>
 
           <Link
             href="/videos"
-            className="flex items-center gap-4 p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl transition-colors"
+            className="flex items-center gap-4 p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-xl transition-colors"
           >
-            <div className="p-3 bg-red-200 rounded-lg">
-              <Play className="w-5 h-5 text-red-700" />
+            <div className="p-3 bg-primary-500/10 rounded-lg">
+              <Play className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="font-medium text-slate-900">All Videos</p>
-              <p className="text-sm text-slate-500">Browse collection</p>
+              <p className="font-medium text-white">All Videos</p>
+              <p className="text-sm text-white/50">Browse collection</p>
             </div>
           </Link>
 
           <Link
             href={`/users/${user.id}`}
-            className="flex items-center gap-4 p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl transition-colors"
+            className="flex items-center gap-4 p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-xl transition-colors"
           >
-            <div className="p-3 bg-orange-200 rounded-lg">
-              <Users className="w-5 h-5 text-orange-700" />
+            <div className="p-3 bg-primary-500/10 rounded-lg">
+              <Users className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="font-medium text-slate-900">My Profile</p>
-              <p className="text-sm text-slate-500">View your activity</p>
+              <p className="font-medium text-white">My Profile</p>
+              <p className="text-sm text-white/50">View your activity</p>
             </div>
           </Link>
 
           <Link
             href="/crowdfunding"
-            className="flex items-center gap-4 p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl transition-colors"
+            className="flex items-center gap-4 p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-xl transition-colors"
           >
-            <div className="p-3 bg-red-200 rounded-lg">
-              <Coins className="w-5 h-5 text-red-700" />
+            <div className="p-3 bg-primary-500/10 rounded-lg">
+              <Coins className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="font-medium text-slate-900">Campaigns</p>
-              <p className="text-sm text-slate-500">Support creators</p>
+              <p className="font-medium text-white">Campaigns</p>
+              <p className="text-sm text-white/50">Support creators</p>
             </div>
           </Link>
         </div>
       </section>
 
       <footer className="px-6 pb-12 max-w-6xl mx-auto">
-        <div className="border-t border-orange-200 pt-6 flex flex-wrap items-center gap-4 text-sm text-slate-500">
-          <Link href="/legal" className="hover:text-slate-700">
+        <div className="border-t border-white/10 pt-6 flex flex-wrap items-center gap-4 text-sm text-white/40">
+          <Link href="/legal" className="hover:text-white/70">
             Legal
           </Link>
-          <Link href="/terms" className="hover:text-slate-700">
+          <Link href="/terms" className="hover:text-white/70">
             Terms
           </Link>
-          <Link href="/privacy" className="hover:text-slate-700">
+          <Link href="/privacy" className="hover:text-white/70">
             Privacy
           </Link>
-          <Link href="/cookies" className="hover:text-slate-700">
+          <Link href="/cookies" className="hover:text-white/70">
             Cookies
           </Link>
         </div>
@@ -445,9 +445,9 @@ export default function Home() {
 
       {/* Ad Space Placeholder */}
       <section className="px-6 py-8 max-w-6xl mx-auto">
-        <div className="bg-orange-50 border border-orange-200 border-dashed rounded-2xl p-8 text-center">
-          <p className="text-slate-500 text-sm uppercase tracking-wider mb-2">Advertisement Space</p>
-          <p className="text-slate-600">Premium ad placements available for businesses</p>
+        <div className="bg-white/[0.03] border border-white/10 border-dashed rounded-2xl p-8 text-center">
+          <p className="text-white/40 text-sm uppercase tracking-wider mb-2">Advertisement Space</p>
+          <p className="text-white/60">Premium ad placements available for businesses</p>
         </div>
       </section>
     </main>

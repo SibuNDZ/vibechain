@@ -119,8 +119,8 @@ export default function UploadPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
       </div>
     );
   }
@@ -130,12 +130,12 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-[#050505] py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Back Button */}
         <Link
           href="/videos"
-          className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Videos
@@ -143,15 +143,15 @@ export default function UploadPage() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Upload Video</h1>
-          <p className="text-slate-500">Share your music video with the community</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Upload Video</h1>
+          <p className="text-white/50">Share your music video with the community</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-            <p className="text-red-600">{error}</p>
+          <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg mb-6">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-red-300">{error}</p>
           </div>
         )}
 
@@ -163,7 +163,7 @@ export default function UploadPage() {
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
               uploadMode === "file"
                 ? "vc-primary-button text-white"
-                : "bg-white border border-orange-200 text-slate-600 hover:bg-orange-50"
+                : "bg-white/5 border border-white/10 text-white/70 hover:bg-white/10"
             }`}
           >
             <CloudUpload className="w-5 h-5" />
@@ -175,7 +175,7 @@ export default function UploadPage() {
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors ${
               uploadMode === "url"
                 ? "vc-primary-button text-white"
-                : "bg-white border border-orange-200 text-slate-600 hover:bg-orange-50"
+                : "bg-white/5 border border-white/10 text-white/70 hover:bg-white/10"
             }`}
           >
             <LinkIcon className="w-5 h-5" />
@@ -188,8 +188,8 @@ export default function UploadPage() {
           {/* Video Upload/URL Section */}
           {uploadMode === "file" ? (
             <div className="vc-card p-6">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-4">
-                <Video className="w-4 h-4 text-orange-500" />
+              <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-4">
+                <Video className="w-4 h-4 text-primary-400" />
                 Video File *
               </label>
               <VideoUploader
@@ -209,8 +209,8 @@ export default function UploadPage() {
             <>
               {/* Video URL */}
               <div className="vc-card p-6">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <Video className="w-4 h-4 text-orange-500" />
+                <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+                  <Video className="w-4 h-4 text-primary-400" />
                   Video URL *
                 </label>
                 <input
@@ -218,17 +218,17 @@ export default function UploadPage() {
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://example.com/video.mp4"
-                  className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
                 />
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-white/40">
                   Supports: MP4, HLS (.m3u8), YouTube, Vimeo URLs
                 </p>
               </div>
 
               {/* Thumbnail URL (only for URL mode) */}
               <div className="vc-card p-6">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <Image className="w-4 h-4 text-orange-500" />
+                <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+                  <Image className="w-4 h-4 text-primary-400" />
                   Thumbnail URL
                 </label>
                 <input
@@ -236,11 +236,11 @@ export default function UploadPage() {
                   value={thumbnailUrl}
                   onChange={(e) => setThumbnailUrl(e.target.value)}
                   placeholder="https://example.com/thumbnail.jpg"
-                  className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
                 />
                 {thumbnailUrl && (
                   <div className="mt-3">
-                    <p className="text-xs text-slate-500 mb-2">Preview:</p>
+                    <p className="text-xs text-white/40 mb-2">Preview:</p>
                     <img
                       src={thumbnailUrl}
                       alt="Thumbnail preview"
@@ -255,8 +255,8 @@ export default function UploadPage() {
 
               {/* Duration (only for URL mode) */}
               <div className="vc-card p-6">
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-                  <Clock className="w-4 h-4 text-orange-500" />
+                <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+                  <Clock className="w-4 h-4 text-primary-400" />
                   Duration *
                 </label>
                 <input
@@ -264,9 +264,9 @@ export default function UploadPage() {
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                   placeholder="e.g., 180 (seconds) or 3:00 (mm:ss)"
-                  className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
                 />
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-white/40">
                   Enter duration in seconds or mm:ss format
                 </p>
               </div>
@@ -275,8 +275,8 @@ export default function UploadPage() {
 
           {/* Title */}
           <div className="vc-card p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-              <FileText className="w-4 h-4 text-orange-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+              <FileText className="w-4 h-4 text-primary-400" />
               Title *
             </label>
             <input
@@ -287,20 +287,20 @@ export default function UploadPage() {
               minLength={3}
               maxLength={100}
               placeholder="Enter video title"
-              className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
             />
           </div>
 
           {/* Genre */}
           <div className="vc-card p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-              <FileText className="w-4 h-4 text-orange-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+              <FileText className="w-4 h-4 text-primary-400" />
               Genre
             </label>
             <select
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30"
             >
               <option value="">Select a genre (optional)</option>
               <option value="AMAPIANO">Amapiano</option>
@@ -325,8 +325,8 @@ export default function UploadPage() {
 
           {/* Description */}
           <div className="vc-card p-6">
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-              <FileText className="w-4 h-4 text-orange-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-2">
+              <FileText className="w-4 h-4 text-primary-400" />
               Description
             </label>
             <textarea
@@ -335,16 +335,16 @@ export default function UploadPage() {
               rows={4}
               maxLength={2000}
               placeholder="Describe your video..."
-              className="w-full px-4 py-3 bg-white border border-orange-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 resize-none"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/30 resize-none"
             />
-            <p className="mt-2 text-xs text-slate-500">{description.length}/2000 characters</p>
+            <p className="mt-2 text-xs text-white/40">{description.length}/2000 characters</p>
           </div>
 
           {/* Thumbnail Preview for File Upload */}
           {uploadMode === "file" && thumbnailUrl && (
             <div className="vc-card p-6">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
-                <Image className="w-4 h-4 text-orange-500" />
+              <label className="flex items-center gap-2 text-sm font-medium text-white/70 mb-3">
+                <Image className="w-4 h-4 text-primary-400" />
                 Generated Thumbnail
               </label>
               <img
@@ -382,28 +382,28 @@ export default function UploadPage() {
 
         {/* Guidelines */}
         <div className="mt-8 p-6 vc-card">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Upload Guidelines
           </h3>
-          <ul className="space-y-2 text-slate-600 text-sm">
+          <ul className="space-y-2 text-white/60 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-red-600">•</span>
+              <span className="text-primary-400">•</span>
               Videos must be music-related content
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-red-600">•</span>
+              <span className="text-primary-400">•</span>
               You must own or have rights to the content
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-red-600">•</span>
+              <span className="text-primary-400">•</span>
               Maximum file size: 500MB
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-red-600">•</span>
+              <span className="text-primary-400">•</span>
               Supported formats: MP4, WebM, MOV, AVI, MKV
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-red-600">•</span>
+              <span className="text-primary-400">•</span>
               High quality videos get more votes!
             </li>
           </ul>

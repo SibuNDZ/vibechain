@@ -87,7 +87,7 @@ export function InstallAppButton({
       type="button"
       onClick={handleInstall}
       className={cn(
-        "inline-flex items-center gap-2 rounded-lg border border-orange-300 px-3 py-2 text-sm font-medium text-orange-700 transition-colors hover:border-orange-400 hover:text-red-600",
+        "inline-flex items-center gap-2 rounded-lg border border-white/20 px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:border-primary-400 hover:text-primary-400",
         isInstalled && "cursor-default opacity-60",
         className
       )}

@@ -86,26 +86,26 @@ export default function AdminInsightsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#050505]">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex flex-col gap-2 mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-400">
             Admin Insights
           </p>
-          <h1 className="text-3xl font-bold text-slate-900">Analytics Dashboards</h1>
-          <p className="text-slate-600">
+          <h1 className="text-3xl font-bold text-white">Analytics Dashboards</h1>
+          <p className="text-white/70">
             Admin-only insights pulled from your predictive analytics API.
           </p>
         </div>
 
         {unauthorized && (
           <div className="vc-card p-6 flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-red-600 mt-1" />
+            <ShieldAlert className="w-5 h-5 text-red-300 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold text-white">
                 Admin access required
               </h2>
-              <p className="text-slate-600">
+              <p className="text-white/70">
                 You don’t have permission to view analytics dashboards on this
                 account.
               </p>
@@ -116,16 +116,16 @@ export default function AdminInsightsPage() {
         {!unauthorized && (
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
             <aside className="vc-card p-4">
-              <h2 className="text-sm font-semibold text-slate-900 mb-3">
+              <h2 className="text-sm font-semibold text-white mb-3">
                 Dashboards
               </h2>
               {isLoading ? (
-                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                <div className="flex items-center gap-2 text-white/50 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Loading dashboards...
                 </div>
               ) : dashboards.length === 0 ? (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-white/70">
                   No dashboards yet. Create one in the analytics API.
                 </p>
               ) : (
@@ -136,14 +136,14 @@ export default function AdminInsightsPage() {
                       type="button"
                       onClick={() => handleSelect(dashboard.id)}
                       className={
-                        "text-left rounded-xl border border-orange-200 px-4 py-3 transition-colors hover:border-orange-300 hover:bg-orange-50"
+                        "text-left rounded-xl border border-white/10 px-4 py-3 transition-colors hover:border-primary-400/50 hover:bg-white/5"
                       }
                     >
-                      <p className="font-semibold text-slate-900">
+                      <p className="font-semibold text-white">
                         {dashboard.name}
                       </p>
                       {dashboard.description && (
-                        <p className="text-xs text-slate-600 mt-1 line-clamp-2">
+                        <p className="text-xs text-white/70 mt-1 line-clamp-2">
                           {dashboard.description}
                         </p>
                       )}
@@ -155,20 +155,20 @@ export default function AdminInsightsPage() {
 
             <section className="vc-card p-6">
               {error && (
-                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                   {error}
                 </div>
               )}
 
               {isLoadingDetail && (
-                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                <div className="flex items-center gap-2 text-white/50 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Loading dashboard...
                 </div>
               )}
 
               {!selected && !isLoadingDetail && (
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-white/70">
                   Select a dashboard to view analytics widgets.
                 </div>
               )}
@@ -176,11 +176,11 @@ export default function AdminInsightsPage() {
               {selected && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-semibold text-slate-900">
+                    <h2 className="text-2xl font-semibold text-white">
                       {selected.name}
                     </h2>
                     {selected.description && (
-                      <p className="text-slate-600 mt-2">
+                      <p className="text-white/70 mt-2">
                         {selected.description}
                       </p>
                     )}
@@ -190,18 +190,18 @@ export default function AdminInsightsPage() {
                     {selected.widgets.map((widget) => (
                       <div
                         key={widget.id}
-                        className="vc-card-muted p-4 bg-white"
+                        className="vc-card-muted p-4"
                       >
-                        <h3 className="text-sm font-semibold text-slate-900 mb-3">
+                        <h3 className="text-sm font-semibold text-white mb-3">
                           {widget.title}
                         </h3>
 
                         {widget.type === "metric" && widget.metric_config ? (
                           <div className="space-y-1">
-                            <p className="text-2xl font-bold text-slate-900">
+                            <p className="text-2xl font-bold text-white">
                               {widget.metric_config.value}
                             </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-white/50">
                               {widget.metric_config.label}
                             </p>
                           </div>
@@ -213,7 +213,7 @@ export default function AdminInsightsPage() {
                             }}
                           />
                         ) : (
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-white/50">
                             No data available for this widget.
                           </p>
                         )}

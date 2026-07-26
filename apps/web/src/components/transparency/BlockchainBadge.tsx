@@ -73,7 +73,7 @@ export function BlockchainBadge({
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
         verified
           ? "bg-green-50 border border-green-200 text-green-700"
-          : "bg-orange-50 border border-orange-200 text-slate-500",
+          : "bg-white/5 border border-white/10 text-white/40",
         className
       )}
     >

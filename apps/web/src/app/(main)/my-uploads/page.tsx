@@ -70,8 +70,8 @@ export default function MyUploadsPage() {
     if (uploads.length > 0) return null;
     return (
       <div className="text-center py-16">
-        <h2 className="text-xl font-semibold text-slate-900 mb-2">No uploads yet</h2>
-        <p className="text-slate-500">Upload your first music video to get started.</p>
+        <h2 className="text-xl font-semibold text-white mb-2">No uploads yet</h2>
+        <p className="text-white/50">Upload your first music video to get started.</p>
       </div>
     );
   }, [isLoading, uploads.length]);
@@ -81,11 +81,11 @@ export default function MyUploadsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white py-8">
+    <main className="min-h-screen bg-[#050505] py-8">
       <div className="max-w-7xl mx-auto px-6">
         <Link
           href="/videos"
-          className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Videos
@@ -93,21 +93,21 @@ export default function MyUploadsPage() {
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">My Uploads</h1>
-            <p className="text-slate-500 mt-1">
+            <h1 className="text-3xl font-bold text-white">My Uploads</h1>
+            <p className="text-white/50 mt-1">
               Pending uploads are visible only to you.
             </p>
           </div>
           <Link
             href="/upload"
-            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 vc-primary-button rounded-lg transition-colors font-medium"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 vc-primary-button rounded-lg font-medium"
           >
             Upload New
           </Link>
         </div>
 
         {error && (
-          <div className="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+          <div className="mb-6 flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -127,7 +127,7 @@ export default function MyUploadsPage() {
               const status = statusMap[video.status];
               return (
                 <Link key={video.id} href={`/videos/${video.id}`} className="group">
-                  <div className="relative aspect-video rounded-lg overflow-hidden bg-orange-100">
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-white/10">
                     <SafeImage
                       src={video.thumbnailUrl}
                       alt={video.title}
@@ -142,11 +142,11 @@ export default function MyUploadsPage() {
                     </div>
                   </div>
                   <div className="mt-3">
-                    <h3 className="font-semibold text-slate-900 truncate">{video.title}</h3>
-                    <p className="text-sm text-slate-500">
+                    <h3 className="font-semibold text-white truncate">{video.title}</h3>
+                    <p className="text-sm text-white/50">
                       {video.user?.username || "You"}
                     </p>
-                    <div className="mt-1 text-sm text-slate-600">
+                    <div className="mt-1 text-sm text-white/70">
                       {video._count?.votes?.toLocaleString?.() ?? 0} votes
                     </div>
                   </div>
