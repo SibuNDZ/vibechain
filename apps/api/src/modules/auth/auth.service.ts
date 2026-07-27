@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -11,10 +12,20 @@ import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
 import { Prisma } from "@prisma/client";
 import { UsersService } from "../users/users.service";
-import { RegisterDto, LoginDto, WalletLoginDto } from "./dto/auth.dto";
+import {
+  RegisterDto,
+  LoginDto,
+  WalletLoginDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from "./dto/auth.dto";
 import { PrismaService } from "../../database/prisma.service";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
+import { EmailService } from "../../common/email/email.service";
 import { toUsernameSeed } from "../../common/username/username-policy";
+
+const PASSWORD_RESET_GENERIC_MESSAGE =
+  "If an account exists for that email, a reset link has been sent.";
 
 @Injectable()
 export class AuthService {
@@ -23,7 +34,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly emailService: EmailService
   ) {}
 
   async register(dto: RegisterDto) {
@@ -179,6 +191,69 @@ export class AuthService {
     });
 
     return { nonce: record.nonce, expiresAt: record.expiresAt };
+  }
+
+  /**
+   * Always returns the same generic message regardless of whether the email
+   * matches an account, so this endpoint can't be used to enumerate
+   * registered emails.
+   */
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.usersService.findByEmail(dto.email);
+
+    if (!user || !user.passwordHash) {
+      return { message: PASSWORD_RESET_GENERIC_MESSAGE };
+    }
+
+    const ttlMs = parseInt(
+      this.configService.get<string>("PASSWORD_RESET_TTL_MS", "1800000"),
+      10
+    );
+    const token = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + ttlMs);
+
+    await this.prisma.passwordResetToken.updateMany({
+      where: { userId: user.id, used: false },
+      data: { used: true, usedAt: new Date() },
+    });
+
+    await this.prisma.passwordResetToken.create({
+      data: { userId: user.id, token, expiresAt },
+    });
+
+    const frontendUrl = this.configService.get<string>("FRONTEND_URL");
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+    void this.emailService.sendPasswordResetEmail(dto.email, resetUrl);
+
+    return { message: PASSWORD_RESET_GENERIC_MESSAGE };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const now = new Date();
+    const record = await this.prisma.passwordResetToken.findFirst({
+      where: { token: dto.token, used: false, expiresAt: { gt: now } },
+    });
+
+    if (!record) {
+      throw new BadRequestException("Invalid or expired reset token");
+    }
+
+    const consumed = await this.prisma.passwordResetToken.updateMany({
+      where: { id: record.id, used: false },
+      data: { used: true, usedAt: new Date() },
+    });
+
+    if (consumed.count === 0) {
+      throw new BadRequestException("Reset token already used");
+    }
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: record.userId },
+      data: { passwordHash },
+    });
+
+    return { message: "Password has been reset successfully" };
   }
 
   private generateToken(userId: string) {

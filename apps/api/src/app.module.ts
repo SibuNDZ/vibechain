@@ -18,6 +18,7 @@ import { DatabaseModule } from "./database/database.module";
 import { HealthModule } from "./health/health.module";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 import { AnalyticsModule } from "./common/analytics/analytics.module";
+import { EmailModule } from "./common/email/email.module";
 import { AnalyticsAdminModule } from "./modules/analytics/analytics.module";
 
 @Module({
@@ -46,6 +47,7 @@ import { AnalyticsAdminModule } from "./modules/analytics/analytics.module";
     DatabaseModule,
     HealthModule,
     AnalyticsModule,
+    EmailModule,
     AuthModule,
     UsersModule,
     VideosModule,

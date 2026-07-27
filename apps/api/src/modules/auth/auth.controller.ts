@@ -7,6 +7,8 @@ import {
   LoginDto,
   WalletLoginDto,
   WalletNonceRequestDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
 } from "./dto/auth.dto";
 
 @ApiTags("auth")
@@ -43,5 +45,21 @@ export class AuthController {
   @ApiOperation({ summary: "Login or register with wallet signature" })
   async walletAuth(@Body() dto: WalletLoginDto) {
     return this.authService.walletAuth(dto);
+  }
+
+  @Post("forgot-password")
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ auth: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: "Request a password reset email" })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post("reset-password")
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ auth: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: "Reset password using a reset token" })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 }

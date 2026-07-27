@@ -41,6 +41,8 @@ model User {
 
   mentionedInComments CommentMention[]
 
+  passwordResetTokens PasswordResetToken[]
+
   @@map("users")
 }
 
@@ -308,6 +310,23 @@ model AuthNonce {
   @@index([walletAddress])
   @@index([expiresAt])
   @@map("auth_nonces")
+}
+
+// Password reset tokens -- single-use, short-lived, same expiry/consumption
+// pattern as AuthNonce above.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  used      Boolean   @default(false)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
 
 // AI Chat models
