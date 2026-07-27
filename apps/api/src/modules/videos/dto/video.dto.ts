@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, Min, IsEnum } from "class-validator";
+import { IsString, IsOptional, IsInt, Min, IsEnum, IsArray } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { VideoGenre } from "@prisma/client";
 
@@ -35,6 +35,15 @@ export class CreateVideoDto {
   @IsEnum(VideoGenre)
   @IsOptional()
   genre?: VideoGenre;
+
+  @ApiPropertyOptional({
+    description: "Explicit hashtags, in addition to any #tags found in the description",
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  tags?: string[];
 }
 
 export class UpdateVideoDto {
@@ -57,4 +66,13 @@ export class UpdateVideoDto {
   @IsEnum(VideoGenre)
   @IsOptional()
   genre?: VideoGenre;
+
+  @ApiPropertyOptional({
+    description: "Explicit hashtags, in addition to any #tags found in the description",
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  tags?: string[];
 }

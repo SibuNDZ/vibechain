@@ -15,6 +15,46 @@ interface VideoDetail extends Video {
   description: string;
 }
 
+// Renders #tags in a description as links to /tags/[name], driven only by
+// the video's stored VideoTag rows -- never re-parses arbitrary #text, and
+// never injects raw HTML.
+function renderDescriptionWithTags(video: VideoDetail) {
+  if (!video.tags || video.tags.length === 0) {
+    return video.description;
+  }
+
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tagNames = video.tags.map((t) => t.tag.name);
+  const pattern = new RegExp(`#(${tagNames.map(escapeRegex).join("|")})(?![a-z0-9_])`, "gi");
+
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let key = 0;
+
+  for (const match of video.description.matchAll(pattern)) {
+    const [full, name] = match;
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      nodes.push(video.description.slice(lastIndex, index));
+    }
+    nodes.push(
+      <Link
+        key={`tag-${key++}`}
+        href={`/tags/${name.toLowerCase()}`}
+        className="text-primary-400 hover:underline"
+      >
+        {full}
+      </Link>
+    );
+    lastIndex = index + full.length;
+  }
+  if (lastIndex < video.description.length) {
+    nodes.push(video.description.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
 export default function VideoDetailPage() {
   const params = useParams();
   const videoId = params.id as string;
@@ -176,7 +216,9 @@ export default function VideoDetailPage() {
               {/* Description */}
               {video.description && (
                 <div className="vc-card p-4">
-                  <p className="text-white/80 whitespace-pre-wrap">{video.description}</p>
+                  <p className="text-white/80 whitespace-pre-wrap">
+                    {renderDescriptionWithTags(video)}
+                  </p>
                 </div>
               )}
             </div>

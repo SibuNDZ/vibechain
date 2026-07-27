@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Hash } from "lucide-react";
 import { VideoCard } from "@/components/video/VideoCard";
 import { SemanticSearch } from "@/components/ai/SemanticSearch";
 import { RecommendationSection } from "@/components/ai/RecommendationSection";
 import { VideoCardSkeleton } from "@/components/ui/Skeleton";
-import { api, Video, PaginatedResponse } from "@/lib/api";
+import { api, Video, PaginatedResponse, TrendingTag } from "@/lib/api";
 import toast from "react-hot-toast";
 
 export default function VideosPage() {
@@ -14,10 +16,18 @@ export default function VideosPage() {
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("votes");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem("vibechain_token");
     setIsAuthenticated(!!token);
+  }, []);
+
+  useEffect(() => {
+    api
+      .get<{ data: TrendingTag[] }>("/tags/trending")
+      .then((res) => setTrendingTags(res.data))
+      .catch(() => setTrendingTags([]));
   }, []);
 
   useEffect(() => {
@@ -57,6 +67,25 @@ export default function VideosPage() {
 
         {/* Personalized Recommendations */}
         {isAuthenticated && <RecommendationSection className="mb-8" />}
+
+        {/* Trending Tags */}
+        {trendingTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-8">
+            <span className="flex items-center gap-1 text-white/50 text-sm mr-1">
+              <Hash className="w-4 h-4" />
+              Trending:
+            </span>
+            {trendingTags.map((tag) => (
+              <Link
+                key={tag.id}
+                href={`/tags/${tag.name}`}
+                className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm text-white/80 hover:text-white transition-colors"
+              >
+                #{tag.name}
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-white">Trending Videos</h1>

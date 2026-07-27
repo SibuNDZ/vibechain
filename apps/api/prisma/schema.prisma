@@ -83,6 +83,7 @@ model Video {
   campaign     Campaign?
   comments     Comment[]
   notifications Notification[]
+  tags          VideoTag[]
 
   @@index([status])
   @@index([genre])
@@ -266,6 +267,31 @@ enum NotificationType {
   MENTION
   VOTE_MILESTONE
   CONTRIBUTION
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  videos VideoTag[]
+
+  @@map("tags")
+}
+
+model VideoTag {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  videoId String
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  tagId   String
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([videoId, tagId])
+  @@index([videoId])
+  @@index([tagId])
+  @@map("video_tags")
 }
 
 // Wallet auth nonces to prevent signature replay

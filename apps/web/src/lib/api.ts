@@ -190,6 +190,13 @@ export interface Video {
   _count: {
     votes: number;
   };
+  tags?: { tag: { name: string } }[];
+}
+
+export interface TrendingTag {
+  id: string;
+  name: string;
+  videoCount: number;
 }
 
 export interface Campaign {

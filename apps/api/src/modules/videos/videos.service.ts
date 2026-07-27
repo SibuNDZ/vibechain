@@ -5,6 +5,7 @@ import { VideoGenre } from "@prisma/client";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
 import { UploadService } from "../upload/upload.service";
+import { mergeTagCandidates } from "../../common/tags/tag-parser";
 
 @Injectable()
 export class VideosService {
@@ -33,13 +34,18 @@ export class VideosService {
 
   async create(userId: string, dto: CreateVideoDto) {
     try {
+      const { tags: explicitTags, ...videoData } = dto;
+
       const video = await this.prisma.video.create({
         data: {
-          ...dto,
+          ...videoData,
           status: "APPROVED",
           userId,
         },
       });
+
+      const tagNames = mergeTagCandidates(videoData.description, explicitTags);
+      await this.syncVideoTags(video.id, tagNames);
 
       void this.analyticsService.track({
         event: "video_upload",
@@ -55,6 +61,52 @@ export class VideosService {
     } catch (error) {
       handleDatabaseError(error, "VideosService.create");
     }
+  }
+
+  /**
+   * Upserts each tag by normalized name, then diffs the video's current
+   * VideoTag rows against the desired set -- adding new ones, removing ones
+   * no longer present, rather than just appending.
+   */
+  private async syncVideoTags(videoId: string, tagNames: string[]) {
+    if (tagNames.length === 0) {
+      await this.prisma.videoTag.deleteMany({ where: { videoId } });
+      return;
+    }
+
+    const tags = await Promise.all(
+      tagNames.map((name) =>
+        this.prisma.tag.upsert({
+          where: { name },
+          create: { name },
+          update: {},
+        })
+      )
+    );
+
+    const currentLinks = await this.prisma.videoTag.findMany({
+      where: { videoId },
+      select: { tagId: true },
+    });
+    const currentTagIds = new Set(currentLinks.map((l) => l.tagId));
+    const desiredTagIds = new Set(tags.map((t) => t.id));
+
+    const toAdd = tags.filter((t) => !currentTagIds.has(t.id));
+    const toRemoveIds = [...currentTagIds].filter((id) => !desiredTagIds.has(id));
+
+    await Promise.all([
+      toAdd.length > 0
+        ? this.prisma.videoTag.createMany({
+            data: toAdd.map((t) => ({ videoId, tagId: t.id })),
+            skipDuplicates: true,
+          })
+        : Promise.resolve(),
+      toRemoveIds.length > 0
+        ? this.prisma.videoTag.deleteMany({
+            where: { videoId, tagId: { in: toRemoveIds } },
+          })
+        : Promise.resolve(),
+    ]);
   }
 
   async findAll(
@@ -115,6 +167,7 @@ export class VideosService {
           },
           _count: { select: { votes: true } },
           campaign: true,
+          tags: { select: { tag: { select: { name: true } } } },
         },
       });
 
@@ -156,10 +209,22 @@ export class VideosService {
         throw new NotFoundException("Video not found");
       }
 
-      return await this.prisma.video.update({
+      const { tags: explicitTags, ...updateData } = dto;
+
+      const updated = await this.prisma.video.update({
         where: { id },
-        data: dto,
+        data: updateData,
       });
+
+      if (dto.description !== undefined || explicitTags !== undefined) {
+        const tagNames = mergeTagCandidates(
+          dto.description !== undefined ? dto.description : video.description,
+          explicitTags
+        );
+        await this.syncVideoTags(id, tagNames);
+      }
+
+      return updated;
     } catch (error) {
       handleDatabaseError(error, "VideosService.update");
     }

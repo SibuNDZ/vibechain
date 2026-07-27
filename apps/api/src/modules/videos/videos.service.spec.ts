@@ -163,6 +163,93 @@ describe('VideosService', () => {
     });
   });
 
+  describe('tag syncing', () => {
+    it('creates tags parsed from the description and links them to a new video', async () => {
+      prisma.video.create.mockResolvedValue({
+        ...mockVideo,
+        description: 'so good #gqom #amapiano',
+      } as any);
+      prisma.tag.upsert.mockImplementation(
+        ({ where }: any) => Promise.resolve({ id: `tag-${where.name}`, name: where.name }) as any
+      );
+      prisma.videoTag.findMany.mockResolvedValue([]);
+
+      await service.create('user-123', {
+        title: 'Test Video',
+        description: 'so good #gqom #amapiano',
+        videoUrl: 'https://example.com/video.mp4',
+        duration: 120,
+      });
+
+      expect(prisma.tag.upsert).toHaveBeenCalledWith({
+        where: { name: 'gqom' },
+        create: { name: 'gqom' },
+        update: {},
+      });
+      expect(prisma.tag.upsert).toHaveBeenCalledWith({
+        where: { name: 'amapiano' },
+        create: { name: 'amapiano' },
+        update: {},
+      });
+      expect(prisma.videoTag.createMany).toHaveBeenCalledWith({
+        data: expect.arrayContaining([
+          { videoId: 'video-123', tagId: 'tag-gqom' },
+          { videoId: 'video-123', tagId: 'tag-amapiano' },
+        ]),
+        skipDuplicates: true,
+      });
+    });
+
+    it('does not query tags at all when the description has none and no explicit tags are given', async () => {
+      prisma.video.create.mockResolvedValue(mockVideo as any);
+
+      await service.create('user-123', {
+        title: 'Test Video',
+        description: 'Test description',
+        videoUrl: 'https://example.com/video.mp4',
+        duration: 120,
+      });
+
+      expect(prisma.tag.upsert).not.toHaveBeenCalled();
+      expect(prisma.videoTag.deleteMany).toHaveBeenCalledWith({ where: { videoId: 'video-123' } });
+    });
+
+    it('on update, adds newly-mentioned tags and removes ones no longer present', async () => {
+      prisma.video.findFirst.mockResolvedValue({
+        ...mockVideo,
+        description: '#gqom old post',
+      } as any);
+      prisma.video.update.mockResolvedValue({
+        ...mockVideo,
+        description: '#amapiano new post',
+      } as any);
+      prisma.tag.upsert.mockResolvedValue({ id: 'tag-amapiano', name: 'amapiano' } as any);
+      prisma.videoTag.findMany.mockResolvedValue([{ tagId: 'tag-gqom' }] as any);
+
+      await service.update('video-123', 'user-123', {
+        description: '#amapiano new post',
+      });
+
+      expect(prisma.videoTag.createMany).toHaveBeenCalledWith({
+        data: [{ videoId: 'video-123', tagId: 'tag-amapiano' }],
+        skipDuplicates: true,
+      });
+      expect(prisma.videoTag.deleteMany).toHaveBeenCalledWith({
+        where: { videoId: 'video-123', tagId: { in: ['tag-gqom'] } },
+      });
+    });
+
+    it('does not touch tags on update when neither description nor tags changed', async () => {
+      prisma.video.findFirst.mockResolvedValue(mockVideo as any);
+      prisma.video.update.mockResolvedValue(mockVideo as any);
+
+      await service.update('video-123', 'user-123', { title: 'New Title' });
+
+      expect(prisma.tag.upsert).not.toHaveBeenCalled();
+      expect(prisma.videoTag.findMany).not.toHaveBeenCalled();
+    });
+  });
+
   describe('findById', () => {
     it('should return a video by id', async () => {
       prisma.video.findUnique.mockResolvedValue(mockVideo as any);
