@@ -168,7 +168,7 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white py-8">
+    <main className="min-h-screen bg-[#050505] py-8">
       <div className="max-w-6xl mx-auto px-6">
         {/* Back button */}
         <Link
