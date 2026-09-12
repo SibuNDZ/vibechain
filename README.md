@@ -28,7 +28,7 @@ vibechain/
 - Node.js 20+
 - pnpm 9+
 - Docker & Docker Compose
-- Phantom or Solflare (for wallet login and funding)
+- A Solana wallet extension (any Wallet Standard wallet, for wallet login and funding)
 - Optional: Solana CLI + Anchor 0.30.1 to build or deploy programs
 
 ## Getting Started
@@ -122,7 +122,7 @@ and in `packages/shared/src/constants.ts` (`PROGRAM_IDS`).
 - **Video upload & streaming**: Cloudinary signed uploads, HLS playback, YouTube/Vimeo
 - **Community voting**: Off-chain votes stored in Postgres
 - **Crowdfunding**: Campaign list + detail; wallet transfer + API contribution record
-- **Wallet authentication**: Solana nonce signature (Phantom / Solflare)
+- **Wallet authentication**: Solana nonce signature via Wallet Standard (any installed wallet)
 - **Social**: Comments, @mentions, follows, DMs, notifications, hashtags
 - **AI (optional)**: Semantic search, chat, recommendations when `OPENAI_API_KEY` is set
 
