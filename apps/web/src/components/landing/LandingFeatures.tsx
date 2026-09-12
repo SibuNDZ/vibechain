@@ -13,7 +13,7 @@ const FEATURES = [
   },
   {
     title: "Wallet sign-in",
-    body: "Connect Phantom or Solflare, or use email. Same account, same votes, same campaigns.",
+    body: "Connect any Solana wallet, or use email. Same account, same votes, same campaigns.",
   },
   {
     title: "On-chain transparency",

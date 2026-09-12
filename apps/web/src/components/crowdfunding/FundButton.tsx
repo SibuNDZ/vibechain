@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 import {
   SystemProgram,
   Transaction,
@@ -130,7 +130,7 @@ export function FundButton({
     return (
       <div className="space-y-2">
         <p className="text-center text-sm text-white/50">Connect Wallet to Fund</p>
-        <WalletMultiButton className="!w-full !justify-center" />
+        <WalletConnectButton />
       </div>
     );
   }

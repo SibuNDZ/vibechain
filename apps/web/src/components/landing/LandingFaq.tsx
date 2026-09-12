@@ -1,7 +1,7 @@
 const FAQS = [
   {
     q: "Do I need a wallet?",
-    a: "No. You can sign in with email. A Solana wallet (Phantom or Solflare) is only required to fund a campaign or sign in with a wallet.",
+    a: "No. You can sign in with email. A Solana wallet is only required to fund a campaign or sign in with a wallet. Any installed wallet in your browser works.",
   },
   {
     q: "How many votes do I get?",

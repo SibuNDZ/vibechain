@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, User, Wallet, Save, Loader2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { formatAddress } from "@/lib/utils";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 
 interface UserProfile {
   id: string;
@@ -298,7 +298,7 @@ export default function SettingsPage() {
             )}
 
             <div className="pt-4 border-t border-white/10">
-              <WalletMultiButton className="!bg-gradient-to-r !from-violet-600 !to-purple-700 !rounded-lg !py-3 !font-semibold !w-full !justify-center" />
+              <WalletConnectButton />
             </div>
           </div>
         </div>

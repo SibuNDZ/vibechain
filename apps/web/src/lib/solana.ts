@@ -1,5 +1,4 @@
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
 import { PROGRAM_IDS, SOLANA_CLUSTERS } from "@vibechain/shared";
 
@@ -28,8 +27,8 @@ export function getSolanaEndpoint(): string {
 }
 
 export function getWallets() {
-  return [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-  ];
+  // Wallet Standard wallets (Phantom, Solflare, Backpack, and others) are
+  // detected automatically. Do not register a legacy Phantom adapter — when
+  // it is not installed, connect() opens phantom.com instead of a picker.
+  return [];
 }

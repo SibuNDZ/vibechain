@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
 import bs58 from "bs58";
@@ -184,7 +184,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex justify-center">
-            <WalletMultiButton className="!bg-gradient-to-r !from-violet-600 !to-purple-700 !rounded-lg !py-3 !font-semibold !w-full !justify-center" />
+            <WalletConnectButton />
           </div>
 
           {connected && (

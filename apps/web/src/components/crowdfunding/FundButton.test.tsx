@@ -15,8 +15,8 @@ vi.mock('@vibechain/shared', () => ({
   SOLANA_CLUSTERS: { MAINNET: 'mainnet-beta', DEVNET: 'devnet' },
 }));
 vi.mock('@solana/wallet-adapter-react');
-vi.mock('@solana/wallet-adapter-react-ui', () => ({
-  WalletMultiButton: () => <button type="button">Select Wallet</button>,
+vi.mock('@/components/wallet/WalletConnectButton', () => ({
+  WalletConnectButton: () => <button type="button">Select Wallet</button>,
 }));
 vi.mock('@/lib/api', () => ({
   api: { post: vi.fn() },

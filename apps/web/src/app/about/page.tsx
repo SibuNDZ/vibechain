@@ -25,7 +25,7 @@ const SECTIONS = [
   },
   {
     title: "Technology",
-    body: "The web app is Next.js. The API is NestJS with Postgres. Media goes through Cloudinary. Wallets use the Solana adapter (Phantom and Solflare). Email/password sign-in is also available. Crowdfunding programs are written in Anchor for Solana.",
+    body: "The web app is Next.js. The API is NestJS with Postgres. Media goes through Cloudinary. Wallets use Solana Wallet Standard, so any installed Solana wallet can connect. Email/password sign-in is also available. Crowdfunding programs are written in Anchor for Solana.",
   },
 ];
 
