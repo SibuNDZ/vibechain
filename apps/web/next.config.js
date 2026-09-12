@@ -1,3 +1,5 @@
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const withPWA = require("next-pwa")({
   dest: "public",
@@ -9,6 +11,7 @@ const withPWA = require("next-pwa")({
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../.."),
   transpilePackages: ["@vibechain/shared"],
   images: {
     remotePatterns: [
