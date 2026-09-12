@@ -1,0 +1,4 @@
+-- AlterEnum
+ALTER TYPE "NotificationType" ADD VALUE 'VIDEO_SUBMITTED';
+ALTER TYPE "NotificationType" ADD VALUE 'VIDEO_APPROVED';
+ALTER TYPE "NotificationType" ADD VALUE 'VIDEO_REJECTED';

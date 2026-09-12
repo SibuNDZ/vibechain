@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 interface CreateVideoResponse {
   id: string;
   title: string;
+  status?: string;
 }
 
 type UploadMode = "file" | "url";
@@ -31,6 +32,7 @@ export default function UploadPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedVideo, setSubmittedVideo] = useState<CreateVideoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadMode, setUploadMode] = useState<UploadMode>("file");
   const [isUploading, setIsUploading] = useState(false);
@@ -107,8 +109,9 @@ export default function UploadPage() {
         genre: genre || undefined,
       });
 
-      toast.success("Video uploaded successfully!");
-      router.push(`/videos/${response.id}`);
+      toast.success("Submitted for review");
+      setSubmittedVideo(response);
+      setIsSubmitting(false);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to upload video";
       setError(errorMessage);
@@ -127,6 +130,34 @@ export default function UploadPage() {
 
   if (!isAuthenticated) {
     return null;
+  }
+
+  if (submittedVideo) {
+    return (
+      <div className="min-h-screen bg-[#050505] py-8">
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold text-white mb-3">Video under review</h1>
+          <p className="text-white/60 mb-8">
+            {submittedVideo.title} was submitted. A platform admin will review it
+            before it goes live.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/my-uploads"
+              className="px-6 py-3 vc-primary-button rounded-xl font-semibold"
+            >
+              View my uploads
+            </Link>
+            <Link
+              href={`/videos/${submittedVideo.id}`}
+              className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10"
+            >
+              Open submission
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -374,7 +405,7 @@ export default function UploadPage() {
             ) : (
               <>
                 <Upload className="w-5 h-5" />
-                Publish Video
+                Submit for review
               </>
             )}
           </button>
@@ -404,7 +435,7 @@ export default function UploadPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary-400">•</span>
-              High quality videos get more votes!
+              Uploads stay under review until a platform admin approves them
             </li>
           </ul>
         </div>

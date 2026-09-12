@@ -2,18 +2,18 @@
 
 ## Prerequisites
 
-- Docker and Docker Compose
+- Docker and Docker Compose, or Railway
 - Node.js 20+
 - pnpm 9+
-- PostgreSQL 15+
-- Access to Polygon RPC endpoints
+- PostgreSQL 16+ with pgvector
+- Solana RPC (public devnet, or Helius/Alchemy/QuickNode for production)
+- Optional: Solana CLI + Anchor 0.30.1 to deploy programs
 
 ## Environment Setup
 
 ### 1. Configure Environment Variables
 
 ```bash
-# Copy production templates
 cp apps/api/.env.example apps/api/.env.production
 cp apps/web/.env.example apps/web/.env.production
 ```
@@ -24,111 +24,99 @@ cp apps/web/.env.example apps/web/.env.production
 |----------|-------------|-----------------|
 | `JWT_SECRET` | 256-bit secret for JWT signing | `openssl rand -hex 32` |
 | `DATABASE_URL` | PostgreSQL connection string | Your database provider |
-| `WALLET_CONNECT_PROJECT_ID` | WalletConnect Cloud project ID | [cloud.walletconnect.com](https://cloud.walletconnect.com) |
-| `PRIVATE_KEY` | Deployer wallet private key | Your deployment wallet |
-| `POLYGONSCAN_API_KEY` | For contract verification | [polygonscan.com/apis](https://polygonscan.com/apis) |
+| `CLOUDINARY_CLOUD_NAME` / `API_KEY` / `API_SECRET` | Video uploads | Cloudinary dashboard |
+| `SOLANA_RPC_URL` | Solana JSON-RPC | Helius, Alchemy, QuickNode, or public cluster |
+| `SOLANA_CLUSTER` | `devnet` or `mainnet-beta` | Match the frontend network |
+| `NEXT_PUBLIC_CROWDFUNDING_PROGRAM` | Crowdfunding program ID | After `anchor deploy` |
+| `NEXT_PUBLIC_VOTING_PROGRAM` | Voting program ID | After `anchor deploy` |
+| `SOLANA_KEYPAIR` | Deployer keypair JSON (CI) | `solana-keygen` — never commit this |
+
+Optional: `OPENAI_API_KEY`, `RESEND_API_KEY`, `ADMIN_USER_IDS`, `ANALYTICS_API_URL` / `ANALYTICS_API_KEY`.
 
 ## Deployment Options
 
-### Option 1: Docker Compose (Recommended for small deployments)
+### Option 1: Docker Compose
 
 ```bash
-# Build and start all services
 docker-compose -f docker-compose.yml up -d
-
-# View logs
 docker-compose logs -f
-
-# Stop services
 docker-compose down
 ```
 
-### Option 2: Manual Deployment
+Compose starts Postgres (pgvector), Redis, API, and web. Redis is unused by the API today.
 
-#### API Server
+### Option 2: Railway
+
+Each app has a `railway.toml`.
+
+- API `startCommand` in `package.json` `start:prod` runs `prisma migrate deploy && node dist/main`. Prefer that over a bare `node dist/main` so migrations apply.
+- Web: set `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOLANA_NETWORK`, and program IDs at build time.
+
+### Option 3: Manual
+
+#### API
 
 ```bash
 cd apps/api
-
-# Install dependencies
 pnpm install --frozen-lockfile
-
-# Generate Prisma client
 pnpm db:generate
-
-# Run migrations
 pnpm db:migrate
-
-# Build
 pnpm build
-
-# Start production server
 NODE_ENV=production pnpm start:prod
 ```
 
-#### Web Frontend
+#### Web
 
 ```bash
 cd apps/web
-
-# Install dependencies
 pnpm install --frozen-lockfile
-
-# Build
 pnpm build
-
-# Start production server
 pnpm start
 ```
-
-### Option 3: Vercel (Frontend only)
-
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard:
-   - `NEXT_PUBLIC_API_URL`
-   - `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID`
-   - `NEXT_PUBLIC_CROWDFUNDING_CONTRACT`
-   - `NEXT_PUBLIC_VOTING_CONTRACT`
-3. Deploy
 
 ## Database Migrations
 
 ```bash
-# Run migrations in production
 DATABASE_URL=your_production_url pnpm --filter @vibechain/api db:migrate
-
-# Generate Prisma client
 pnpm --filter @vibechain/api db:generate
 ```
 
-## Smart Contract Deployment
+The AI migration enables `CREATE EXTENSION vector`. Use a pgvector-capable Postgres image or Neon with the extension allowed.
 
-### Testnet (Polygon Amoy)
+## Solana Program Deployment
+
+Need: Solana CLI, Anchor 0.30.1, a funded keypair.
+
+```bash
+solana-keygen new --outfile ~/.config/solana/id.json
+solana config set --url devnet
+solana airdrop 2
+```
+
+### Devnet
 
 ```bash
 cd packages/contracts
-
-# Set environment variables
-export PRIVATE_KEY=your_deployer_private_key
-export POLYGON_AMOY_RPC_URL=https://rpc-amoy.polygon.technology
-export POLYGONSCAN_API_KEY=your_api_key
-
-# Deploy
-pnpm deploy:testnet
-
-# Verify contracts
-npx hardhat verify --network polygonAmoy <CONTRACT_ADDRESS>
+pnpm compile
+pnpm test
+pnpm deploy:devnet
 ```
 
-### Mainnet (Polygon)
+Copy the printed program IDs into:
+
+- `apps/web/.env` → `NEXT_PUBLIC_CROWDFUNDING_PROGRAM`, `NEXT_PUBLIC_VOTING_PROGRAM`
+- `packages/shared/src/constants.ts` → `PROGRAM_IDS.devnet`
+- `packages/contracts/Anchor.toml` and each program `declare_id!` if you generated new keypairs
+
+GitHub Actions: `.github/workflows/deploy-contracts.yml` (workflow_dispatch, needs `SOLANA_KEYPAIR` secret).
+
+### Mainnet
 
 ```bash
-# Deploy
-pnpm deploy:mainnet
-
-# Verify
-npx hardhat verify --network polygon <CONTRACT_ADDRESS>
+pnpm --filter @vibechain/contracts deploy:mainnet
 ```
+
+Use a private RPC. Programs are upgradeable by the deployer keypair — treat that key as production secret.
 
 ## Health Checks
 
@@ -138,28 +126,24 @@ npx hardhat verify --network polygon <CONTRACT_ADDRESS>
 | `GET /health/ready` | Readiness probe | `{ status: "ok" }` |
 | `GET /health/live` | Liveness probe | `{ status: "ok" }` |
 
+## CI
+
+`.github/workflows/ci.yml` runs on `master`, `main`, and `develop`:
+
+- Lint
+- API Jest tests (Postgres 16 service)
+- Anchor build + tests (Rust, Solana CLI, Anchor)
+- Frontend Vitest
+- `pnpm build`
+
 ## Monitoring
 
-### Application Logs
+- Logs: Railway, Docker, or journald
+- Suggested: Sentry for errors, UptimeRobot for `/health`
 
-```bash
-# Docker
-docker-compose logs -f api
+## SSL/TLS
 
-# Systemd
-journalctl -u vibechain-api -f
-```
-
-### Recommended Monitoring Stack
-
-- **Logs**: ELK Stack or Loki
-- **Metrics**: Prometheus + Grafana
-- **Error Tracking**: Sentry
-- **Uptime**: UptimeRobot or Pingdom
-
-## SSL/TLS Configuration
-
-Use a reverse proxy (nginx, Caddy, Traefik) for SSL termination:
+Terminate TLS at a reverse proxy. Example nginx:
 
 ```nginx
 server {
@@ -178,48 +162,37 @@ server {
 }
 ```
 
-## Rollback Procedures
+## Rollback
 
-### API Rollback
+### API
 
-```bash
-# Docker
-docker-compose pull api
-docker-compose up -d api
+Redeploy the previous image or git SHA, then `pnpm build &&` restart the process.
 
-# Manual
-git checkout <previous-tag>
-pnpm install && pnpm build
-pm2 restart api
-```
+### Database
 
-### Database Rollback
+Prefer a forward fix migration. `prisma migrate reset` destroys data — do not use it in production.
 
-```bash
-# Revert last migration
-npx prisma migrate reset --skip-seed
-```
+### Programs
 
-### Contract Rollback
-
-Smart contracts are immutable. Deploy new versions and update frontend configuration.
+Programs are immutable except via upgrade authority. Deploy a new version or upgrade with the deployer keypair, then update frontend program IDs.
 
 ## Troubleshooting
 
-### Database Connection Issues
+### Database connection
 
-1. Verify `DATABASE_URL` format: `postgresql://user:password@host:port/database`
-2. Check network connectivity
-3. Verify connection pool settings
+1. Check `DATABASE_URL`: `postgresql://user:password@host:port/database`
+2. Confirm pgvector is available if embeddings are used
+3. Check connection pool size
 
-### Contract Verification Failed
+### Program deploy failed
 
-1. Ensure `POLYGONSCAN_API_KEY` is valid
-2. Wait 30-60 seconds after deployment
-3. Verify compiler settings match
+1. `solana balance` — deployer needs SOL (devnet: `solana airdrop 2`)
+2. `declare_id!` must match the keypair in `target/deploy/*-keypair.json`
+3. RPC rate limits — use a dedicated provider
 
-### Frontend Build Errors
+### Frontend build
 
-1. Clear `.next` cache: `rm -rf .next`
-2. Verify all environment variables are set
-3. Check for TypeScript errors: `pnpm tsc --noEmit`
+1. Clear `.next`
+2. Set `NEXT_PUBLIC_API_URL` and Solana public env vars
+3. `pnpm --filter @vibechain/shared build` first
+4. `pnpm tsc --noEmit`

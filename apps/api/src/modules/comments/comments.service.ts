@@ -35,6 +35,10 @@ export class CommentsService {
       throw new NotFoundException("Video not found");
     }
 
+    if (video.status !== "APPROVED") {
+      throw new ForbiddenException("Comments are disabled until the video is approved");
+    }
+
     // If parentId provided, verify parent comment exists and belongs to same video
     if (dto.parentId) {
       const parentComment = await this.prisma.comment.findUnique({

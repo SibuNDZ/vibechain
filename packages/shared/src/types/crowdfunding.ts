@@ -49,5 +49,5 @@ export interface CreateCampaignInput {
 
 export interface RecordContributionInput {
   amount: number;
-  txHash: string;
+  txSignature: string;
 }

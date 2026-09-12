@@ -5,6 +5,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function campaignAmount(value: number | string | null | undefined): number {
+  const n = typeof value === "number" ? value : parseFloat(String(value ?? ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function campaignEndDate(campaign: {
+  endDate?: string;
+  deadline?: string;
+}): string {
+  return campaign.endDate || campaign.deadline || "";
+}
+
 export function formatAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }

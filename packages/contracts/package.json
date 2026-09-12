@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "anchor build",
+    "build": "node -e \"process.exit(0)\"",
+    "compile": "anchor build",
+    "build:programs": "anchor build",
     "test": "anchor test",
     "deploy:devnet": "anchor deploy --provider.cluster devnet",
     "deploy:mainnet": "anchor deploy --provider.cluster mainnet",

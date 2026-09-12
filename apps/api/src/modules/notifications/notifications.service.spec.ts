@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
 import { PrismaService } from '../../database/prisma.service';
+import { ConfigService } from '@nestjs/config';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 
@@ -17,6 +18,13 @@ describe('NotificationsService', () => {
         {
           provide: PrismaService,
           useValue: prisma,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: (key: string) =>
+              key === 'ADMIN_USER_IDS' ? 'admin-1,admin-2' : undefined,
+          },
         },
       ],
     }).compile();
@@ -98,6 +106,48 @@ describe('NotificationsService', () => {
       await service.notifyMention('user-1', 'user-1', 'video-1', 'comment-1');
 
       expect(prisma.notification.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('notifyAdminsOfUpload', () => {
+    it('notifies each configured admin except the uploader', async () => {
+      prisma.notification.create.mockResolvedValue({} as any);
+
+      await service.notifyAdminsOfUpload('uploader-1', 'video-1');
+
+      expect(prisma.notification.create).toHaveBeenCalledTimes(2);
+      expect(prisma.notification.create).toHaveBeenCalledWith({
+        data: {
+          type: 'VIDEO_SUBMITTED',
+          actorId: 'uploader-1',
+          recipientId: 'admin-1',
+          videoId: 'video-1',
+        },
+      });
+      expect(prisma.notification.create).toHaveBeenCalledWith({
+        data: {
+          type: 'VIDEO_SUBMITTED',
+          actorId: 'uploader-1',
+          recipientId: 'admin-2',
+          videoId: 'video-1',
+        },
+      });
+    });
+
+    it('does not notify the uploader when they are also an admin', async () => {
+      prisma.notification.create.mockResolvedValue({} as any);
+
+      await service.notifyAdminsOfUpload('admin-1', 'video-1');
+
+      expect(prisma.notification.create).toHaveBeenCalledTimes(1);
+      expect(prisma.notification.create).toHaveBeenCalledWith({
+        data: {
+          type: 'VIDEO_SUBMITTED',
+          actorId: 'admin-1',
+          recipientId: 'admin-2',
+          videoId: 'video-1',
+        },
+      });
     });
   });
 

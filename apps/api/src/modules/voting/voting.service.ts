@@ -26,6 +26,10 @@ export class VotingService {
         throw new NotFoundException("Video not found");
       }
 
+      if (video.status !== "APPROVED") {
+        throw new NotFoundException("Video not found");
+      }
+
       const existingVote = await this.prisma.vote.findUnique({
         where: {
           userId_videoId: { userId, videoId },

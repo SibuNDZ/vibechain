@@ -202,19 +202,23 @@ export interface TrendingTag {
 export interface Campaign {
   id: string;
   videoId: string;
-  goalAmount: number;
-  raisedAmount: number;
+  goalAmount: number | string;
+  raisedAmount: number | string;
   status: "ACTIVE" | "SUCCESSFUL" | "FAILED" | "CANCELLED";
-  deadline: string;
+  endDate: string;
+  deadline?: string;
+  contractAddress: string | null;
   contractCampaignId: number | null;
   createdAt: string;
   video: {
     id: string;
     title: string;
+    description?: string | null;
     thumbnailUrl: string | null;
     user: {
       id: string;
       username: string;
+      avatarUrl?: string | null;
     };
   };
   _count: {
@@ -286,7 +290,10 @@ export type AppNotificationType =
   | "COMMENT"
   | "MENTION"
   | "VOTE_MILESTONE"
-  | "CONTRIBUTION";
+  | "CONTRIBUTION"
+  | "VIDEO_SUBMITTED"
+  | "VIDEO_APPROVED"
+  | "VIDEO_REJECTED";
 
 export interface AppNotification {
   id: string;

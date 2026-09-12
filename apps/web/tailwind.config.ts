@@ -8,7 +8,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ["var(--font-bebas)", "sans-serif"],
+        barlow: ["var(--font-barlow)", "sans-serif"],
+      },
       colors: {
+        landing: {
+          bg: "var(--landing-bg)",
+          surface: "var(--landing-surface)",
+          raised: "var(--landing-raised)",
+          accent: "var(--landing-accent)",
+          ink: "var(--landing-ink)",
+          muted: "var(--landing-muted)",
+        },
         primary: {
           50: "#f0f9ff",
           100: "#e0f2fe",
@@ -35,6 +47,15 @@ const config: Config = {
           900: "#701a75",
           950: "#4a044e",
         },
+      },
+      boxShadow: {
+        "landing-glow": "0 0 40px var(--landing-glow)",
+      },
+      backgroundImage: {
+        "landing-cta":
+          "linear-gradient(135deg, var(--landing-gradient-from), var(--landing-gradient-to))",
+        "landing-wash":
+          "radial-gradient(ellipse at 50% 0%, oklch(0.51 0.22 277 / 0.22), transparent 58%)",
       },
     },
   },

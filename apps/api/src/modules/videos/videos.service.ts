@@ -1,19 +1,32 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../database/prisma.service";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
 import { VideoGenre } from "@prisma/client";
 import { handleDatabaseError } from "../../common/exceptions/database.exceptions";
 import { AnalyticsService } from "../../common/analytics/analytics.service";
 import { UploadService } from "../upload/upload.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { mergeTagCandidates } from "../../common/tags/tag-parser";
+import { isAdminUser } from "../../common/admin/admin-ids";
 
 @Injectable()
 export class VideosService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly analyticsService: AnalyticsService,
-    private readonly uploadService: UploadService
+    private readonly uploadService: UploadService,
+    private readonly notificationsService: NotificationsService,
+    private readonly configService: ConfigService
   ) {}
+
+  isAdmin(userId?: string) {
+    return isAdminUser(
+      userId,
+      this.configService.get<string>("ADMIN_USER_IDS"),
+      this.configService.get<string>("NODE_ENV")
+    );
+  }
 
   private withStreamingUrl<T extends { cloudinaryPublicId?: string | null }>(
     video: T
@@ -39,13 +52,15 @@ export class VideosService {
       const video = await this.prisma.video.create({
         data: {
           ...videoData,
-          status: "APPROVED",
+          status: "PENDING",
           userId,
         },
       });
 
       const tagNames = mergeTagCandidates(videoData.description, explicitTags);
       await this.syncVideoTags(video.id, tagNames);
+
+      void this.notificationsService.notifyAdminsOfUpload(userId, video.id);
 
       void this.analyticsService.track({
         event: "video_upload",
@@ -157,7 +172,7 @@ export class VideosService {
     }
   }
 
-  async findById(id: string) {
+  async findById(id: string, viewerId?: string) {
     try {
       const video = await this.prisma.video.findUnique({
         where: { id },
@@ -175,9 +190,94 @@ export class VideosService {
         throw new NotFoundException("Video not found");
       }
 
+      if (video.status !== "APPROVED") {
+        const isOwner = !!viewerId && video.userId === viewerId;
+        const admin = !!viewerId && this.isAdmin(viewerId);
+        if (!isOwner && !admin) {
+          throw new NotFoundException("Video not found");
+        }
+      }
+
       return this.withStreamingUrl(video);
     } catch (error) {
       handleDatabaseError(error, "VideosService.findById");
+    }
+  }
+
+  async findPending(page = 1, limit = 20) {
+    try {
+      const skip = (page - 1) * limit;
+      const where = { status: "PENDING" as const };
+
+      const [videos, total] = await Promise.all([
+        this.prisma.video.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { createdAt: "asc" },
+          include: {
+            user: {
+              select: { id: true, username: true, avatarUrl: true },
+            },
+            _count: { select: { votes: true } },
+          },
+        }),
+        this.prisma.video.count({ where }),
+      ]);
+
+      return {
+        data: videos.map((video) => this.withStreamingUrl(video)),
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      handleDatabaseError(error, "VideosService.findPending");
+    }
+  }
+
+  async review(id: string, adminId: string, approve: boolean) {
+    try {
+      const video = await this.prisma.video.findUnique({ where: { id } });
+
+      if (!video) {
+        throw new NotFoundException("Video not found");
+      }
+
+      if (video.status !== "PENDING") {
+        throw new BadRequestException("Video is not awaiting review");
+      }
+
+      const updated = await this.prisma.video.update({
+        where: { id },
+        data: { status: approve ? "APPROVED" : "REJECTED" },
+        include: {
+          user: {
+            select: { id: true, username: true, avatarUrl: true },
+          },
+          _count: { select: { votes: true } },
+        },
+      });
+
+      void this.notificationsService.notifyVideoReviewed(
+        adminId,
+        video.userId,
+        video.id,
+        approve
+      );
+
+      void this.analyticsService.track({
+        event: approve ? "video_approved" : "video_rejected",
+        user_id: adminId,
+        video_id: video.id,
+      });
+
+      return this.withStreamingUrl(updated);
+    } catch (error) {
+      handleDatabaseError(error, "VideosService.review");
     }
   }
 

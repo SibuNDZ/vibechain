@@ -6,6 +6,17 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 5, 5, 5;
   --background-end-rgb: 5, 5, 5;
+
+  /* Landing palette from #0a0a1a, #141432, #1e1e5a, #4f46e5 */
+  --landing-bg: oklch(0.13 0.035 285);
+  --landing-surface: oklch(0.2 0.055 285);
+  --landing-raised: oklch(0.28 0.09 280);
+  --landing-accent: oklch(0.51 0.22 277);
+  --landing-ink: oklch(0.97 0.012 285);
+  --landing-muted: oklch(0.78 0.03 285);
+  --landing-glow: oklch(0.51 0.22 277 / 0.45);
+  --landing-gradient-from: oklch(0.51 0.22 277);
+  --landing-gradient-to: oklch(0.42 0.18 290);
 }
 
 body {

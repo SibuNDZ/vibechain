@@ -15,6 +15,7 @@ import { VideosService } from "./videos.service";
 import { VideoGenre } from "@prisma/client";
 import { CreateVideoDto, UpdateVideoDto } from "./dto/video.dto";
 import { AdminGuard } from "../../common/guards/admin.guard";
+import { OptionalJwtAuthGuard } from "../../common/guards/optional-jwt-auth.guard";
 
 @ApiTags("videos")
 @Controller("videos")
@@ -64,6 +65,20 @@ export class VideosController {
     return this.videosService.findByUser(req.user.userId);
   }
 
+  @Get("admin/pending")
+  @UseGuards(AuthGuard("jwt"), AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "List videos awaiting review (admin only)" })
+  async findPending(
+    @Query("page") page?: string,
+    @Query("limit") limit?: string
+  ) {
+    return this.videosService.findPending(
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 20
+    );
+  }
+
   @Post("admin/regenerate-thumbnails")
   @UseGuards(AuthGuard("jwt"), AdminGuard)
   @ApiBearerAuth()
@@ -72,10 +87,36 @@ export class VideosController {
     return this.videosService.regenerateThumbnails(force === "true");
   }
 
+  @Post(":id/approve")
+  @UseGuards(AuthGuard("jwt"), AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Approve a pending video (admin only)" })
+  async approve(
+    @Param("id") id: string,
+    @Request() req: { user: { userId: string } }
+  ) {
+    return this.videosService.review(id, req.user.userId, true);
+  }
+
+  @Post(":id/reject")
+  @UseGuards(AuthGuard("jwt"), AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Reject a pending video (admin only)" })
+  async reject(
+    @Param("id") id: string,
+    @Request() req: { user: { userId: string } }
+  ) {
+    return this.videosService.review(id, req.user.userId, false);
+  }
+
   @Get(":id")
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: "Get video by ID" })
-  async findOne(@Param("id") id: string) {
-    return this.videosService.findById(id);
+  async findOne(
+    @Param("id") id: string,
+    @Request() req: { user?: { userId?: string } }
+  ) {
+    return this.videosService.findById(id, req.user?.userId);
   }
 
   @Patch(":id")

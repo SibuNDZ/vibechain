@@ -20,6 +20,12 @@ function notificationText(n: AppNotification): string {
       return `${n.video?.title ?? "Your video"} hit ${n.metadata?.milestone ?? ""} votes`;
     case "CONTRIBUTION":
       return `${n.actor.username} contributed to ${n.campaign?.video.title ?? "your campaign"}`;
+    case "VIDEO_SUBMITTED":
+      return `${n.actor.username} submitted ${n.video?.title ?? "a video"} for review`;
+    case "VIDEO_APPROVED":
+      return `${n.video?.title ?? "Your video"} is now live`;
+    case "VIDEO_REJECTED":
+      return `${n.video?.title ?? "Your video"} was not approved`;
     default:
       return "New notification";
   }
@@ -31,9 +37,13 @@ function notificationHref(n: AppNotification): string {
       return `/users/${n.actor.id}`;
     case "CONTRIBUTION":
       return n.campaign ? `/videos/${n.campaign.video.id}` : "#";
+    case "VIDEO_SUBMITTED":
+      return n.video ? `/admin/reviews` : "/admin/reviews";
     case "COMMENT":
     case "MENTION":
     case "VOTE_MILESTONE":
+    case "VIDEO_APPROVED":
+    case "VIDEO_REJECTED":
     default:
       return n.video ? `/videos/${n.video.id}` : "#";
   }

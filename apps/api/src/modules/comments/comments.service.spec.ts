@@ -15,6 +15,7 @@ describe('CommentsService', () => {
     id: 'video-1',
     userId: 'owner-1',
     title: 'Test Video',
+    status: 'APPROVED',
   };
 
   const mockComment = {

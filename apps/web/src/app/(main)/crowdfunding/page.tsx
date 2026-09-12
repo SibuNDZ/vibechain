@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CampaignCard } from "@/components/crowdfunding/CampaignCard";
 import { CampaignCardSkeleton } from "@/components/ui/Skeleton";
 import { api, Campaign, PaginatedResponse } from "@/lib/api";
+import { campaignAmount, campaignEndDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 export default function CrowdfundingPage() {
@@ -91,10 +92,10 @@ export default function CrowdfundingPage() {
                 thumbnailUrl={
                   campaign.video.thumbnailUrl || "/placeholder-campaign.jpg"
                 }
-                goalAmount={campaign.goalAmount}
-                raisedAmount={campaign.raisedAmount}
+                goalAmount={campaignAmount(campaign.goalAmount)}
+                raisedAmount={campaignAmount(campaign.raisedAmount)}
                 backerCount={campaign._count.contributions}
-                daysLeft={calculateDaysLeft(campaign.deadline)}
+                daysLeft={calculateDaysLeft(campaignEndDate(campaign))}
               />
             ))}
           </div>

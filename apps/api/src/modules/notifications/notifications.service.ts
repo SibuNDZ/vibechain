@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { NotificationType } from "@prisma/client";
 import { PrismaService } from "../../database/prisma.service";
+import { parseAdminUserIds } from "../../common/admin/admin-ids";
 
 const VOTE_MILESTONES = [10, 50, 100, 500, 1000];
 
@@ -16,7 +18,10 @@ interface CreateNotificationInput {
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService
+  ) {}
 
   /** Never notify a user about their own action -- enforced here so no caller can bypass it. */
   private async create(data: CreateNotificationInput) {
@@ -61,6 +66,36 @@ export class NotificationsService {
       recipientId,
       videoId,
       commentId,
+    });
+  }
+
+  async notifyAdminsOfUpload(actorId: string, videoId: string) {
+    const adminIds = parseAdminUserIds(
+      this.configService.get<string>("ADMIN_USER_IDS")
+    );
+    await Promise.all(
+      adminIds.map((recipientId) =>
+        this.create({
+          type: "VIDEO_SUBMITTED",
+          actorId,
+          recipientId,
+          videoId,
+        })
+      )
+    );
+  }
+
+  async notifyVideoReviewed(
+    actorId: string,
+    recipientId: string,
+    videoId: string,
+    approved: boolean
+  ) {
+    return this.create({
+      type: approved ? "VIDEO_APPROVED" : "VIDEO_REJECTED",
+      actorId,
+      recipientId,
+      videoId,
     });
   }
 

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Heart, Calendar, Eye } from "lucide-react";
+import { ArrowLeft, Heart, Calendar, Clock, ShieldCheck, XCircle } from "lucide-react";
+import toast from "react-hot-toast";
 import { api, Video, FollowCounts } from "@/lib/api";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VoteButton } from "@/components/voting/VoteButton";
@@ -66,6 +67,8 @@ export default function VideoDetailPage() {
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [followCounts, setFollowCounts] = useState<FollowCounts | null>(null);
   const [showFollowers, setShowFollowers] = useState<"followers" | "following" | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
 
   useEffect(() => {
     // Check authentication
@@ -79,6 +82,13 @@ export default function VideoDetailPage() {
       } catch {
         // Ignore parse errors
       }
+    }
+
+    if (token) {
+      api
+        .get("/videos/admin/pending", { params: { limit: "1" } })
+        .then(() => setIsAdmin(true))
+        .catch(() => setIsAdmin(false));
     }
 
     fetchVideo();
@@ -102,6 +112,23 @@ export default function VideoDetailPage() {
 
   const handleVote = async () => {
     await api.post(`/videos/${videoId}/vote`);
+  };
+
+  const handleReview = async (approve: boolean) => {
+    setIsReviewing(true);
+    try {
+      const updated = await api.post<VideoDetail>(
+        `/videos/${videoId}/${approve ? "approve" : "reject"}`
+      );
+      setVideo(updated);
+      toast.success(approve ? "Video is now live" : "Video rejected");
+    } catch (err: unknown) {
+      const message =
+        (err as { message?: string }).message || "Failed to review video";
+      toast.error(message);
+    } finally {
+      setIsReviewing(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -182,6 +209,50 @@ export default function VideoDetailPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Video and details */}
           <div className="lg:col-span-2 space-y-6">
+            {video.status === "PENDING" && (
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-100">
+                <Clock className="w-5 h-5 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Video under review</p>
+                  <p className="text-sm text-amber-100/80">
+                    This upload is waiting for a platform admin. It is not public yet.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {video.status === "REJECTED" && (
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-100">
+                <XCircle className="w-5 h-5 mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold">This video was not approved</p>
+                  <p className="text-sm text-red-100/80">
+                    It remains visible only to you.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {isAdmin && video.status === "PENDING" && (
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleReview(true)}
+                  disabled={isReviewing}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 vc-primary-button rounded-lg font-semibold disabled:opacity-50"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  Approve and publish
+                </button>
+                <button
+                  onClick={() => handleReview(false)}
+                  disabled={isReviewing}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+
             {/* Video player */}
             <div className="aspect-video bg-black rounded-xl overflow-hidden">
               <VideoPlayer
@@ -204,14 +275,15 @@ export default function VideoDetailPage() {
                 </span>
               </div>
 
-              {/* Vote button */}
-              <div className="mb-6">
-                <VoteButton
-                  videoId={video.id}
-                  initialVotes={video._count.votes}
-                  onVote={handleVote}
-                />
-              </div>
+              {video.status === "APPROVED" && (
+                <div className="mb-6">
+                  <VoteButton
+                    videoId={video.id}
+                    initialVotes={video._count.votes}
+                    onVote={handleVote}
+                  />
+                </div>
+              )}
 
               {/* Description */}
               {video.description && (
@@ -223,13 +295,14 @@ export default function VideoDetailPage() {
               )}
             </div>
 
-            {/* Comments section */}
-            <CommentSection
-              videoId={video.id}
-              isAuthenticated={isAuthenticated}
-              currentUserId={currentUserId}
-              videoOwner={video.user}
-            />
+            {video.status === "APPROVED" && (
+              <CommentSection
+                videoId={video.id}
+                isAuthenticated={isAuthenticated}
+                currentUserId={currentUserId}
+                videoOwner={video.user}
+              />
+            )}
           </div>
 
           {/* Sidebar - Artist info */}

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, Video, Settings, LogOut, ChevronDown, BarChart3, Upload } from "lucide-react";
+import { User, Video, Settings, LogOut, ChevronDown, BarChart3, Upload, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface UserDropdownProps {
@@ -100,14 +100,24 @@ export function UserDropdown({ user, onLogout, isAdmin = false }: UserDropdownPr
           </Link>
 
           {isAdmin && (
-            <Link
-              href="/admin/insights"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
-            >
-              <BarChart3 className="w-4 h-4" />
-              Admin Insights
-            </Link>
+            <>
+              <Link
+                href="/admin/reviews"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Review queue
+              </Link>
+              <Link
+                href="/admin/insights"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Admin Insights
+              </Link>
+            </>
           )}
 
           <div className="border-t border-white/10 mt-2 pt-2">

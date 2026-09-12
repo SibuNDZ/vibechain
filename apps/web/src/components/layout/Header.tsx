@@ -113,8 +113,12 @@ export function Header() {
     router.push("/");
   };
 
-  // Don't show header on auth pages
-  if (pathname?.startsWith("/login") || pathname?.startsWith("/register")) {
+  if (
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/register") ||
+    pathname === "/about" ||
+    (pathname === "/" && !user)
+  ) {
     return null;
   }
 
@@ -258,13 +262,22 @@ export function Header() {
                 Settings
               </Link>
               {isAdmin && (
-                <Link
-                  href="/admin/insights"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  Admin Insights
-                </Link>
+                <>
+                  <Link
+                    href="/admin/reviews"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Review queue
+                  </Link>
+                  <Link
+                    href="/admin/insights"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Admin Insights
+                  </Link>
+                </>
               )}
               <div className="h-px bg-white/10 my-2" />
               <button

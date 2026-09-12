@@ -2,13 +2,14 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [master, main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [master, main, develop]
 
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '9'
+  ANCHOR_VERSION: '0.30.1'
 
 jobs:
   lint:
@@ -107,10 +108,32 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            packages/contracts/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('packages/contracts/**/Cargo.lock') }}
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install Anchor CLI
+        run: cargo install --git https://github.com/coral-xyz/anchor avm --locked --force && avm install ${{ env.ANCHOR_VERSION }} && avm use ${{ env.ANCHOR_VERSION }}
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Compile contracts
+      - name: Build programs
         run: pnpm --filter @vibechain/contracts compile
 
       - name: Run contract tests
@@ -168,4 +191,4 @@ jobs:
         env:
           DATABASE_URL: postgresql://localhost:5432/vibechain
           NEXT_PUBLIC_API_URL: http://localhost:3001
-          NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_SOLANA_NETWORK: devnet

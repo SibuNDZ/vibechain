@@ -20,7 +20,7 @@ const statusMap: Record<Video["status"], StatusInfo> = {
     className: "bg-green-100 text-green-700 border border-green-200",
   },
   PENDING: {
-    label: "Pending",
+    label: "Under review",
     className: "bg-amber-100 text-amber-700 border border-amber-200",
   },
   REJECTED: {
@@ -95,7 +95,7 @@ export default function MyUploadsPage() {
           <div>
             <h1 className="text-3xl font-bold text-white">My Uploads</h1>
             <p className="text-white/50 mt-1">
-              Pending uploads are visible only to you.
+              Videos under review are visible only to you until an admin approves them.
             </p>
           </div>
           <Link
@@ -124,7 +124,7 @@ export default function MyUploadsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {uploads.map((video) => {
-              const status = statusMap[video.status];
+              const status = statusMap[video.status] ?? statusMap.PENDING;
               return (
                 <Link key={video.id} href={`/videos/${video.id}`} className="group">
                   <div className="relative aspect-video rounded-lg overflow-hidden bg-white/10">

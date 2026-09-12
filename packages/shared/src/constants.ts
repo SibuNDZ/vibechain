@@ -62,5 +62,6 @@ export const API_ROUTES = {
     CAMPAIGNS: "/crowdfunding/campaigns",
     BY_ID: (id: string) => `/crowdfunding/campaigns/${id}`,
     CONTRIBUTE: (id: string) => `/crowdfunding/campaigns/${id}/contribute`,
+    CONTRIBUTIONS: (id: string) => `/crowdfunding/campaigns/${id}/contributions`,
   },
 } as const;

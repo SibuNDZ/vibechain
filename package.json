@@ -11,8 +11,8 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "db:migrate": "pnpm --filter api run db:migrate",
     "db:seed": "pnpm --filter api run db:seed",
-    "contracts:compile": "pnpm --filter contracts run compile",
-    "contracts:deploy": "pnpm --filter contracts run deploy"
+    "contracts:compile": "pnpm --filter @vibechain/contracts compile",
+    "contracts:deploy": "pnpm --filter @vibechain/contracts deploy:devnet"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

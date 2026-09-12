@@ -11,25 +11,25 @@
                      │                       │                       │
                      ▼                       ▼                       ▼
             ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
-            │  Next.js Web   │     │  RainbowKit    │     │    Polygon     │
-            │  (Frontend)    │────▶│  (Wallet UI)   │────▶│   Blockchain   │
+            │  Next.js Web   │     │ Wallet Adapter │     │     Solana     │
+            │  (Frontend)    │────▶│ Phantom/Solflare│────▶│  (devnet/main) │
             └───────┬────────┘     └────────────────┘     └───────┬────────┘
                     │                                             │
                     │ REST API                                    │ JSON-RPC
                     ▼                                             │
             ┌────────────────┐                                    │
             │  NestJS API    │◀───────────────────────────────────┘
-            │  (Backend)     │           Events/Queries
+            │  (Backend)     │           Wallet nonce verify
             └───────┬────────┘
                     │
-        ┌───────────┴───────────┐
-        │                       │
-        ▼                       ▼
-┌────────────────┐     ┌────────────────┐
-│  PostgreSQL    │     │     Redis      │
-│  (Database)    │     │   (Cache)      │
-└────────────────┘     └────────────────┘
+                    ▼
+            ┌────────────────┐
+            │  PostgreSQL    │
+            │  + pgvector    │
+            └────────────────┘
 ```
+
+Redis appears in `docker-compose.yml` for local infra but the API does not use it.
 
 ## Package Structure
 
@@ -38,254 +38,137 @@
 ```
 vibechain/
 ├── apps/
-│   ├── api/                 # NestJS Backend
-│   └── web/                 # Next.js Frontend
+│   ├── api/                 # NestJS backend
+│   └── web/                 # Next.js frontend
 ├── packages/
 │   ├── shared/              # Shared TypeScript types
-│   └── contracts/           # Solidity smart contracts
-├── docs/                    # Documentation
-├── .github/workflows/       # CI/CD pipelines
-├── docker-compose.yml       # Local development
-├── turbo.json               # Turborepo configuration
-└── pnpm-workspace.yaml      # pnpm workspace config
+│   └── contracts/           # Anchor programs (Rust)
+├── docs/
+├── .github/workflows/
+├── docker-compose.yml
+├── turbo.json
+└── pnpm-workspace.yaml
 ```
 
-### API Structure (apps/api)
+### API Structure (`apps/api`)
 
 ```
 src/
-├── main.ts                     # Application entry point
-├── app.module.ts               # Root module
+├── main.ts
+├── app.module.ts
 ├── config/
-│   ├── configuration.ts        # Typed configuration
-│   └── env.validation.ts       # Environment validation
 ├── database/
-│   ├── database.module.ts      # Prisma module
-│   └── prisma.service.ts       # Prisma client wrapper
 ├── health/
-│   ├── health.module.ts        # Health check module
-│   ├── health.controller.ts    # Health endpoints
-│   └── prisma.health.ts        # Database health indicator
-├── common/
-│   ├── filters/
-│   │   └── http-exception.filter.ts   # Global error handling
-│   ├── middleware/
-│   │   └── logging.middleware.ts      # Request logging
-│   └── exceptions/
-│       └── business.exceptions.ts     # Custom exceptions
+├── common/                  # filters, username, mentions, email, analytics
 └── modules/
-    ├── auth/                   # Authentication
-    │   ├── auth.controller.ts
-    │   ├── auth.service.ts
-    │   ├── auth.module.ts
-    │   ├── jwt.strategy.ts
-    │   └── dto/auth.dto.ts
-    ├── users/                  # User management
-    │   ├── users.controller.ts
-    │   ├── users.service.ts
-    │   └── users.module.ts
-    ├── videos/                 # Video CRUD
-    │   ├── videos.controller.ts
-    │   ├── videos.service.ts
-    │   ├── videos.module.ts
-    │   └── dto/video.dto.ts
-    ├── voting/                 # Vote tracking
-    │   ├── voting.controller.ts
-    │   ├── voting.service.ts
-    │   └── voting.module.ts
-    └── crowdfunding/           # Campaign management
-        ├── crowdfunding.controller.ts
-        ├── crowdfunding.service.ts
-        ├── crowdfunding.module.ts
-        └── dto/crowdfunding.dto.ts
+    ├── auth/
+    ├── users/
+    ├── videos/
+    ├── voting/              # Off-chain votes
+    ├── crowdfunding/        # Campaign + contribution records
+    ├── comments/
+    ├── follows/
+    ├── notifications/
+    ├── tags/
+    ├── ai/
+    ├── messages/
+    ├── upload/              # Cloudinary signatures
+    └── analytics/
 ```
 
-### Frontend Structure (apps/web)
+### Frontend Structure (`apps/web`)
 
 ```
 src/
-├── app/                        # Next.js App Router
-│   ├── layout.tsx              # Root layout
-│   ├── page.tsx                # Home page
-│   ├── (auth)/                 # Auth routes group
-│   │   ├── login/page.tsx
-│   │   └── register/page.tsx
-│   └── (main)/                 # Main routes group
-│       ├── videos/page.tsx
-│       ├── videos/[id]/page.tsx
-│       └── crowdfunding/page.tsx
+├── app/                     # App Router pages
+│   ├── page.tsx             # Marketing landing
+│   ├── (auth)/              # login, register, forgot/reset password
+│   └── (main)/              # videos, upload, crowdfunding, messages, settings
 ├── components/
-│   ├── video/
-│   │   ├── VideoCard.tsx
-│   │   └── VideoPlayer.tsx
-│   ├── voting/
-│   │   └── VoteButton.tsx
-│   └── crowdfunding/
-│       ├── CampaignCard.tsx
-│       └── FundButton.tsx
 ├── hooks/
-│   └── useAuth.ts              # Authentication hook
 ├── lib/
-│   ├── api.ts                  # API client
-│   ├── wagmi.ts                # Web3 configuration
-│   └── utils.ts                # Utilities
-├── providers/
-│   └── index.tsx               # Provider wrapper
-└── test/
-    └── setup.ts                # Test configuration
+│   ├── api.ts
+│   ├── solana.ts            # cluster, RPC, wallet list
+│   └── utils.ts
+└── providers/               # Connection + Wallet + React Query
 ```
 
-### Smart Contracts (packages/contracts)
+### Smart Contracts (`packages/contracts`)
 
 ```
-contracts/
-├── VibeCrowdfunding.sol        # Crowdfunding logic
-└── VibeVoting.sol              # Voting rounds
-test/
-├── VibeCrowdfunding.test.ts
-└── VibeVoting.test.ts
-scripts/
-└── deploy.ts                   # Deployment script
+programs/
+├── vibe-crowdfunding/src/lib.rs
+└── vibe-voting/src/lib.rs
+tests/
+├── crowdfunding.test.ts
+└── voting.test.ts
+Anchor.toml
 ```
+
+Devnet program IDs live in `packages/shared/src/constants.ts`. Placeholder Anchor IDs ship until a real deploy replaces them.
 
 ## Data Flow
 
-### Authentication Flow
+### Authentication
 
-```
-┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐
-│ Browser │────▶│ Next.js │────▶│ NestJS  │────▶│ Prisma  │
-└─────────┘     └─────────┘     └─────────┘     └─────────┘
-     │               │               │               │
-     │  1. Submit    │  2. POST      │  3. Verify    │
-     │     creds     │    /auth      │     + hash    │
-     │               │               │               │
-     │               │◀──────────────│◀──────────────│
-     │◀──────────────│  4. JWT Token │  5. User data │
-     │               │               │               │
-```
+1. Email/password → bcrypt → JWT (7 days, localStorage)
+2. Wallet: `GET /auth/wallet/nonce` → wallet signs message (tweetnacl/bs58) → `POST /auth/wallet` → JWT
+3. Password reset uses single-use tokens and optional Resend email
 
-### Voting Flow
+### Voting
 
-```
-┌──────────┐     ┌──────────┐     ┌──────────┐
-│  User    │────▶│   API    │────▶│   DB     │
-└──────────┘     └──────────┘     └──────────┘
-     │                │                │
-     │ 1. Vote        │ 2. Check       │
-     │    (JWT)       │    duplicate   │
-     │                │                │
-     │                │ 3. Create      │
-     │                │    vote        │
-     │                │                │
-     │◀───────────────│◀───────────────│
-     │ 4. Updated     │                │
-     │    count       │                │
-```
+Votes are written to Postgres (`Vote` unique on userId + videoId). The Solana voting program is not called by the web app yet.
 
-### Crowdfunding Flow
+### Crowdfunding
 
-```
-┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
-│  User    │────▶│ RainbowKit│────▶│ Polygon  │────▶│   API    │
-└──────────┘     └──────────┘     └──────────┘     └──────────┘
-     │                │                │                │
-     │ 1. Connect     │ 2. Sign        │ 3. Tx hash     │
-     │    wallet      │    transaction │    confirmed   │
-     │                │                │                │
-     │                │                │ 4. Record      │
-     │                │                │    contribution│
-     │◀───────────────│◀───────────────│◀───────────────│
-     │ 5. Success     │                │                │
-     │    message     │                │                │
-```
+1. Campaign row is created in Postgres (`POST /crowdfunding/campaigns/:videoId`)
+2. User connects a Solana wallet and sends SOL to the campaign program/destination
+3. After confirmation, the client `POST`s `{ amount, txSignature }` to `/crowdfunding/campaigns/:id/contribute`
+4. API stores `Contribution.txHash` and increments `raisedAmount`
+
+Full Anchor `contribute` (vault PDA) requires an on-chain campaign account. Until that create flow is wired, the client records a confirmed transfer plus the API row.
 
 ## Security Measures
 
-### API Security
+### API
 
-- **Authentication**: JWT tokens (7-day expiry)
-- **Password Hashing**: bcrypt with salt rounds
-- **Wallet Auth**: ethers.js signature verification
-- **Rate Limiting**: 100 requests/minute per IP
-- **CORS**: Restricted to frontend origin
-- **Validation**: class-validator for all inputs
-- **Exception Filter**: Sanitized error responses
+- JWT bearer auth (7-day expiry)
+- bcrypt password hashing
+- Solana signature + nonce (replay-protected)
+- Rate limits: 100/min default, 10/min auth, 30/min AI
+- CORS from `FRONTEND_URL`
+- class-validator + helmet + sanitized exception filter
+- Username format, reserved names, change cooldown
 
-### Smart Contract Security
+### Programs
 
-- **Access Control**: OpenZeppelin Ownable
-- **Reentrancy Protection**: ReentrancyGuard on contribute()
-- **Input Validation**: Require statements for all inputs
-- **Platform Fee Cap**: Maximum 10% fee
+- Anchor account constraints and PDA seeds
+- Platform fee cap 10% (1000 bps)
+- Campaign duration cap 90 days
+- Contribute / claim / refund state checks
 
-## Database Schema
+## Database Schema (core)
 
-### Core Entities
-
-```
-User
-├── id (UUID)
-├── email
-├── username
-├── passwordHash
-├── walletAddress
-├── avatarUrl
-├── bio
-└── timestamps
-
-Video
-├── id (UUID)
-├── title
-├── description
-├── videoUrl
-├── thumbnailUrl
-├── status (PENDING|APPROVED|REJECTED)
-├── userId (FK)
-└── timestamps
-
-Vote
-├── id (UUID)
-├── userId (FK)
-├── videoId (FK)
-└── createdAt
-
-Campaign
-├── id (UUID)
-├── videoId (FK)
-├── goalAmount
-├── raisedAmount
-├── status (ACTIVE|SUCCESSFUL|FAILED|CANCELLED)
-├── endDate
-├── contractAddress
-└── timestamps
-
-Contribution
-├── id (UUID)
-├── campaignId (FK)
-├── userId (FK)
-├── amount
-├── txHash
-└── createdAt
-```
+User, UsernameHistory, Video (+ embedding vector 1536), Vote, Campaign, Contribution, Comment, CommentMention, Follow, Notification, Tag, VideoTag, AuthNonce, PasswordResetToken, ChatConversation, ChatMessage, DirectConversation, DirectMessage.
 
 ## Technology Stack
 
 | Layer | Technology |
 |-------|------------|
 | Frontend | Next.js 14, React 18, TailwindCSS |
-| Web3 | wagmi, viem, RainbowKit |
+| Wallets | @solana/wallet-adapter, Phantom, Solflare |
 | API | NestJS 10, TypeScript 5 |
-| Database | PostgreSQL 16, Prisma ORM |
-| Blockchain | Polygon, Solidity 0.8.24 |
-| Testing | Jest, Vitest, Hardhat |
-| CI/CD | GitHub Actions |
-| Container | Docker, Docker Compose |
+| Database | PostgreSQL 16, pgvector, Prisma |
+| Blockchain | Solana, Anchor 0.30, Rust |
+| Media | Cloudinary |
+| Testing | Jest, Vitest, Anchor/mocha |
+| CI/CD | GitHub Actions (`master`) |
+| Hosting | Railway (nixpacks) + Docker Compose |
 
-## Performance Considerations
+## Performance
 
-- **Database Indexes**: On frequently queried columns (email, walletAddress, videoId)
-- **Pagination**: All list endpoints support limit/offset
-- **Connection Pooling**: Prisma connection pool (2-10 connections)
-- **Rate Limiting**: Throttler module prevents abuse
-- **Static Assets**: Next.js optimized image loading
+- Indexes on email, wallet, video, campaign, notification inbox
+- Paginated list endpoints
+- Prisma connection pooling
+- Throttler on auth and AI
+- Next.js image optimization with host allowlist

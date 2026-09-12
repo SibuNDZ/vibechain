@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bebas_Neue, Barlow, Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import { Toaster } from "react-hot-toast";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -26,6 +26,16 @@ const PwaRegister = dynamic(
 );
 
 const inter = Inter({ subsets: ["latin"] });
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas",
+});
+const barlow = Barlow({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-barlow",
+});
 
 export const metadata: Metadata = {
   title: "VibeChain - Music Video Platform",
@@ -47,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${bebas.variable} ${barlow.variable}`}>
       <body className={inter.className}>
         <Providers>
           <Toaster

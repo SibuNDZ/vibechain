@@ -1,25 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import {
   SystemProgram,
   Transaction,
+  PublicKey,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import toast from "react-hot-toast";
+import { api, ApiError } from "@/lib/api";
+import { getCrowdfundingProgramId } from "@/lib/solana";
 
 interface FundButtonProps {
   campaignId: string;
-  programAddress: string;
+  programAddress?: string | null;
   minContribution?: number;
+  onFunded?: () => void;
 }
 
 function getErrorMessage(error: Error): string {
   const message = error.message.toLowerCase();
 
-  if (message.includes("user rejected") || message.includes("user denied") || message.includes("cancelled")) {
+  if (
+    message.includes("user rejected") ||
+    message.includes("user denied") ||
+    message.includes("cancelled")
+  ) {
     return "Transaction was rejected";
   }
   if (message.includes("insufficient") || message.includes("not enough")) {
@@ -27,6 +35,9 @@ function getErrorMessage(error: Error): string {
   }
   if (message.includes("blockhash")) {
     return "Transaction expired. Please try again.";
+  }
+  if (message.includes("invalid public key")) {
+    return "This campaign has no valid Solana destination yet";
   }
 
   return "Failed to send transaction. Please try again.";
@@ -36,6 +47,7 @@ export function FundButton({
   campaignId,
   programAddress,
   minContribution = 0.01,
+  onFunded,
 }: FundButtonProps) {
   const [amount, setAmount] = useState(minContribution.toString());
   const [isOpen, setIsOpen] = useState(false);
@@ -43,9 +55,16 @@ export function FundButton({
   const { connected, publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
 
+  const destination = getCrowdfundingProgramId(programAddress);
+
   const handleFund = async () => {
     if (!connected || !publicKey) {
       toast.error("Please connect your wallet first");
+      return;
+    }
+
+    if (!localStorage.getItem("vibechain_token")) {
+      toast.error("Please sign in to record your contribution");
       return;
     }
 
@@ -55,17 +74,23 @@ export function FundButton({
       return;
     }
 
+    let destinationKey: PublicKey;
+    try {
+      destinationKey = new PublicKey(destination);
+    } catch {
+      toast.error("This campaign has no valid Solana destination yet");
+      return;
+    }
+
     setIsPending(true);
 
     try {
       const lamports = Math.round(amountNum * LAMPORTS_PER_SOL);
 
-      // For now, send SOL directly to the program address
-      // In production, this would invoke the Anchor program's contribute instruction
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: new (await import("@solana/web3.js")).PublicKey(programAddress),
+          toPubkey: destinationKey,
           lamports,
         })
       );
@@ -73,11 +98,28 @@ export function FundButton({
       const signature = await sendTransaction(transaction, connection);
       await connection.confirmTransaction(signature, "confirmed");
 
+      try {
+        await api.post(`/crowdfunding/campaigns/${campaignId}/contribute`, {
+          amount: amountNum,
+          txSignature: signature,
+        });
+      } catch (err) {
+        const message =
+          err instanceof ApiError
+            ? err.message
+            : "Payment confirmed, but we could not record it. Contact support with your transaction signature.";
+        toast.error(message);
+        return;
+      }
+
       toast.success("Thank you for your contribution!");
       setIsOpen(false);
       setAmount(minContribution.toString());
+      onFunded?.();
     } catch (err) {
-      const message = getErrorMessage(err instanceof Error ? err : new Error(String(err)));
+      const message = getErrorMessage(
+        err instanceof Error ? err : new Error(String(err))
+      );
       toast.error(message);
     } finally {
       setIsPending(false);
@@ -86,12 +128,10 @@ export function FundButton({
 
   if (!connected) {
     return (
-      <button
-        disabled
-        className="w-full py-3 bg-white/5 text-white/30 rounded-lg cursor-not-allowed border border-white/10"
-      >
-        Connect Wallet to Fund
-      </button>
+      <div className="space-y-2">
+        <p className="text-center text-sm text-white/50">Connect Wallet to Fund</p>
+        <WalletMultiButton className="!w-full !justify-center" />
+      </div>
     );
   }
 

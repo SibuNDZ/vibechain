@@ -6,6 +6,8 @@ import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 import { AnalyticsService } from '../../common/analytics/analytics.service';
 import { UploadService } from '../upload/upload.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('VideosService', () => {
   let service: VideosService;
@@ -54,6 +56,19 @@ describe('VideosService', () => {
           provide: UploadService,
           useValue: {},
         },
+        {
+          provide: NotificationsService,
+          useValue: {
+            notifyAdminsOfUpload: jest.fn(),
+            notifyVideoReviewed: jest.fn(),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: (key: string) => (key === 'NODE_ENV' ? 'test' : ''),
+          },
+        },
       ],
     }).compile();
 
@@ -78,7 +93,7 @@ describe('VideosService', () => {
           description: 'Test description',
           videoUrl: 'https://example.com/video.mp4',
           duration: 120,
-          status: 'APPROVED',
+          status: 'PENDING',
           userId: 'user-123',
         },
       });
@@ -272,6 +287,51 @@ describe('VideosService', () => {
 
       await expect(service.findById('nonexistent')).rejects.toThrow(
         NotFoundException
+      );
+    });
+
+    it('hides pending videos from anonymous viewers', async () => {
+      prisma.video.findUnique.mockResolvedValue({
+        ...mockVideo,
+        status: 'PENDING',
+      } as any);
+
+      await expect(service.findById('video-123')).rejects.toThrow(
+        NotFoundException
+      );
+    });
+
+    it('lets the owner see a pending video', async () => {
+      prisma.video.findUnique.mockResolvedValue({
+        ...mockVideo,
+        status: 'PENDING',
+      } as any);
+
+      const result = await service.findById('video-123', 'user-123');
+
+      expect(result.id).toBe('video-123');
+    });
+  });
+
+  describe('review', () => {
+    it('approves a pending video', async () => {
+      prisma.video.findUnique.mockResolvedValue({
+        ...mockVideo,
+        status: 'PENDING',
+      } as any);
+      prisma.video.update.mockResolvedValue({
+        ...mockVideo,
+        status: 'APPROVED',
+      } as any);
+
+      const result = await service.review('video-123', 'admin-1', true);
+
+      expect(result.status).toBe('APPROVED');
+      expect(prisma.video.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'video-123' },
+          data: { status: 'APPROVED' },
+        })
       );
     });
   });
