@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LAUNCH_APP_HREF } from "./links";
 
 export function LandingCta() {
@@ -13,14 +14,12 @@ export function LandingCta() {
             Watch, vote, and fund with a public record. The crowd decides what
             gets made next.
           </p>
-          <a
+          <Link
             href={LAUNCH_APP_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-8 inline-flex rounded-xl bg-landing-cta px-8 py-3.5 text-base font-semibold text-landing-ink transition hover:shadow-landing-glow"
           >
             Launch App
-          </a>
+          </Link>
         </div>
       </div>
     </section>

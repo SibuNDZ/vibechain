@@ -72,14 +72,12 @@ export default function AboutPage() {
                 <li>Artists upload from the app. New videos stay under review until approved.</li>
                 <li>Support an active campaign from the crowdfunding board.</li>
               </ol>
-              <a
+              <Link
                 href={LAUNCH_APP_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="mt-8 inline-flex rounded-xl bg-landing-cta px-8 py-3.5 text-base font-semibold text-landing-ink transition hover:shadow-landing-glow"
               >
                 Launch App
-              </a>
+              </Link>
             </section>
           </FadeIn>
         </div>

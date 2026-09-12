@@ -34,14 +34,12 @@ export function LandingNav() {
               {link.label}
             </Link>
           ))}
-          <a
+          <Link
             href={LAUNCH_APP_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
             className="rounded-lg bg-landing-cta px-4 py-2 text-sm font-semibold text-landing-ink shadow-landing-glow/0 transition hover:shadow-landing-glow"
           >
             Launch App
-          </a>
+          </Link>
         </nav>
 
         <button
@@ -67,14 +65,13 @@ export function LandingNav() {
                 {link.label}
               </Link>
             ))}
-            <a
+            <Link
               href={LAUNCH_APP_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
               className="rounded-lg bg-landing-cta px-4 py-2 text-center text-sm font-semibold text-landing-ink"
             >
               Launch App
-            </a>
+            </Link>
           </nav>
         </div>
       )}

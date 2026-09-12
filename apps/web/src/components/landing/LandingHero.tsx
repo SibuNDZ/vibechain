@@ -17,14 +17,12 @@ export function LandingHero() {
             contribution recorded on Solana.
           </p>
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            <a
+            <Link
               href={LAUNCH_APP_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rounded-xl bg-landing-cta px-8 py-3.5 text-base font-semibold text-landing-ink transition hover:shadow-landing-glow"
             >
               Launch App
-            </a>
+            </Link>
             <Link
               href="/videos"
               className="text-sm font-medium text-landing-muted underline-offset-4 hover:text-landing-ink hover:underline"
