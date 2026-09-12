@@ -23,3 +23,4 @@ if (!fs.existsSync(path.join(dest, "server.js"))) {
 
 copyDir(path.join(webRoot, "public"), path.join(dest, "public"));
 copyDir(path.join(webRoot, ".next", "static"), path.join(dest, ".next", "static"));
+console.log(`Copied standalone assets next to ${path.join(dest, "server.js")}`);

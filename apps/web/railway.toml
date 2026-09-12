@@ -2,6 +2,6 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "node scripts/start.js"
-healthcheckPath = "/"
+startCommand = "node apps/web/scripts/start.js"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 300
